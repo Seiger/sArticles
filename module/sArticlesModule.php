@@ -231,11 +231,11 @@ switch ($data['get']) {
         }
         break;
     case "settingsSave":
-        if (request()->has('parent') && request()->parent != evo()->getConfig('s_offers_resource')) {
+        if (request()->has('parent') && request()->parent != evo()->getConfig('s_articles_resource')) {
             $resource = request()->parent;
             $tbl = evo()->getDatabase()->getFullTableName('system_settings');
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_offers_resource', '{$resource}')");
-            evo()->setConfig('s_offers_resource', $resource);
+            evo()->setConfig('s_articles_resource', $resource);
             evo()->clearCache('full');
         }
 
@@ -253,7 +253,7 @@ switch ($data['get']) {
             }
         }
 
-        $f = fopen(MODX_BASE_PATH . config_path('cms/settings/sArticles.php', true), "w");
+        $f = fopen(MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php', "w");
         fwrite($f, '<?php return [' . "\r\n");
         if (count($settings)) {
             foreach ($settings as $key => $setting) {

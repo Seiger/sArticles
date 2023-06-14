@@ -31,7 +31,7 @@ class sArticlesServiceProvider extends ServiceProvider
                 dirname(__DIR__) . '/config/sArticlesAlias.php' => config_path('app/aliases/sArticles.php', true),
                 dirname(__DIR__) . '/config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php', true),
                 dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png'),
-                dirname(__DIR__) . '/images/seigerit-yellow.svg' => public_path('assets/site/seirgerit-yellow.svg'),
+                dirname(__DIR__) . '/images/seigerit-yellow.svg' => public_path('assets/site/seigerit-yellow.svg'),
             ]);
         }
 

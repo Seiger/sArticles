@@ -1,9 +1,9 @@
-<h3>@lang('sOffers::global.management_additional_fields')</h3>
+<h3>@lang('sArticles::global.management_additional_fields')</h3>
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=settingsSave" onsubmit="documentDirty=false;">
     <input type="hidden" name="back" value="&get=settings" />
 
     <div class="row form-row widgets sortable">
-        @php($settings = require config_path('seiger/settings/sArticles.php', true))
+        @php($settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php')
         @foreach($settings as $setting)
             <div class="col-sm-12">
                 <div class="card">
@@ -24,7 +24,7 @@
                                 </div>
                                 <div class="row form-row">
                                     <div class="col-auto col-title-6">
-                                        <label class="warning">@lang('sOffers::global.field_type')</label>
+                                        <label class="warning">@lang('sArticles::global.field_type')</label>
                                     </div>
                                     <div class="col">
                                         <select id="rating" class="form-control" name="settings[type][]" onchange="documentDirty=true;">
@@ -42,23 +42,21 @@
             </div>
         @endforeach
     </div>
-
     <div class="split my-2"></div>
-
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-6">
-                    <label for="parent" class="warning">@lang('sOffers::global.resource')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sOffers::global.resource_help')"></i>
+                    <label for="parent" class="warning">@lang('sArticles::global.resource')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.resource_help')"></i>
                 </div>
                 <div class="col">
                     <div>
                         @php($parentlookup = false)
-                        @if(evo()->getConfig('s_offers_resource', 1) == 0)
+                        @if(evo()->getConfig('s_articles_resource', 1) == 0)
                             @php($parentname = evo()->getConfig('site_name'))
                         @else
-                            @php($parentlookup = evo()->getConfig('s_offers_resource', 1))
+                            @php($parentlookup = evo()->getConfig('s_articles_resource', 1))
                         @endif
                         @if($parentlookup !== false && is_numeric($parentlookup))
                             @php($parentname = \EvolutionCMS\Models\SiteContent::withTrashed()->select('pagetitle')->find($parentlookup)->pagetitle)
@@ -67,14 +65,13 @@
                             @endif
                         @endif
                         <i id="plock" class="fa fa-folder" onclick="enableParentSelection(!allowParentSelection);"></i>
-                        <b id="parentName">{{evo()->getConfig('s_offers_resource', 1)}} ({{entities($parentname)}})</b>
-                        <input type="hidden" name="parent" value="{{evo()->getConfig('s_offers_resource', 1)}}" onchange="documentDirty=true;" />
+                        <b id="parentName">{{evo()->getConfig('s_articles_resource', 1)}} ({{entities($parentname)}})</b>
+                        <input type="hidden" name="parent" value="{{evo()->getConfig('s_articles_resource', 1)}}" onchange="documentDirty=true;" />
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="split my-2"></div>
 </form>
 
@@ -104,7 +101,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    <i style="cursor:pointer;font-size:x-large;" class="fas fa-sort"></i>&emsp; @lang('sOffers::global.new_field')
+                    <i style="cursor:pointer;font-size:x-large;" class="fas fa-sort"></i>&emsp; @lang('sArticles::global.new_field')
                     <span class="close-icon"><i class="fa fa-times"></i></span>
                 </div>
                 <div class="card-block">
@@ -112,7 +109,7 @@
                         <div class="card-body">
                             <div class="row form-row">
                                 <div class="col-auto col-title-6">
-                                    <label class="warning">@lang('sOffers::global.key')</label>
+                                    <label class="warning">@lang('sArticles::global.key')</label>
                                 </div>
                                 <div class="col">
                                     <input type="text" class="form-control" name="settings[key][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
@@ -128,7 +125,7 @@
                             </div>
                             <div class="row form-row">
                                 <div class="col-auto col-title-6">
-                                    <label class="warning">@lang('sOffers::global.field_type')</label>
+                                    <label class="warning">@lang('sArticles::global.field_type')</label>
                                 </div>
                                 <div class="col">
                                     <select id="rating" class="form-control" name="settings[type][]" onchange="documentDirty=true;">

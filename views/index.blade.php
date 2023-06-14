@@ -13,7 +13,7 @@
                             <h2 class="tab">
                                 <a onclick="javascript:tabSave('&get={{$tab}}&lang={{$lang}}{{${$tab.'_url'} ?? ''}}');" href="{!!$url!!}&get={{$tab}}&lang={{$lang}}{{${$tab.'_url'} ?? ''}}">
                                     <i class="fa fa-flag"></i>
-                                    @lang('sOffers::global.content')
+                                    @lang('sArticles::global.content')
                                     @if($lang != 'base')
                                         <span class="badge bg-seigerit">{{$lang}}</span>
                                     @endif
