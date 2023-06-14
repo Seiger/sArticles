@@ -3,7 +3,7 @@
     <input type="hidden" name="back" value="&get=settings" />
 
     <div class="row form-row widgets sortable">
-        @php($settings = require MODX_BASE_PATH . 'core/custom/config/cms/settings/sOffer.php')
+        @php($settings = require config_path('seirger/settings/sArticles.php', true))
         @foreach($settings as $setting)
             <div class="col-sm-12">
                 <div class="card">

@@ -226,7 +226,7 @@ switch ($data['get']) {
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'settings';
         } else {
-            $back = request()->back ?? '&get=offers';
+            $back = request()->back ?? '&get=articles';
             return header('Location: ' . $sArticlesController->url . $back);
         }
         break;
