@@ -1,0 +1,36 @@
+{
+    "name": "seiger/sarticles",
+    "license": "GPL-3.0",
+    "type": "EvolutionCMS-Module",
+    "description": "Blog News and Articles Management Module for Evolution CMS admin panel.",
+    "keywords": ["evocms", "evolution-cms"],
+    "authors": [
+        {
+            "name": "Serhii Korneliuk",
+            "email": "info@seigerit.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Seiger\\sArticles\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Seiger\\sArticles\\sArticlesServiceProvider"
+            ],
+            "aliases": {
+                "sArticles": "Seiger\\sArticles\\Facades\\sArticles"
+            }
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "php artisan migrate"
+        ]
+    }
+}
