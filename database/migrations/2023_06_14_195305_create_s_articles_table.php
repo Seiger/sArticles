@@ -41,6 +41,21 @@ class CreateSArticlesTable extends Migration
             $table->jsonb('constructor')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamps();
         });
+
+        Schema::create('s_a_features', function (Blueprint $table) {
+            $table->id('fid');
+            $table->integer('position')->default(0);
+            $table->string('alias', 255)->index();
+            $table->string('badge', 255)->default('');
+            $table->string('color', 100)->default('');
+            $table->string('base', 255)->default('');
+            $table->timestamps();
+        });
+
+        Schema::create('s_article_features', function (Blueprint $table) {
+            $table->integer('article')->index();
+            $table->integer('feature')->index();
+        });
     }
 
     /**
@@ -50,6 +65,8 @@ class CreateSArticlesTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('s_article_features');
+        Schema::dropIfExists('s_a_features');
         Schema::dropIfExists('s_article_translates');
         Schema::dropIfExists('s_articles');
     }

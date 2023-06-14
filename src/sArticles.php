@@ -9,6 +9,8 @@ use Seiger\sArticles\Models\sArticle;
 
 class sArticles
 {
+    public $url = '';
+
     public function __construct()
     {
         if (IN_MANAGER_MODE) {

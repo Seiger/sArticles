@@ -27,12 +27,12 @@ class sArticle extends Model
         $locale = evo()->getConfig('lang', $controller->langDefault());
 
         static::addGlobalScope('translates', function (Builder $builder) use ($locale) {
-            $builder->leftJoin('s_offer_translates', function ($leftJoin) use ($locale) {
-                $leftJoin->on('s_offers.id', '=', 's_offer_translates.offer')
+            $builder->leftJoin('s_article_translates', function ($leftJoin) use ($locale) {
+                $leftJoin->on('s_articles.id', '=', 's_article_translates.article')
                     ->where('lang', function ($leftJoin) use ($locale) {
                         $leftJoin->select('lang')
-                            ->from('s_offer_translates')
-                            ->whereRaw(DB::getTablePrefix().'s_offer_translates.offer = '.DB::getTablePrefix().'s_offers.id')
+                            ->from('s_article_translates')
+                            ->whereRaw(DB::getTablePrefix().'s_article_translates.article = '.DB::getTablePrefix().'s_articles.id')
                             ->whereIn('lang', [$locale, 'base'])
                             ->orderByRaw('FIELD(lang, "'.$locale.'", "base")')
                             ->limit(1);
@@ -47,8 +47,8 @@ class sArticle extends Model
     public function features()
     {
         return $this
-            ->belongsToMany(sOFeature::class, 's_offer_features', 'offer', 'feature')
-            ->orderBy('s_o_features.position');
+            ->belongsToMany(sOFeature::class, 's_article_features', 'article', 'feature')
+            ->orderBy('s_a_features.position');
     }
 
     /**
@@ -59,7 +59,7 @@ class sArticle extends Model
      */
     public function scopeActive($builder)
     {
-        return $builder->where('s_offers.published', '1');
+        return $builder->where('s_articles.published', '1');
     }
 
     /**
