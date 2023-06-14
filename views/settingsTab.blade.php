@@ -3,7 +3,7 @@
     <input type="hidden" name="back" value="&get=settings" />
 
     <div class="row form-row widgets sortable">
-        @php($settings = require config_path('seirger/settings/sArticles.php', true))
+        @php($settings = require config_path('seiger/settings/sArticles.php', true))
         @foreach($settings as $setting)
             <div class="col-sm-12">
                 <div class="card">
