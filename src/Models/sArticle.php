@@ -1,11 +1,11 @@
-<?php namespace Seiger\sOffers\Models;
+<?php namespace Seiger\sArticles\Models;
 
 use EvolutionCMS\Facades\UrlProcessor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Seiger\sOffers\Controllers\sArticlesController;
-use Seiger\sOffers\Models\sOFeature;
+use Seiger\sArticles\Controllers\sArticlesController;
+use Seiger\sArticles\Models\sOFeature;
 
 class sArticle extends Model
 {

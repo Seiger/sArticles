@@ -1,36 +1,36 @@
 <?php
 /**
- * Offers management module
+ * Articles management module
  */
 
 use EvolutionCMS\Models\SiteContent;
 use EvolutionCMS\Models\SiteTmplvar;
 use EvolutionCMS\Models\SiteTmplvarTemplate;
 use Illuminate\Support\Str;
-use Seiger\sOffers\Controllers\sArticlesController;
-use Seiger\sOffers\Models\sOFeature;
-use Seiger\sOffers\Models\sArticle;
-use Seiger\sOffers\Models\sArticlesTranslate;
+use Seiger\sArticles\Controllers\sArticlesController;
+use Seiger\sArticles\Models\sOFeature;
+use Seiger\sArticles\Models\sArticle;
+use Seiger\sArticles\Models\sArticlesTranslate;
 
 if (!defined('IN_MANAGER_MODE') || IN_MANAGER_MODE != 'true') die("No access");
 
-$sOfferController = new sArticlesController();
+$sArticlesController = new sArticlesController();
 $data['editor'] = '';
 $data['tabs'] = [];
-$data['get'] = request()->get ?? "offers";
-$data['sOfferController'] = $sOfferController;
-$data['lang_default'] = $sOfferController->langDefault();
-$data['url'] = $sOfferController->url;
+$data['get'] = request()->get ?? "articles";
+$data['sArticlesController'] = $sArticlesController;
+$data['lang_default'] = $sArticlesController->langDefault();
+$data['url'] = $sArticlesController->url;
 
 switch ($data['get']) {
     default:
-        $data['tabs'] = ['offers', 'features'];
+        $data['tabs'] = ['articles', 'features'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'settings';
         }
         break;
     case "offer":
-        $data['tabs'] = ['offers', 'offer', 'content'];
+        $data['tabs'] = ['articles', 'offer', 'content'];
         $data['offer'] = sOffers::getOffer(request()->i);
         $data['offer_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
@@ -67,10 +67,10 @@ switch ($data['get']) {
 
         $sOfferController->setOfferListing();
 
-        $back = '&get=offers';
+        $back = '&get=articles';
         return header('Location: ' . $sOfferController->url . $back);
     case "content":
-        $data['tabs'] = ['offers', 'offer', 'content'];
+        $data['tabs'] = ['articles', 'offer', 'content'];
 
         $template = SiteContent::find(evo()->getConfig('s_offers_resource', 0))->template ?? null;
         if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
@@ -114,10 +114,10 @@ switch ($data['get']) {
         $content->seorobots = request()->seorobots;
         $content->constructor = json_encode(request()->constructor);
         $content->save();
-        $back = str_replace('&i=0', '&i=' . $content->offer, (request()->back ?? '&get=offers'));
+        $back = str_replace('&i=0', '&i=' . $content->offer, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sOfferController->url . $back);
     case "tvs":
-        $data['tabs'] = ['offers', 'offer', 'content', 'tvs'];
+        $data['tabs'] = ['articles', 'offer', 'content', 'tvs'];
         $data['offer'] = sOffers::getOffer(request()->i);
         $data['offer_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
@@ -221,7 +221,7 @@ switch ($data['get']) {
         $back = request()->back ?? '&get=features';
         return header('Location: ' . $sOfferController->url . $back);
     case "settings":
-        $data['tabs'] = ['offers', 'features'];
+        $data['tabs'] = ['articles', 'features'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'settings';
         } else {
@@ -252,7 +252,7 @@ switch ($data['get']) {
             }
         }
 
-        $f = fopen(MODX_BASE_PATH . 'core/custom/config/cms/settings/sOffer.php', "w");
+        $f = fopen(MODX_BASE_PATH . config_path('cms/settings/sArticles.php', true), "w");
         fwrite($f, '<?php return [' . "\r\n");
         if (count($settings)) {
             foreach ($settings as $key => $setting) {
@@ -273,4 +273,4 @@ switch ($data['get']) {
         return header('Location: ' . $sOfferController->url . $back);
 }
 
-echo $sOfferController->view('index', $data);
+echo $sArticlesController->view('index', $data);

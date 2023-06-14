@@ -1,4 +1,4 @@
-<?php namespace Seiger\sOffers;
+<?php namespace Seiger\sArticles;
 
 use EvolutionCMS\ServiceProvider;
 use Event;
@@ -21,21 +21,21 @@ class sArticlesServiceProvider extends ServiceProvider
             $this->loadMigrationsFrom(dirname(__DIR__) . '/database/migrations');
 
             // Views
-            $this->loadViewsFrom(dirname(__DIR__) . '/views', 'sOffers');
+            $this->loadViewsFrom(dirname(__DIR__) . '/views', 'sArticles');
 
             // MultiLang
-            $this->loadTranslationsFrom(dirname(__DIR__) . '/lang', 'sOffers');
+            $this->loadTranslationsFrom(dirname(__DIR__) . '/lang', 'sArticles');
 
             // For use config
             $this->publishes([
-                dirname(__DIR__) . '/config/sOffersAlias.php' => config_path('app/aliases/sOffers.php', true),
-                dirname(__DIR__) . '/config/sOffer.php' => config_path('cms/settings/sOffer.php', true),
-                dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png', true),
+                dirname(__DIR__) . '/config/sArticlesAlias.php' => config_path('app/aliases/sArticles.php', true),
+                dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png'),
+                dirname(__DIR__) . '/images/seirgerit-yellow.svg' => public_path('assets/site/seirgerit-yellow.svg'),
             ]);
         }
 
         $this->app->singleton(sArticles::class);
-        $this->app->alias(sArticles::class, 'sOffers');
+        $this->app->alias(sArticles::class, 'sArticles');
     }
 
     /**
@@ -64,7 +64,7 @@ class sArticlesServiceProvider extends ServiceProvider
                 }
             }
             $lang = include_once dirname(__DIR__) . '/lang/' . $lang . '/global.php';
-            $this->app->registerModule($lang['offers'], dirname(__DIR__) . '/module/sOfferModule.php', $lang['offers_icon']);
+            $this->app->registerModule($lang['articles'], dirname(__DIR__) . '/module/sArticlesModule.php', $lang['articles_icon']);
         }
     }
 }

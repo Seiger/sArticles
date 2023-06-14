@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Seiger\sOffers\Models\sOFeature;
-use Seiger\sOffers\Models\sArticle;
+use Seiger\sArticles\Models\sOFeature;
+use Seiger\sArticles\Models\sArticle;
 
 class sArticlesController
 {
@@ -95,27 +95,27 @@ class sArticlesController
     }
 
     /**
-     * Generate offer list aliases
+     * Generate articles list aliases
      *
      * @return void
      */
-    public function setOfferListing(): void
+    public function setArticlesListing(): void
     {
-        $offerListing = [];
-        $offers = sArticle::select('id', 'alias', 'parent')->wherePublished(1)->get();
+        $articlesListing = [];
+        $articles = sArticle::select('id', 'alias', 'parent')->wherePublished(1)->get();
 
-        if ($offers) {
-            foreach ($offers as $offer) {
+        if ($articles) {
+            foreach ($articles as $article) {
                 $parent = '';
-                if ((int)$offer->parent > 0) {
-                    $parent = UrlProcessor::makeUrl($offer->parent);
+                if ((int)$article->parent > 0) {
+                    $parent = UrlProcessor::makeUrl($articles->parent);
                     $parent = ltrim($parent, '/');
                 }
-                $offerListing[$parent.$offer->alias] = $offer->id;
+                $articlesListing[$parent.$article->alias] = $article->id;
             }
         }
 
-        Cache::forever('offerListing', $offerListing);
+        Cache::forever('articlesListing', $articlesListing);
     }
 
     /**
@@ -153,7 +153,7 @@ class sArticlesController
      */
     protected function moduleUrl(): string
     {
-        return 'index.php?a=112&id=' . md5(__('sOffers::global.offers'));
+        return 'index.php?a=112&id=' . md5(__('sArticles::global.articles'));
     }
 
     /**
@@ -235,6 +235,6 @@ class sArticlesController
      */
     public function view(string $tpl, array $data = [])
     {
-        return \View::make('sOffers::'.$tpl, $data);
+        return \View::make('sArticles::'.$tpl, $data);
     }
 }

@@ -1,7 +1,7 @@
 @extends('manager::template.page')
 @section('content')
     <div class="notifier"><div class="notifier-txt"></div></div>
-    <h1><i class="fa fa-briefcase" data-tooltip="@lang('sOffers::global.description')"></i> @lang('sOffers::global.offers')</h1>
+    <h1><i class="@lang('sArticles::global.articles_icon')" data-tooltip="<b>sArticles</b> - @lang('sArticles::global.description')"></i> @lang('sArticles::global.articles')</h1>
 
     <div class="sectionBody">
         <div class="tab-pane" id="resourcesPane">
@@ -21,7 +21,7 @@
                             </h2>
                             <script>tpResources.addTabPage(document.getElementById('content{{$lang}}Tab'));</script>
                             @if($get == $tab && $lang == request()->lang)
-                                @include('sOffers::'.$tab.'Tab')
+                                @include('sArticles::'.$tab.'Tab')
                                 @php($get = 'content' . $lang)
                             @endif
                         </div>
@@ -30,12 +30,12 @@
                     <div class="tab-page {{$tab}}Tab" id="{{$tab}}Tab">
                         <h2 class="tab">
                             <a onclick="javascript:tabSave('&get={{$tab}}{{${$tab.'_url'} ?? ''}}');" href="{!!$url!!}&get={{$tab}}{{${$tab.'_url'} ?? ''}}">
-                                <span><i class="@lang('sOffers::global.'.$tab.'_icon')" data-tooltip="@lang('sOffers::global.'.$tab.'_help')"></i> @lang('sOffers::global.'.$tab)</span>
+                                <span><i class="@lang('sArticles::global.'.$tab.'_icon')" data-tooltip="@lang('sArticles::global.'.$tab.'_help')"></i> @lang('sArticles::global.'.$tab)</span>
                             </a>
                         </h2>
                         <script>tpResources.addTabPage(document.getElementById('{{$tab}}Tab'));</script>
                         @if($get == $tab)
-                            @include('sOffers::'.$tab.'Tab')
+                            @include('sArticles::'.$tab.'Tab')
                         @endif
                     </div>
                 @endif
@@ -49,7 +49,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-    @include('sOffers::partials.style')
+    @include('sArticles::partials.style')
     <script>
         function evoRenderImageCheck(a) {
             console.log(a);
@@ -101,10 +101,10 @@
                 console.log(_this.attr('data-delete'));
                 alertify
                     .confirm(
-                        "@lang('sOffers::global.confirm_delete')",
-                        "@lang('sOffers::global.you_sure') <b>"+_this.attr('data-name')+"</b> @lang('sOffers::global.with_id') <b>"+_this.attr('data-delete')+"</b>",
+                        "@lang('sArticles::global.confirm_delete')",
+                        "@lang('sArticles::global.you_sure') <b>"+_this.attr('data-name')+"</b> @lang('sArticles::global.with_id') <b>"+_this.attr('data-delete')+"</b>",
                         function() {
-                            alertify.success("@lang('sOffers::global.deleted')");
+                            alertify.success("@lang('sArticles::global.deleted')");
                             window.location.href = _this.attr('data-href');
                         },
                         function() {

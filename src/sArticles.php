@@ -1,18 +1,18 @@
-<?php namespace Seiger\sOffers;
+<?php namespace Seiger\sArticles;
 
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Seiger\sOffers\Controllers\sArticlesController;
-use Seiger\sOffers\Models\sArticle;
+use Seiger\sArticles\Controllers\sArticlesController;
+use Seiger\sArticles\Models\sArticle;
 
 class sArticles
 {
     public function __construct()
     {
         if (IN_MANAGER_MODE) {
-            Paginator::defaultView('sOffers::partials.pagination');
+            Paginator::defaultView('sArticles::partials.pagination');
             $this->url = $this->moduleUrl();
         } else {
             Paginator::defaultView('partials.pagination');
@@ -26,7 +26,7 @@ class sArticles
      */
     public function all($paginate = 30): object
     {
-        $order = 's_offers.position';
+        $order = 's_articles.position';
         $direc = 'asc';
 
         $query = sArticle::orderBy($order, $direc);
@@ -35,30 +35,30 @@ class sArticles
             $query->active();
         }
 
-        $offers = $query->paginate($paginate);
-        return $offers;
+        $articles = $query->paginate($paginate);
+        return $articles;
     }
 
     /**
-     * Get offer object with translation by ID
+     * Get article object with translation by ID
      *
-     * @param int $offerId
+     * @param int $articleId
      * @return object
      */
-    public function getOffer(int $offerId): object
+    public function getArticle(int $articleId): object
     {
-        return sArticle::where('s_offers.id', $offerId)->first() ?? new sArticle();
+        return sArticle::where('s_articles.id', $articleId)->first() ?? new sArticle();
     }
 
     /**
-     * Get offer object with translation by Alias
+     * Get article object with translation by Alias
      *
-     * @param string $offerAlias
+     * @param string $articleAlias
      * @return object
      */
-    public function getOfferByAlias(string $offerAlias): object
+    public function getArticleByAlias(string $articleAlias): object
     {
-        return sArticle::where('s_offers.alias', $offerAlias)->first() ?? new sArticle();
+        return sArticle::where('s_articles.alias', $articleAlias)->first() ?? new sArticle();
     }
 
     /**
@@ -68,15 +68,15 @@ class sArticles
      */
     public function documentListing(): array
     {
-        $offerListing = Cache::get('offerListing');
+        $articlesListing = Cache::get('articlesListing');
 
-        if (!$offerListing) {
-            $sOfferController = new sArticlesController();
-            $sOfferController->setOfferListing();
-            $offerListing = Cache::get('offerListing');
+        if (!$articlesListing) {
+            $sArticlesController = new sArticlesController();
+            $sArticlesController->setArticlesListing();
+            $articlesListing = Cache::get('articlesListing');
         }
 
-        return $offerListing ?? [];
+        return $articlesListing ?? [];
     }
 
     /**
