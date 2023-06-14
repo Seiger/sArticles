@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Seiger\sArticles\Models\sOFeature;
+use Seiger\sArticles\Models\sAFeature;
 use Seiger\sArticles\Models\sArticle;
 
 class sArticlesController
@@ -70,7 +70,7 @@ class sArticlesController
         $lang = $this->langList();
 
         if ($lang != [$this->langDefault()]) {
-            $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_o_features'));
+            $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_a_features'));
 
             if ($query) {
                 $fields = evo()->getDatabase()->makeArray($query);
@@ -88,7 +88,7 @@ class sArticlesController
 
             if (count($needs)) {
                 $need = implode(', ', $needs);
-                $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_o_features')."` {$need}";
+                $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_a_features')."` {$need}";
                 evo()->getDatabase()->query($query);
             }
         }
@@ -184,7 +184,7 @@ class sArticlesController
      * @param string $table
      * @return string
      */
-    public function validateAlias($string = '', $id = 0, $key = 'offer'): string
+    public function validateAlias($string = '', $id = 0, $key = 'article'): string
     {
         if (trim($string)) {
             $alias = Str::slug(trim($string), '-');
@@ -194,10 +194,10 @@ class sArticlesController
 
         switch ($key) {
             default :
-                $aliases = sArticle::where('s_offers.id', '<>', $id)->get('alias')->pluck('alias')->toArray();
+                $aliases = sArticle::where('s_articles.id', '<>', $id)->get('alias')->pluck('alias')->toArray();
                 break;
             case "feature" :
-                $aliases = sOFeature::where('s_o_features.fid', '<>', $id)->get('alias')->pluck('alias')->toArray();
+                $aliases = sAFeature::where('s_a_features.fid', '<>', $id)->get('alias')->pluck('alias')->toArray();
                 break;
         }
 

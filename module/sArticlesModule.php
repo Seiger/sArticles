@@ -8,7 +8,7 @@ use EvolutionCMS\Models\SiteTmplvar;
 use EvolutionCMS\Models\SiteTmplvarTemplate;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
-use Seiger\sArticles\Models\sOFeature;
+use Seiger\sArticles\Models\sAFeature;
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticlesTranslate;
 
@@ -24,12 +24,13 @@ $data['url'] = $sArticlesController->url;
 
 switch ($data['get']) {
     default:
-        $data['tabs'] = ['articles', 'features'];
+        $data['tabs'] = ['articles'];
         if (evo()->hasPermission('settings')) {
+            $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
         }
         break;
-    case "offer":
+    case "article":
         $data['tabs'] = ['articles', 'offer', 'content'];
         $data['offer'] = sOffers::getOffer(request()->i);
         $data['offer_url'] = '&i='.request()->i;
@@ -37,19 +38,19 @@ switch ($data['get']) {
         $data['tvs_url'] = '&i='.request()->i;
         $data['features'] = sOFeature::orderBy('base')->get();
 
-        $template = SiteContent::find(evo()->getConfig('s_offers_resource', 0))->template ?? null;
+        $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
         if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
         break;
-    case "offerSave":
-        $offer = sArticle::where('s_offers.id', (int)request()->offer)->firstOrNew();
+    case "articleSave":
+        $offer = sArticle::where('s_articles.id', (int)request()->offer)->firstOrNew();
         $offer->published = (int)request()->published;
         $offer->parent = (int)request()->parent;
-        $offer->price = $sOfferController->validatePrice(request()->price);
+        $offer->price = $sArticlesController->validatePrice(request()->price);
         $offer->position = (int)request()->position;
         $offer->rating = (int)request()->rating;
-        $offer->alias = $sOfferController->validateAlias(request()->alias, request()->offer);
+        $offer->alias = $sArticlesController->validateAlias(request()->alias, request()->offer);
         $offer->prg_link = request()->prg_link;
         $offer->website = request()->website;
         $offer->cover = request()->cover;
@@ -57,36 +58,36 @@ switch ($data['get']) {
         $offer->save();
         $offer->features()->sync(request()->features ?? []);
 
-        $sOfferController->setOfferListing();
+        $sArticlesController->setOfferListing();
 
-        $back = str_replace('&i=0', '&i=' . $offer->id, (request()->back ?? '&get=offers'));
-        return header('Location: ' . $sOfferController->url . $back);
-    case "offerDelete":
-        $offer = DB::table('s_offers')->whereId((int)request()->i)->delete();
-        DB::table('s_offer_translates')->whereOffer((int)request()->i)->delete();
+        $back = str_replace('&i=0', '&i=' . $offer->id, (request()->back ?? '&get=articles'));
+        return header('Location: ' . $sArticlesController->url . $back);
+    case "articleDelete":
+        $offer = DB::table('s_articles')->whereId((int)request()->i)->delete();
+        DB::table('s_article_translates')->whereOffer((int)request()->i)->delete();
 
-        $sOfferController->setOfferListing();
+        $sArticlesController->setOfferListing();
 
         $back = '&get=articles';
-        return header('Location: ' . $sOfferController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back);
     case "content":
         $data['tabs'] = ['articles', 'offer', 'content'];
 
-        $template = SiteContent::find(evo()->getConfig('s_offers_resource', 0))->template ?? null;
+        $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
         if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
 
         $content = sArticlesTranslate::whereOffer((int)request()->i)->whereLang(request()->lang)->first();
-        if (!$content && request()->lang == $sOfferController->langDefault()) {
+        if (!$content && request()->lang == $sArticlesController->langDefault()) {
             $content = sArticlesTranslate::whereOffer((int)request()->i)->whereLang('base')->first();
         }
-        $data['offer_url'] = '&i=' . request()->i;
+        $data['article_url'] = '&i=' . request()->i;
         $data['content_url'] = '&i=' . request()->i;
         $data['tvs_url'] = '&i='.request()->i;
         $data['constructor'] = [];
         $constructor = data_is_json($content->constructor ?? '', true);
-        $settings = require MODX_BASE_PATH . 'core/custom/config/cms/settings/sOffer.php';
+        $settings = require MODX_BASE_PATH . 'core/custom/config/cms/settings/sArticle.php';
         $editor = "introtext,content";
         if (is_array($settings)) {
             foreach ($settings as $setting) {
@@ -96,7 +97,7 @@ switch ($data['get']) {
                 }
             }
         }
-        $data['editor'] = $sOfferController->textEditor($editor);
+        $data['editor'] = $sArticlesController->textEditor($editor);
         $data['content'] = $content;
         break;
     case "contentSave":
@@ -115,7 +116,7 @@ switch ($data['get']) {
         $content->constructor = json_encode(request()->constructor);
         $content->save();
         $back = str_replace('&i=0', '&i=' . $content->offer, (request()->back ?? '&get=articles'));
-        return header('Location: ' . $sOfferController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back);
     case "tvs":
         $data['tabs'] = ['articles', 'offer', 'content', 'tvs'];
         $data['offer'] = sOffers::getOffer(request()->i);
@@ -160,16 +161,16 @@ switch ($data['get']) {
         $offer->tmplvars = json_encode($tvValues);
         $offer->save();
         $back = str_replace('&i=0', '&i=' . $offer->id, (request()->back ?? '&get=tvs'));
-        return header('Location: ' . $sOfferController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back);
     case "features":
-        $sOfferController->setModifyTables();
-        $data['tabs'] = ['offers', 'features'];
-        $data['features'] = sOFeature::orderBy('position')->get();
+        $sArticlesController->setModifyTables();
+        $data['tabs'] = ['articles', 'features', 'settings'];
+        $data['features'] = sAFeature::orderBy('position')->get();
         break;
     case "featuresSave":
         if (request()->filled('features')) {
             $features = request()->features;
-            $sOFeatures = sOFeature::all();
+            $sAFeatures = sAFeature::all();
             if (count($features)) {
                 $values = [];
                 $fields = array_keys($features);
@@ -181,52 +182,52 @@ switch ($data['get']) {
                     }
                     if (count(array_diff($array, [""]))) {
                         $array['position'] = $idx;
-                        if ($sOfferController->langDefault() != 'base') {
-                            $array['base'] = $array[$sOfferController->langDefault()];
+                        if ($sArticlesController->langDefault() != 'base') {
+                            $array['base'] = $array[$sArticlesController->langDefault()];
                         }
-                        $array['alias'] = $sOfferController->validateAlias(trim($array['alias'] ?? '') ?: $array['base'], $array['fid'] ?? 0, 'feature');
+                        $array['alias'] = $sArticlesController->validateAlias(trim($array['alias'] ?? '') ?: $array['base'], $array['fid'] ?? 0, 'feature');
                         unset($array['fid']);
                         $values[$array['alias']] = $array;
                     }
                 }
 
-                foreach ($sOFeatures as $sOFeature) {
-                    if (isset($values[$sOFeature->alias])) {
-                        foreach ($values[$sOFeature->alias] as $field => $item) {
-                            $sOFeature->{$field} = $item;
+                foreach ($sAFeatures as $sAFeature) {
+                    if (isset($values[$sAFeature->alias])) {
+                        foreach ($values[$sAFeature->alias] as $field => $item) {
+                            $sAFeature->{$field} = $item;
                         }
-                        $sOFeature->update();
+                        $sAFeature->update();
 
-                        unset($values[$sOFeature->alias]);
+                        unset($values[$sAFeature->alias]);
                     } else {
-                        $sOFeature->delete();
+                        $sAFeature->delete();
                     }
                 }
 
                 if (count($values)) {
                     foreach ($values as $value) {
-                        $sOFeature = new sOFeature();
+                        $sAFeature = new sAFeature();
                         foreach ($value as $field => $item) {
-                            $sOFeature->{$field} = $item;
+                            $sAFeature->{$field} = $item;
                         }
-                        $sOFeature->save();
+                        $sAFeature->save();
                     }
                 }
             } else {
-                foreach ($sOFeatures as $sOFeature) {
-                    $sOFeature->delete();
+                foreach ($sAFeatures as $sAFeature) {
+                    $sAFeature->delete();
                 }
             }
         }
         $back = request()->back ?? '&get=features';
-        return header('Location: ' . $sOfferController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back);
     case "settings":
         $data['tabs'] = ['articles', 'features'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=offers';
-            return header('Location: ' . $sOfferController->url . $back);
+            return header('Location: ' . $sArticlesController->url . $back);
         }
         break;
     case "settingsSave":
@@ -270,7 +271,7 @@ switch ($data['get']) {
         sleep(10);
 
         $back = request()->back ?? '&get=settings';
-        return header('Location: ' . $sOfferController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back);
 }
 
 echo $sArticlesController->view('index', $data);

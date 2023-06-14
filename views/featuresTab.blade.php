@@ -14,7 +14,7 @@
                             <div class="card-body">
                                 <div class="row form-row">
                                     <div class="col-auto col-title-6">
-                                        <label class="warning">@lang('sOffers::global.badge')</label>
+                                        <label class="warning">@lang('sArticles::global.badge')</label>
                                     </div>
                                     <div class="col">
                                         <input type="text" class="form-control" name="features[badge][]" maxlength="255" value="{{$feature->badge ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
@@ -22,16 +22,16 @@
                                 </div>
                                 <div class="row form-row">
                                     <div class="col-auto col-title-6">
-                                        <label class="warning">@lang('sOffers::global.color')</label>
+                                        <label class="warning">@lang('sArticles::global.color')</label>
                                     </div>
                                     <div class="col">
                                         <input type="text" class="form-control" name="features[color][]" maxlength="255" value="{{$feature->color ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
                                     </div>
                                 </div>
-                                @foreach($sOfferController->langList() as $idx => $lang)
+                                @foreach($sArticlesController->langList() as $idx => $lang)
                                     <div class="row form-row">
                                         <div class="col-auto col-title-6">
-                                            <label class="warning">@lang('sOffers::global.content') @if($lang != 'base')<span class="badge bg-seigerit">{{$lang}}</span>@endif</label>
+                                            <label class="warning">@lang('sArticles::global.content') @if($lang != 'base')<span class="badge bg-seigerit">{{$lang}}</span>@endif</label>
                                         </div>
                                         <div class="col">
                                             <input type="text" class="form-control" name="features[{{$lang}}][]" maxlength="255" value="{{$feature->{$lang} ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
@@ -82,7 +82,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    <i style="cursor:pointer;font-size:x-large;" class="fas fa-sort"></i>&emsp; @lang('sOffers::global.feature_item')
+                    <i style="cursor:pointer;font-size:x-large;" class="fas fa-sort"></i>&emsp; @lang('sArticles::global.feature_item')
                     <span class="close-icon"><i class="fa fa-times"></i></span>
                 </div>
                 <div class="card-block">
@@ -90,7 +90,7 @@
                         <div class="card-body">
                             <div class="row form-row">
                                 <div class="col-auto col-title-6">
-                                    <label class="warning">@lang('sOffers::global.badge')</label>
+                                    <label class="warning">@lang('sArticles::global.badge')</label>
                                 </div>
                                 <div class="col">
                                     <input type="text" class="form-control" name="features[badge][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
@@ -98,16 +98,16 @@
                             </div>
                             <div class="row form-row">
                                 <div class="col-auto col-title-6">
-                                    <label class="warning">@lang('sOffers::global.color')</label>
+                                    <label class="warning">@lang('sArticles::global.color')</label>
                                 </div>
                                 <div class="col">
                                     <input type="text" class="form-control" name="features[color][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
                                 </div>
                             </div>
-                            @foreach($sOfferController->langList() as $idx => $lang)
+                            @foreach($sArticlesController->langList() as $idx => $lang)
                                 <div class="row form-row">
                                     <div class="col-auto col-title-6">
-                                        <label class="warning">@lang('sOffers::global.content') @if($lang != 'base')<span class="badge bg-seigerit">{{$lang}}</span>@endif</label>
+                                        <label class="warning">@lang('sArticles::global.content') @if($lang != 'base')<span class="badge bg-seigerit">{{$lang}}</span>@endif</label>
                                     </div>
                                     <div class="col">
                                         <input type="text" class="form-control" name="features[{{$lang}}][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
