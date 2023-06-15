@@ -106,7 +106,7 @@
         </div>
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row form-row-image">
-                <div class="col-auto col-title-7">
+                <div class="col-auto col-title">
                     <label for="cover" class="warning">@lang('sArticles::global.image')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.image_help')"></i>
                 </div>
