@@ -31,7 +31,7 @@ switch ($data['get']) {
         }
         break;
     case "article":
-        $data['tabs'] = ['article', 'content', 'tvs'];
+        $data['tabs'] = ['article', 'content'];
         $data['article'] = sArticles::getArticle(request()->i);
         $data['article_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
@@ -62,7 +62,7 @@ switch ($data['get']) {
         $back = '&get=articles';
         return header('Location: ' . $sArticlesController->url . $back);
     case "content":
-        $data['tabs'] = ['article', 'content', 'tvs'];
+        $data['tabs'] = ['article', 'content'];
         $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
         if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
@@ -90,7 +90,7 @@ switch ($data['get']) {
         $data['content'] = $content;
         break;
     case "contentSave":
-        $content = sArticlesTranslate::whereArticle((int)request()->article)->whereLang(request()->lang)->firstOrNew();
+        $content = sArticleTranslate::whereArticle((int)request()->article)->whereLang(request()->lang)->firstOrNew();
         if (!$content->tid) {
             $content->article = (int)request()->article;
             $content->lang = request()->lang;
@@ -108,10 +108,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "tvs":
         $data['tabs'] = ['article', 'content', 'tvs'];
-        $data['article'] = sOffers::getOffer(request()->i);
+        $data['article'] = sArticles::getArticle(request()->i);
         $data['article_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
-        $template = SiteContent::find(evo()->getConfig('s_offers_resource', 0))->template ?? 0;
+        $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? 0;
         $data['tvs'] = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
             ->join('site_tmplvar_templates', 'site_tmplvar_templates.tmplvarid', '=', 'site_tmplvars.id')
@@ -120,10 +120,10 @@ switch ($data['get']) {
             ->orderBy('site_tmplvars.id', 'ASC')
             ->where('site_tmplvar_templates.templateid', $template)
             ->get();
-        $data['tvValues'] = data_is_json($data['offer']->tmplvars, true) ?? [];
+        $data['tvValues'] = data_is_json($data['article']->tmplvars, true) ?? [];
         break;
     case "tvsSave":
-        $offer = sOffers::getOffer((int)request()->offer);
+        $article = sArticles::getArticle((int)request()->article);
         $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? 0;
         $tvs = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
@@ -147,9 +147,9 @@ switch ($data['get']) {
             }
         }
 
-        $offer->tmplvars = json_encode($tvValues);
-        $offer->save();
-        $back = str_replace('&i=0', '&i=' . $offer->id, (request()->back ?? '&get=tvs'));
+        $article->tmplvars = json_encode($tvValues);
+        $article->save();
+        $back = str_replace('&i=0', '&i=' . $article->id, (request()->back ?? '&get=tvs'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables();

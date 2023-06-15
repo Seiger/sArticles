@@ -1,4 +1,4 @@
-<h3>{{(request()->i ?? 0) == 0 ? __('sOffers::global.add_help') : ($offer->pagetitle ?? __('sOffers::global.no_text'))}}</h3>
+<h3>{{(request()->i ?? 0) == 0 ? __('sArticles::global.add_help') : ($article->pagetitle ?? __('sArticles::global.no_text'))}}</h3>
 <div class="split my-3"></div>
 
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=tvsSave" onsubmit="documentDirty=false;">
@@ -26,7 +26,7 @@
                             '',
                             $tv->toArray(),
                             $tvs->toArray(),
-                            $offer->toArray(),
+                            $article->toArray(),
                         ) !!}
                     </div>
                 </div>
@@ -46,7 +46,7 @@
             <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
                 <i class="fa fa-times-circle"></i><span>@lang('global.cancel')</span>
             </a>
-            <a id="Button3" class="btn btn-danger" data-href="{{$url}}&get=offerDelete&i={{$offer->id}}" data-delete="{{$offer->id}}" data-name="{{$offer->pagetitle}}">
+            <a id="Button3" class="btn btn-danger" data-href="{{$url}}&get=articleDelete&i={{$article->id}}" data-delete="{{$article->id}}" data-name="{{$article->pagetitle}}">
                 <i class="fa fa-trash"></i> <span>@lang('global.remove')</span>
             </a>
         </div>
