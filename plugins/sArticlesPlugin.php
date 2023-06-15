@@ -4,7 +4,7 @@
  */
 
 use Illuminate\Support\Arr;
-use Seiger\sOffers\Models\sArticle;
+use Seiger\sArticles\Models\sArticle;
 
 /**
  * Catch the offer by alias
@@ -17,19 +17,19 @@ Event::listen('evolution.OnPageNotFound', function($params) {
     }
     $alias = implode('/', $aliasArr);
 
-    $goTo = Arr::exists(sOffers::documentListing(), $alias);
+    $goTo = Arr::exists(sArticles::documentListing(), $alias);
 
     if (!$goTo && evo()->getLoginUserID('mgr')) {
         $alias = Arr::last($aliasArr);
-        $offer = sOffers::getOfferByAlias($alias ?? '');
+        $article = sArticles::getArticleByAlias($alias ?? '');
 
-        if ($offer && isset($offer->offer) && (int)$offer->offer > 0) {
+        if ($article && isset($article->article) && (int)$article->article > 0) {
             $goTo = true;
         }
     }
 
     if ($goTo) {
-        evo()->sendForward(evo()->getConfig('s_offers_resource', 1));
+        evo()->sendForward(evo()->getConfig('s_articles_resource', 1));
         exit();
     }
 });
@@ -43,32 +43,32 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
         unset($aliasArr[0]);
     }
     $alias = implode('/', $aliasArr);
-    $document = sOffers::documentListing()[$alias] ?? false;
+    $document = sArticles::documentListing()[$alias] ?? false;
 
     if (!$document && evo()->getLoginUserID('mgr')) {
         $alias = Arr::last($aliasArr);
-        $offer = sOffers::getOfferByAlias($alias ?? '');
+        $article = sArticles::getArticleByAlias($alias ?? '');
 
-        if ($offer && isset($offer->offer) && (int)$offer->offer > 0) {
-            $document = (int)$offer->offer;
+        if ($article && isset($article->article) && (int)$article->article > 0) {
+            $document = (int)$article->article;
         }
     }
 
     if ($document) {
-        $offer = sArticle::find($document);
-        $offer->constructor = data_is_json($offer->constructor, true);
-        $offer->tmplvars = data_is_json($offer->tmplvars, true);
+        $article = sArticle::find($document);
+        $article->constructor = data_is_json($article->constructor, true);
+        $article->tmplvars = data_is_json($article->tmplvars, true);
 
-        if ($offer->tmplvars && count($offer->tmplvars)) {
-            foreach ($offer->tmplvars as $name => $value) {
+        if ($article->tmplvars && count($article->tmplvars)) {
+            foreach ($article->tmplvars as $name => $value) {
                 if (isset($params['documentObject'][$name]) && is_array($params['documentObject'][$name])) {
                     $params['documentObject'][$name][1] = $value;
                 }
             }
         }
 
-        unset($offer->tmplvars);
+        unset($article->tmplvars);
 
-        evo()->documentObject = array_merge($params['documentObject'], Arr::dot($offer->toArray()));
+        evo()->documentObject = array_merge($params['documentObject'], Arr::dot($article->toArray()));
     }
 });
