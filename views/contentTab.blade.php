@@ -1,6 +1,6 @@
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=contentSave" onsubmit="documentDirty=false;">
     <input type="hidden" name="back" value="&get=content&lang={{request()->lang ?? 'base'}}&i={{request()->i ?? 0}}" />
-    <input type="hidden" name="offer" value="{{request()->i ?? 0}}" />
+    <input type="hidden" name="article" value="{{request()->i ?? 0}}" />
     <input type="hidden" name="lang" value="{{request()->lang ?? 'base'}}" />
     <div class="row form-row">
         <div class="row-col col-lg-12 col-12">
@@ -39,8 +39,8 @@
             </div>
             <div class="row form-row">
                 <div class="col-auto col-title-9">
-                    <label for="seotitle" class="warning">@lang('sOffers::global.seotitle')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sOffers::global.seotitle_help')"></i>
+                    <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seotitle_help')"></i>
                 </div>
                 <div class="col">
                     <div class="input-group">
@@ -50,8 +50,8 @@
             </div>
             <div class="row form-row">
                 <div class="col-auto col-title">
-                    <label for="seodescription" class="warning">@lang('sOffers::global.seodescription')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sOffers::global.seodescription_help')"></i>
+                    <label for="seodescription" class="warning">@lang('sArticles::global.seodescription')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seodescription_help')"></i>
                 </div>
                 <div class="col">
                     <div class="input-group">
@@ -61,8 +61,8 @@
             </div>
             <div class="row form-row">
                 <div class="col-auto col-title">
-                    <label for="seorobots" class="warning">@lang('sOffers::global.seorobots')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sOffers::global.seorobots_help')"></i>
+                    <label for="seorobots" class="warning">@lang('sArticles::global.seorobots')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seorobots_help')"></i>
                 </div>
                 <div class="col">
                     <select id="seorobots" class="form-control" name="seorobots" onchange="documentDirty=true;">
@@ -104,7 +104,7 @@
             <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
                 <i class="fa fa-times-circle"></i><span>@lang('global.cancel')</span>
             </a>
-            <a id="Button3" class="btn btn-danger" data-href="{{$url}}&get=offerDelete&i={{request()->i ?? 0}}" data-toggle="modal" data-target="#confirmDelete" data-id="{{request()->i ?? 0}}" data-name="{{$content->pagetitle ?? ''}}">
+            <a id="Button3" class="btn btn-danger" data-href="{{$url}}&get=articleDelete&i={{request()->i ?? 0}}" data-toggle="modal" data-target="#confirmDelete" data-id="{{request()->i ?? 0}}" data-name="{{$content->pagetitle ?? ''}}">
                 <i class="fa fa-trash"></i> <span>@lang('global.remove')</span>
             </a>
         </div>
@@ -112,9 +112,9 @@
     <div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">@lang('sOffers::global.confirm_delete')</div>
+                <div class="modal-header">@lang('sArticles::global.confirm_delete')</div>
                 <div class="modal-body">
-                    @lang('sOffers::global.you_sure') <b id="confirm-name"></b> @lang('sOffers::global.with_id') <b id="confirm-id"></b>
+                    @lang('sArticles::global.you_sure') <b id="confirm-name"></b> @lang('sArticles::global.with_id') <b id="confirm-id"></b>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">@lang('global.cancel')</button>

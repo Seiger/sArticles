@@ -8,7 +8,7 @@
             <script>tpResources = new WebFXTabPane(document.getElementById('resourcesPane'), false);</script>
             @foreach($tabs as $tab)
                 @if($tab == 'content')
-                    @foreach($sOfferController->langList() as $idx => $lang)
+                    @foreach($sArticlesController->langList() as $idx => $lang)
                         <div class="tab-page content{{$lang}}Tab" id="content{{$lang}}Tab">
                             <h2 class="tab">
                                 <a onclick="javascript:tabSave('&get={{$tab}}&lang={{$lang}}{{${$tab.'_url'} ?? ''}}');" href="{!!$url!!}&get={{$tab}}&lang={{$lang}}{{${$tab.'_url'} ?? ''}}">

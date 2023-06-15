@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sAFeature;
 use Seiger\sArticles\Models\sArticle;
-use Seiger\sArticles\Models\sArticlesTranslate;
+use Seiger\sArticles\Models\sArticleTranslate;
 
 if (!defined('IN_MANAGER_MODE') || IN_MANAGER_MODE != 'true') die("No access");
 
@@ -31,63 +31,52 @@ switch ($data['get']) {
         }
         break;
     case "article":
-        $data['tabs'] = ['articles', 'offer', 'content'];
-        $data['offer'] = sOffers::getOffer(request()->i);
-        $data['offer_url'] = '&i='.request()->i;
+        $data['tabs'] = ['article', 'content', 'tvs'];
+        $data['article'] = sArticles::getArticle(request()->i);
+        $data['article_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
         $data['tvs_url'] = '&i='.request()->i;
-        $data['features'] = sOFeature::orderBy('base')->get();
-
+        $data['features'] = sAFeature::orderBy('base')->get();
         $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
         if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
         break;
     case "articleSave":
-        $offer = sArticle::where('s_articles.id', (int)request()->offer)->firstOrNew();
-        $offer->published = (int)request()->published;
-        $offer->parent = (int)request()->parent;
-        $offer->price = $sArticlesController->validatePrice(request()->price);
-        $offer->position = (int)request()->position;
-        $offer->rating = (int)request()->rating;
-        $offer->alias = $sArticlesController->validateAlias(request()->alias, request()->offer);
-        $offer->prg_link = request()->prg_link;
-        $offer->website = request()->website;
-        $offer->cover = request()->cover;
-        $offer->published_at = request()->published_at;
-        $offer->save();
-        $offer->features()->sync(request()->features ?? []);
-
-        $sArticlesController->setOfferListing();
-
-        $back = str_replace('&i=0', '&i=' . $offer->id, (request()->back ?? '&get=articles'));
+        $article = sArticle::where('s_articles.id', (int)request()->article)->firstOrNew();
+        $article->published = (int)request()->published;
+        $article->parent = (int)request()->parent;
+        $article->position = (int)request()->position;
+        $article->alias = $sArticlesController->validateAlias(request()->alias, request()->article);
+        $article->cover = request()->cover;
+        $article->published_at = request()->published_at;
+        $article->save();
+        $article->features()->sync(request()->features ?? []);
+        $sArticlesController->setArticlesListing();
+        $back = str_replace('&i=0', '&i=' . $article->id, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "articleDelete":
-        $offer = DB::table('s_articles')->whereId((int)request()->i)->delete();
-        DB::table('s_article_translates')->whereOffer((int)request()->i)->delete();
-
-        $sArticlesController->setOfferListing();
-
+        DB::table('s_articles')->whereId((int)request()->i)->delete();
+        DB::table('s_article_translates')->whereArticle((int)request()->i)->delete();
+        $sArticlesController->setArticlesListing();
         $back = '&get=articles';
         return header('Location: ' . $sArticlesController->url . $back);
     case "content":
-        $data['tabs'] = ['articles', 'offer', 'content'];
-
+        $data['tabs'] = ['article', 'content', 'tvs'];
         $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
         if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
-
-        $content = sArticlesTranslate::whereOffer((int)request()->i)->whereLang(request()->lang)->first();
+        $content = sArticleTranslate::whereArticle((int)request()->i)->whereLang(request()->lang)->first();
         if (!$content && request()->lang == $sArticlesController->langDefault()) {
-            $content = sArticlesTranslate::whereOffer((int)request()->i)->whereLang('base')->first();
+            $content = sArticleTranslate::whereArticle((int)request()->i)->whereLang('base')->first();
         }
         $data['article_url'] = '&i=' . request()->i;
         $data['content_url'] = '&i=' . request()->i;
         $data['tvs_url'] = '&i='.request()->i;
         $data['constructor'] = [];
         $constructor = data_is_json($content->constructor ?? '', true);
-        $settings = require MODX_BASE_PATH . 'core/custom/config/cms/settings/sArticle.php';
+        $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
         $editor = "introtext,content";
         if (is_array($settings)) {
             foreach ($settings as $setting) {
@@ -101,9 +90,9 @@ switch ($data['get']) {
         $data['content'] = $content;
         break;
     case "contentSave":
-        $content = sArticlesTranslate::whereOffer((int)request()->offer)->whereLang(request()->lang)->firstOrNew();
+        $content = sArticlesTranslate::whereArticle((int)request()->article)->whereLang(request()->lang)->firstOrNew();
         if (!$content->tid) {
-            $content->offer = (int)request()->offer;
+            $content->article = (int)request()->article;
             $content->lang = request()->lang;
         }
         $content->pagetitle = request()->pagetitle;
@@ -115,12 +104,12 @@ switch ($data['get']) {
         $content->seorobots = request()->seorobots;
         $content->constructor = json_encode(request()->constructor);
         $content->save();
-        $back = str_replace('&i=0', '&i=' . $content->offer, (request()->back ?? '&get=articles'));
+        $back = str_replace('&i=0', '&i=' . $content->article, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "tvs":
-        $data['tabs'] = ['articles', 'offer', 'content', 'tvs'];
-        $data['offer'] = sOffers::getOffer(request()->i);
-        $data['offer_url'] = '&i='.request()->i;
+        $data['tabs'] = ['article', 'content', 'tvs'];
+        $data['article'] = sOffers::getOffer(request()->i);
+        $data['article_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
         $template = SiteContent::find(evo()->getConfig('s_offers_resource', 0))->template ?? 0;
         $data['tvs'] = SiteTmplvar::query()
@@ -135,7 +124,7 @@ switch ($data['get']) {
         break;
     case "tvsSave":
         $offer = sOffers::getOffer((int)request()->offer);
-        $template = SiteContent::find(evo()->getConfig('s_offers_resource', 0))->template ?? 0;
+        $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? 0;
         $tvs = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
             ->join('site_tmplvar_templates', 'site_tmplvar_templates.tmplvarid', '=', 'site_tmplvars.id')
@@ -234,7 +223,7 @@ switch ($data['get']) {
         if (request()->has('parent') && request()->parent != evo()->getConfig('s_articles_resource')) {
             $resource = request()->parent;
             $tbl = evo()->getDatabase()->getFullTableName('system_settings');
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_offers_resource', '{$resource}')");
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_resource', '{$resource}')");
             evo()->setConfig('s_articles_resource', $resource);
             evo()->clearCache('full');
         }

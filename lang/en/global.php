@@ -1,5 +1,5 @@
 <?php return [
-    'add_help' => 'Add new Offer',
+    'add_help' => 'Add new Article',
     'availability' => 'Availability',
     'badge' => 'Badge',
     'color' => 'Color',

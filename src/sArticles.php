@@ -30,13 +30,10 @@ class sArticles
     {
         $order = 's_articles.position';
         $direc = 'asc';
-
         $query = sArticle::orderBy($order, $direc);
-
         if (!IN_MANAGER_MODE) {
             $query->active();
         }
-
         $articles = $query->paginate($paginate);
         return $articles;
     }
