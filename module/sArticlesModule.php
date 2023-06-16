@@ -19,7 +19,7 @@ $data['editor'] = '';
 $data['tabs'] = [];
 $data['get'] = request()->get ?? "articles";
 $data['sArticlesController'] = $sArticlesController;
-$data['lang_default'] = $sArticlesController->langDefault();
+$data['lang_default'] = $defaultLng = $sArticlesController->langDefault();
 $data['url'] = $sArticlesController->url;
 
 switch ($data['get']) {
@@ -43,13 +43,28 @@ switch ($data['get']) {
         }
         break;
     case "articleSave":
-        $article = sArticle::where('s_articles.id', (int)request()->article)->firstOrNew();
+        $requestId = (int)request()->article;
+        $publishedAt = request()->published_at;
+        if (empty($publishedAt) || $publishedAt == '0000-00-00 00:00:00') {
+            $publishedAt = evo()->now()->toDateTimeString();
+        }
+        $article = sArticle::where('s_articles.id', $requestId)->firstOrNew();
+        $alias = request()->alias;
+        if (empty($alias)) {
+            $translate = sArticleTranslate::whereArticle($requestId)->whereIn('lang', ['en', $defaultLng, 'base'])->orderByRaw('FIELD(lang, "en", "'.$defaultLng.'", "base")')->first();
+            if ($translate) {
+                $alias = $translate->pagetitle;
+            } else {
+                $alias = $requestId;
+            }
+        }
         $article->published = (int)request()->published;
         $article->parent = (int)request()->parent;
+        $article->author = (int)request()->author;
+        $article->alias = $sArticlesController->validateAlias($alias, request()->article);
         $article->position = (int)request()->position;
-        $article->alias = $sArticlesController->validateAlias(request()->alias, request()->article);
         $article->cover = request()->cover;
-        $article->published_at = request()->published_at;
+        $article->published_at = $publishedAt;
         $article->save();
         $article->features()->sync(request()->features ?? []);
         $sArticlesController->setArticlesListing();
@@ -103,6 +118,12 @@ switch ($data['get']) {
         $content->seodescription = request()->seodescription;
         $content->seorobots = request()->seorobots;
         $content->constructor = json_encode(request()->constructor);
+        if ($content->article == 0) {
+            $article = new sArticle();
+            $article->alias = $sArticlesController->validateAlias(request()->pagetitle);
+            $article->save();
+            $content->article = $article->id;
+        }
         $content->save();
         $back = str_replace('&i=0', '&i=' . $content->article, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);

@@ -42,7 +42,7 @@ class sArticle extends Model
     }
 
     /**
-     * Get the features for the Offer.
+     * Get the features for the Article.
      */
     public function features()
     {
@@ -52,7 +52,7 @@ class sArticle extends Model
     }
 
     /**
-     * Only active offers
+     * Only active articles
      *
      * @param Builder $builder
      * @return Builder
@@ -63,7 +63,7 @@ class sArticle extends Model
     }
 
     /**
-     * Get the offer cover src link
+     * Get the article cover src link
      *
      * @return string cover_src
      */
@@ -79,7 +79,7 @@ class sArticle extends Model
     }
 
     /**
-     * Get the offer link
+     * Get the article link
      *
      * @return string link
      */
@@ -90,7 +90,10 @@ class sArticle extends Model
         }
         $base_url = UrlProcessor::makeUrl($this->parent);
         if (str_starts_with($base_url, '/')) {
-            $base_url = MODX_SITE_URL . ltrim($base_url, '/');
+            $base_url = MODX_SITE_URL . trim($base_url, '/');
+        }
+        if (!str_ends_with($base_url, '/')) {
+            $base_url = str_replace(evo()->getConfig('friendly_url_suffix', ''), '', $base_url) . '/';
         }
         return $base_url.$this->alias.evo()->getConfig('friendly_url_suffix', '');
     }

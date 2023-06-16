@@ -12,17 +12,26 @@
         <thead>
         <tr>
             <th style="text-align:center;">@lang('global.name')</th>
+            <th style="width:110px;text-align:center;">@lang('sArticles::global.section')</th>
             <th style="width:70px;text-align:center;">@lang('sArticles::global.availability')</th>
             <th id="action-btns">@lang('global.onlineusers_action')</th>
         </tr>
         </thead>
         <tbody>
         @php($articles = sArticles::all())
+        @php($parents = \EvolutionCMS\Models\SiteContent::select('id', 'pagetitle')->whereIn('id', $articles->pluck('parent')->unique()->toArray())->get()->pluck('pagetitle', 'id')->toArray())
         @foreach($articles as $article)
             <tr>
                 <td>
                     <img src="{{$article->coverSrc}}" alt="{{$article->coverSrc}}" class="post-thumbnail">
                     <a href="{{$article->link}}" target="_blank"><b>{{$article->pagetitle ?? __('sArticles::global.no_text')}}</b> <small>({{$article->id}})</small></a>
+                </td>
+                <td>
+                    @if($article->parent > 1)
+                        <a href="@makeUrl($article->parent)" target="_blank">{{$parents[$article->parent]}} <small>({{$article->parent}})</small></a>
+                    @else
+                        <a href="@makeUrl(1)" target="_blank">{{evo()->getConfig('site_name')}} <small>({{$article->parent}})</small></a>
+                    @endif
                 </td>
                 <td>
                     @if($article->published)
@@ -33,10 +42,10 @@
                 </td>
                 <td style="text-align:center;">
                     <div class="btn-group">
-                        <a href="{{$url}}&get=offer&i={{$article->id}}" class="btn btn-outline-success">
+                        <a href="{{$url}}&get=article&i={{$article->id}}" class="btn btn-outline-success">
                             <i class="fa fa-pencil"></i> <span>@lang('global.edit')</span>
                         </a>
-                        <a href="#" data-href="{{$url}}&get=offerDelete&i={{$article->id}}" data-delete="{{$article->id}}" data-name="{{$article->pagetitle}}" class="btn btn-outline-danger">
+                        <a href="#" data-href="{{$url}}&get=articleDelete&i={{$article->id}}" data-delete="{{$article->id}}" data-name="{{$article->pagetitle}}" class="btn btn-outline-danger">
                             <i class="fa fa-trash"></i> <span>@lang('global.remove')</span>
                         </a>
                     </div>

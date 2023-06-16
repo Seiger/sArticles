@@ -10,7 +10,16 @@
                     <i class="fa fa-question-circle" data-tooltip="@lang('global.resource_title_help')"></i>
                 </div>
                 <div class="col">
-                    <input type="text" id="pagetitle" class="form-control" name="pagetitle" maxlength="255" value="{{$content->pagetitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
+                    {{--@if($lang == $sArticlesController->langDefault())--}}
+                        <input type="text" id="pagetitle" class="form-control" name="pagetitle" maxlength="255" value="{{$content->pagetitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true"/>
+                    {{--@else
+                        <div class="input-group">
+                            <input type="text" id="pagetitle" class="form-control" name="pagetitle" maxlength="255" value="{{$content->pagetitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true" style="width: calc(100% - 52px);"/>
+                            <button data-lang="{{$lang}}" class="btn btn-light js_translate" type="button" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}" style="padding:0 5px;color:#0275d8;">
+                                <i class="fa fa-language" style="font-size:xx-large;"></i>
+                            </button>
+                        </div>
+                    @endif--}}
                 </div>
             </div>
             <div class="row form-row">

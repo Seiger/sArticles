@@ -1,6 +1,7 @@
 <?php namespace Seiger\sArticles\Controllers;
 
 use EvolutionCMS\Facades\UrlProcessor;
+use EvolutionCMS\Models\SiteContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
@@ -103,18 +104,11 @@ class sArticlesController
     {
         $articlesListing = [];
         $articles = sArticle::select('id', 'alias', 'parent')->wherePublished(1)->get();
-
         if ($articles) {
             foreach ($articles as $article) {
-                $parent = '';
-                if ((int)$article->parent > 0) {
-                    $parent = UrlProcessor::makeUrl($articles->parent);
-                    $parent = ltrim($parent, '/');
-                }
-                $articlesListing[$parent.$article->alias] = $article->id;
+                $articlesListing[$article->link] = $article->id;
             }
         }
-
         Cache::forever('articlesListing', $articlesListing);
     }
 

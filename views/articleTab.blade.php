@@ -19,37 +19,6 @@
         </div>
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
-                <div class="col-auto col-title-7">
-                    <label for="position" class="warning">@lang('sArticles::global.position')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.position_help')"></i>
-                </div>
-                <div class="input-group col">
-                    <div class="input-group-prepend">
-                        <span class="btn btn-secondary" onclick="var elm = document.form.position;var v=parseInt(elm.value+'')-1;elm.value=v>0? v:0;elm.focus();documentDirty=true;return false;" style="cursor: pointer;"><i class="fa fa-angle-left"></i></span>
-                        <span class="btn btn-secondary" onclick="var elm = document.form.position;var v=parseInt(elm.value+'')+1;elm.value=v>0? v:0;elm.focus();documentDirty=true;return false;" style="cursor: pointer;"><i class="fa fa-angle-right"></i></span>
-                    </div>
-                    <input type="text" id="position" name="position" class="form-control" value="{{$article->position ?? 0}}" onchange="documentDirty=true;">
-                </div>
-            </div>
-        </div>
-        <div class="row-col col-lg-3 col-md-3 col-12">
-            <div class="row form-row form-row-date">
-                <div class="col-auto col-title-9">
-                    <label for="published_at" class="warning">@lang('global.publish_date')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.published_at_help')"></i>
-                </div>
-                <div class="col">
-                    <input id="published_at" class="form-control DatePicker" name="published_at" value="{{$article->published_at ?? ''}}" onblur="documentDirty=true;" placeholder="dd-mm-YYYY hh:mm:ss" autocomplete="off">
-                    <span class="input-group-append">
-                    <a class="btn text-danger" href="javascript:(0);" onclick="document.form.published_at.value='';documentDirty=true; return true;">
-                        <i class="fa fa-calendar-times-o" title="@lang('global.remove_date')"></i>
-                    </a>
-                </span>
-                </div>
-            </div>
-        </div>
-        <div class="row-col col-lg-3 col-md-3 col-12">
-            <div class="row form-row">
                 <div class="col-auto col-title-6">
                     <label for="parent" class="warning">@lang('global.resource_parent')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('global.resource_parent_help')"></i>
@@ -75,11 +44,43 @@
                 </div>
             </div>
         </div>
+        <div class="row-col col-lg-3 col-md-6 col-12">
+            <div class="row form-row form-row-date">
+                <div class="col-auto col-title-9">
+                    <label for="published_at" class="warning">@lang('global.publish_date')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.published_at_help')"></i>
+                </div>
+                <div class="col">
+                    <input id="published_at" class="form-control DatePicker" name="published_at" value="{{$article->published_at ?? ''}}" onblur="documentDirty=true;" placeholder="dd-mm-YYYY hh:mm:ss" autocomplete="off">
+                    <span class="input-group-append">
+                    <a class="btn text-danger" href="javascript:(0);" onclick="document.form.published_at.value='';documentDirty=true; return true;">
+                        <i class="fa fa-calendar-times-o" title="@lang('global.remove_date')"></i>
+                    </a>
+                </span>
+                </div>
+            </div>
+        </div>
+        <div class="row-col col-lg-3 col-md-6 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title-6">
+                    <label for="author" class="warning">@lang('sArticles::global.author')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.author_help')"></i>
+                </div>
+                @php($author = (int)$article->author > 0 ? $article->author : evo()->getLoginUserID())
+                <div class="col">
+                    <select id="author" class="form-control select2" name="author" onchange="documentDirty=true;">
+                        @foreach(\EvolutionCMS\Models\UserAttribute::all() as $user)
+                            <option value="{{$user->internalKey}}" @if($author == $user->internalKey) selected @endif>{{$user->fullname}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title">
                     <label for="features" class="warning">@lang('sArticles::global.features')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_help')"></i>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_article_help')"></i>
                 </div>
                 <div class="col">
                     @php($article->feature = $article->features->pluck('fid')->toArray())
