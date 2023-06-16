@@ -1,5 +1,6 @@
 <?php return [
     'add_help' => 'Add new Article',
+    'add_tag' => 'Add tag',
     'author_help' => 'Choose the author of the article among the registered users of the site.',
     'author' => 'Author',
     'auto_translate' => 'Auto translation',
@@ -36,6 +37,11 @@
     'published_help' => 'Mark to publish immediately after saving.',
     'rating' => 'Rating',
     'rating_help' => 'Offer rating. May change automatically if voting is enabled on the site.',
+    'tags_article_help' => 'Add tags to the article from the suggested list. To manage tags, visit the tags page.',
+    'tags_article' => 'Article tags',
+    'tags' => 'Tags',
+    'tags_help' => 'Site tag management page.',
+    'tags_icon' => 'fa fa-hashtag',
     'section' => 'Section',
     'seodescription' => 'SEO Description',
     'seodescription_help' => 'Enter an SEO Description for the details page.',

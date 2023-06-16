@@ -28,8 +28,8 @@ class sArticles
      */
     public function all($paginate = 30): object
     {
-        $order = 's_articles.position';
-        $direc = 'asc';
+        $order = 's_articles.published_at';
+        $direc = 'desc';
         $query = sArticle::orderBy($order, $direc);
         if (!IN_MANAGER_MODE) {
             $query->active();

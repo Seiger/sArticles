@@ -106,6 +106,21 @@
             </div>
         </div>
         <div class="row-col col-lg-6 col-md-6 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title">
+                    <label for="tags" class="warning">@lang('sArticles::global.tags_article')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
+                </div>
+                <div class="col">
+                    <select id="type" class="form-control select2" name="tags[]" multiple onchange="documentDirty=true;">
+                        {{--@foreach(\sPost\Models\sPostTag::all() as $tag)
+                            <option value="{{$tag->id}}" @if(in_array($tag->id, $tags)) selected @endif>{!! $tag->{$sPost->langDefault()} !!} ({{$tag->alias}})</option>
+                        @endforeach--}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row form-row-image">
                 <div class="col-auto col-title">
                     <label for="cover" class="warning">@lang('sArticles::global.image')</label>

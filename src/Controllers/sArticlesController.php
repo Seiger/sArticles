@@ -109,6 +109,7 @@ class sArticlesController
                 $articlesListing[$article->link] = $article->id;
             }
         }
+        evo()->clearCache('full');
         Cache::forever('articlesListing', $articlesListing);
     }
 

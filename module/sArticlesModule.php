@@ -24,7 +24,7 @@ $data['url'] = $sArticlesController->url;
 
 switch ($data['get']) {
     default:
-        $data['tabs'] = ['articles'];
+        $data['tabs'] = ['articles', 'tags'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
@@ -174,7 +174,14 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables();
-        $data['tabs'] = ['articles', 'features', 'settings'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (evo()->hasPermission('settings')) {
+            $data['tabs'][] = 'features';
+            $data['tabs'][] = 'settings';
+        } else {
+            $back = request()->back ?? '&get=articles';
+            return header('Location: ' . $sArticlesController->url . $back);
+        }
         $data['features'] = sAFeature::orderBy('position')->get();
         break;
     case "featuresSave":
@@ -232,8 +239,9 @@ switch ($data['get']) {
         $back = request()->back ?? '&get=features';
         return header('Location: ' . $sArticlesController->url . $back);
     case "settings":
-        $data['tabs'] = ['articles', 'features'];
+        $data['tabs'] = ['articles', 'tags'];
         if (evo()->hasPermission('settings')) {
+            $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
