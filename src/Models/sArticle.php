@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Seiger\sArticles\Controllers\sArticlesController;
-use Seiger\sArticles\Models\sAFeature;
+use Seiger\sArticles\Models\sArticlesFeature;
 
 class sArticle extends Model
 {
@@ -47,8 +47,8 @@ class sArticle extends Model
     public function features()
     {
         return $this
-            ->belongsToMany(sAFeature::class, 's_article_features', 'article', 'feature')
-            ->orderBy('s_a_features.position');
+            ->belongsToMany(sArticlesFeature::class, 's_article_features', 'article', 'feature')
+            ->orderBy('s_articles_features.position');
     }
 
     /**

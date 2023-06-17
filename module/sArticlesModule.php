@@ -8,8 +8,9 @@ use EvolutionCMS\Models\SiteTmplvar;
 use EvolutionCMS\Models\SiteTmplvarTemplate;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
-use Seiger\sArticles\Models\sAFeature;
 use Seiger\sArticles\Models\sArticle;
+use Seiger\sArticles\Models\sArticlesFeature;
+use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticleTranslate;
 
 if (!defined('IN_MANAGER_MODE') || IN_MANAGER_MODE != 'true') die("No access");
@@ -36,7 +37,7 @@ switch ($data['get']) {
         $data['article_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
         $data['tvs_url'] = '&i='.request()->i;
-        $data['features'] = sAFeature::orderBy('base')->get();
+        $data['features'] = sArticlesFeature::orderBy('base')->get();
         $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
         if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
@@ -155,7 +156,6 @@ switch ($data['get']) {
             ->where('site_tmplvar_templates.templateid', $template)
             ->get();
         $tvValues = [];
-
         if ($tvs) {
             foreach ($tvs as $tv) {
                 if (request()->has('tv'.$tv->id)) {
@@ -167,13 +167,12 @@ switch ($data['get']) {
                 }
             }
         }
-
         $article->tmplvars = json_encode($tvValues);
         $article->save();
         $back = str_replace('&i=0', '&i=' . $article->id, (request()->back ?? '&get=tvs'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
-        $sArticlesController->setModifyTables();
+        $sArticlesController->setModifyTables('features');
         $data['tabs'] = ['articles', 'tags'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
@@ -182,12 +181,12 @@ switch ($data['get']) {
             $back = request()->back ?? '&get=articles';
             return header('Location: ' . $sArticlesController->url . $back);
         }
-        $data['features'] = sAFeature::orderBy('position')->get();
+        $data['features'] = sArticlesFeature::orderBy('position')->get();
         break;
     case "featuresSave":
         if (request()->filled('features')) {
             $features = request()->features;
-            $sAFeatures = sAFeature::all();
+            $sArticlesFeatures = sArticlesFeature::all();
             if (count($features)) {
                 $values = [];
                 $fields = array_keys($features);
@@ -208,31 +207,30 @@ switch ($data['get']) {
                     }
                 }
 
-                foreach ($sAFeatures as $sAFeature) {
-                    if (isset($values[$sAFeature->alias])) {
-                        foreach ($values[$sAFeature->alias] as $field => $item) {
-                            $sAFeature->{$field} = $item;
+                foreach ($sArticlesFeatures as $sArticlesFeature) {
+                    if (isset($values[$sArticlesFeature->alias])) {
+                        foreach ($values[$sArticlesFeature->alias] as $field => $item) {
+                            $sArticlesFeature->{$field} = $item;
                         }
-                        $sAFeature->update();
-
-                        unset($values[$sAFeature->alias]);
+                        $sArticlesFeature->update();
+                        unset($values[$sArticlesFeature->alias]);
                     } else {
-                        $sAFeature->delete();
+                        $sArticlesFeature->delete();
                     }
                 }
 
                 if (count($values)) {
                     foreach ($values as $value) {
-                        $sAFeature = new sAFeature();
+                        $sArticlesFeature = new sArticlesFeature();
                         foreach ($value as $field => $item) {
-                            $sAFeature->{$field} = $item;
+                            $sArticlesFeature->{$field} = $item;
                         }
-                        $sAFeature->save();
+                        $sArticlesFeature->save();
                     }
                 }
             } else {
-                foreach ($sAFeatures as $sAFeature) {
-                    $sAFeature->delete();
+                foreach ($sArticlesFeatures as $sArticlesFeature) {
+                    $sArticlesFeature->delete();
                 }
             }
         }
@@ -289,6 +287,62 @@ switch ($data['get']) {
         sleep(10);
 
         $back = request()->back ?? '&get=settings';
+        return header('Location: ' . $sArticlesController->url . $back);
+    case "tags":
+        $sArticlesController->setModifyTables('tags');
+        $data['tabs'] = ['articles', 'tags'];
+        if (evo()->hasPermission('settings')) {
+            $data['tabs'][] = 'features';
+            $data['tabs'][] = 'settings';
+        }
+        $data['tags'] = sArticlesTag::orderBy($defaultLng)->get();
+        $editor = "tagContent";
+        $data['editor'] = $sArticlesController->textEditor($editor);
+        break;
+    case "addTag":
+        $responce = ['status' => 0];
+        $value = request()->get('value') ?? '';
+        if (!empty($value) && $value = trim($value)) {
+            $tag = sArticlesTag::where($defaultLng, $value)->first();
+            if (!$tag) {
+                $tag = new sArticlesTag();
+                $tag->alias = Str::slug($value);
+                $tag->base = $value;
+                $tag->{$defaultLng} = $value;
+                $tag->save();
+                $responce['status'] = 1;
+            }
+        }
+        die(json_encode($responce));
+    case "tagGetTexts":
+        $texts = sArticlesTag::whereTagid($_POST['tagId'])->first()->toArray();
+        die(json_encode($texts ?? []));
+    case "tagSetAlias":
+        $responce = ['status' => 0];
+        $tag = sArticlesTag::find($_POST['tagId']);
+        if ($tag) {
+            $alias = $sArticlesController->validateAlias($_POST['alias'], $tag->tagid, 'tag');
+            $tag->alias = $alias;
+            $tag->update();
+            $responce['status'] = 1;
+        }
+        die(json_encode($responce));
+    case "tagSetTexts":
+        $tag = sArticlesTag::find($_POST['tagId']);
+        foreach ($_POST['texts'] as $field => $text) {
+            $tag->{$_POST['lang'] . '_' . $field} = $text;
+        }
+        $result =  $tag->update();
+        die($result);
+    case "tagTranslate":
+        $result = $sArticlesController->getAutomaticTranslateTag($_POST['source'], $_POST['target']);
+        die($result);
+    case "tagTranslateUpdate":
+        $result = $sArticlesController->updateTranslateTag($_POST['source'], $_POST['target'], $_POST['value']);
+        die($result);
+    case "tagDelete":
+        DB::table('s_articles_tags')->where('tagid', (int)request()->i)->delete();
+        $back = '&get=tags';
         return header('Location: ' . $sArticlesController->url . $back);
 }
 

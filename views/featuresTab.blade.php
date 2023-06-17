@@ -1,6 +1,5 @@
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=featuresSave" onsubmit="documentDirty=false;">
     <input type="hidden" name="back" value="&get=features" />
-
     <div class="row form-row widgets sortable">
         @foreach($features as $feature)
             <div class="col-sm-12">
@@ -55,7 +54,6 @@
         @endforeach
     </div>
 </form>
-
 @push('scripts.bot')
     <style>
         .close-icon{cursor:pointer;position:absolute;top:0;right:0;z-index:2;padding:0.6rem 1rem;}

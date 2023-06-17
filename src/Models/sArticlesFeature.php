@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class sAFeature extends Model
+class sArticlesFeature extends Model
 {
     protected $primaryKey = 'fid';
 }

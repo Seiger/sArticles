@@ -43,7 +43,7 @@ class CreateSArticlesTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create('s_a_features', function (Blueprint $table) {
+        Schema::create('s_articles_features', function (Blueprint $table) {
             $table->id('fid');
             $table->integer('position')->default(0);
             $table->string('alias', 255)->index();
@@ -57,6 +57,15 @@ class CreateSArticlesTable extends Migration
             $table->integer('article')->index();
             $table->integer('feature')->index();
         });
+
+        Schema::create('s_articles_tags', function (Blueprint $table) {
+            $table->id('tagid');
+            $table->integer('position')->default(0);
+            $table->string('alias', 255)->index();
+            $table->string('base', 255)->default('');
+            $table->mediumText('base_content')->default('');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -66,8 +75,9 @@ class CreateSArticlesTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('s_articles_tags');
         Schema::dropIfExists('s_article_features');
-        Schema::dropIfExists('s_a_features');
+        Schema::dropIfExists('s_articles_features');
         Schema::dropIfExists('s_article_translates');
         Schema::dropIfExists('s_articles');
     }

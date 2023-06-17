@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Seiger\sArticles\Models\sAFeature;
+use Seiger\sArticles\Models\sArticlesFeature;
+use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticle;
 
 class sArticlesController
@@ -64,33 +65,52 @@ class sArticlesController
      *
      * @return void
      */
-    public function setModifyTables(): void
+    public function setModifyTables($table = ''): void
     {
         $needs = [];
         $columns = [];
         $lang = $this->langList();
-
-        if ($lang != [$this->langDefault()]) {
-            $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_a_features'));
-
-            if ($query) {
-                $fields = evo()->getDatabase()->makeArray($query);
-
-                foreach ($fields as $field) {
-                    $columns[$field['Field']] = $field;
-                }
-
-                foreach ($lang as $item) {
-                    if (!isset($columns[$item])) {
-                        $needs[] = "ADD `{$item}` varchar(255) COMMENT '" . strtoupper($item) . " value version'";
+        if ($lang != ['base']) {
+            switch ($table) {
+                case 'features': // Features table
+                    $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_articles_features'));
+                    if ($query) {
+                        $fields = evo()->getDatabase()->makeArray($query);
+                        foreach ($fields as $field) {
+                            $columns[$field['Field']] = $field;
+                        }
+                        foreach ($lang as $item) {
+                            if (!isset($columns[$item])) {
+                                $needs[] = "ADD `{$item}` varchar(255) COMMENT '" . strtoupper($item) . " Value version'";
+                            }
+                        }
                     }
-                }
-            }
-
-            if (count($needs)) {
-                $need = implode(', ', $needs);
-                $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_a_features')."` {$need}";
-                evo()->getDatabase()->query($query);
+                    if (count($needs)) {
+                        $need = implode(', ', $needs);
+                        $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_features')."` {$need}";
+                        evo()->getDatabase()->query($query);
+                    }
+                    break;
+                case 'tags': // Tags table
+                    $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_articles_tags'));
+                    if ($query) {
+                        $fields = evo()->getDatabase()->makeArray($query);
+                        foreach ($fields as $field) {
+                            $columns[$field['Field']] = $field;
+                        }
+                        foreach ($lang as $item) {
+                            if (!isset($columns[$item])) {
+                                $needs[] = "ADD `{$item}` varchar(255) COMMENT '" . strtoupper($item) . " Value version'";
+                                $needs[] = "ADD `{$item}_content` mediumtext COMMENT '" . strtoupper($item) . " Text version'";
+                            }
+                        }
+                    }
+                    if (count($needs)) {
+                        $need = implode(', ', $needs);
+                        $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_tags')."` {$need}";
+                        evo()->getDatabase()->query($query);
+                    }
+                    break;
             }
         }
     }
@@ -111,6 +131,91 @@ class sArticlesController
         }
         evo()->clearCache('full');
         Cache::forever('articlesListing', $articlesListing);
+    }
+
+    /**
+     * Get automatic Tag translation
+     *
+     * @param $source
+     * @param $target
+     * @return string
+     */
+    public function getAutomaticTranslateTag($source, $target): string
+    {
+        $result = '';
+        $langDefault = $this->langDefault();
+        $tag = sArticlesTag::find($source);
+        if ($tag) {
+            $text = $tag[$langDefault];
+            $result = $this->googleTranslate($text, $langDefault, $target);
+        }
+        if (trim($result)) {
+            $tag->{$target} = $result;
+            $tag->save();
+        }
+        return $result;
+    }
+
+    /**
+     * Update translation Tag
+     *
+     * @param $source
+     * @param $target
+     * @param $value
+     * @return bool
+     */
+    public function updateTranslateTag($source, $target, $value): bool
+    {
+        $result = false;
+        $tag = sArticlesTag::find($source);
+        if ($tag) {
+            $tag->{$target} = $value;
+            $tag->update();
+            $result = true;
+        }
+        return $result;
+    }
+
+    /**
+     * Get Google Translations
+     *
+     * @param $text
+     * @param string $source
+     * @param string $target
+     * @return string
+     */
+    protected function googleTranslate(string $text, string $source = 'ru', string $target = 'uk'): string
+    {
+        if ($source == $target) {
+            return $text;
+        }
+        $out = '';
+        // Google translate URL
+        $url = 'https://translate.google.com/translate_a/single?client=at&dt=t&dt=ld&dt=qca&dt=rm&dt=bd&dj=1&hl=uk-RU&ie=UTF-8&oe=UTF-8&inputm=2&otf=2&iid=1dd3b944-fa62-4b55-b330-74909a99969e';
+        $fields_string = 'sl=' . urlencode($source) . '&tl=' . urlencode($target) . '&q=' . urlencode($text);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 3);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'AndroidTranslate/5.3.0.RC02.130475354-53000263 5.1 phone TRANSLATE_OPM5_TEST_1');
+        $result = curl_exec($ch);
+        $result = json_decode($result, TRUE);
+        if (isset($result['sentences'])) {
+            foreach ($result['sentences'] as $s) {
+                $out .= isset($s['trans']) ? $s['trans'] : '';
+            }
+        } else {
+            $out = '';
+        }
+        if (preg_match('%^\p{Lu}%u', $text) && !preg_match('%^\p{Lu}%u', $out)) { // If the original is capitalized, then we make the translation capitalized
+            $out = mb_strtoupper(mb_substr($out, 0, 1)) . mb_substr($out, 1);
+        }
+        return $out;
     }
 
     /**
@@ -192,7 +297,10 @@ class sArticlesController
                 $aliases = sArticle::where('s_articles.id', '<>', $id)->get('alias')->pluck('alias')->toArray();
                 break;
             case "feature" :
-                $aliases = sAFeature::where('s_a_features.fid', '<>', $id)->get('alias')->pluck('alias')->toArray();
+                $aliases = sArticlesFeature::where('s_articles_features.fid', '<>', $id)->get('alias')->pluck('alias')->toArray();
+                break;
+            case "tag" :
+                $aliases = sArticlesTag::where('s_articles_tags.tagid', '<>', $id)->get('alias')->pluck('alias')->toArray();
                 break;
         }
 

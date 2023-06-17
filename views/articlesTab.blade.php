@@ -66,7 +66,6 @@
             </a>
         </div>
     </div>
-
     <script>
         jQuery(document).on("click", ".js_search", function () {
             var _form = jQuery(document).find("[name=\"search\"]");

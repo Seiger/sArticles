@@ -9,58 +9,49 @@
         </tr>
         </thead>
         <tbody>
-        {{--@foreach($sPost->listTags() as $tag)
+        @foreach($tags as $tag)
             <tr>
-                <td>{{$tag['alias']}}</td>
-                @foreach($sPost->langTabs() as $lang => $tabName)
-                    <td data-id="{{$tag['id']}}" data-lang="{{$lang}}">
-                        @if($lang == $sPost->langDefault())
+                <td data-id="{{$tag['tagid']}}">
+                    <a style="padding: 3px 5px;" href="#" data-href="{!! $url !!}&get=tagDelete&i={{$tag['tagid']}}" data-delete="{{$tag['tagid']}}" data-name="{{$tag[$sArticlesController->langDefault()]}}" class="btn btn-outline-danger">
+                        <i class="fa fa-trash" style="font-size: x-large;" title="@lang('global.remove')"></i>
+                    </a>
+                    <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTagAlias" title="@lang('sArticles::global.edit_alias')">
+                        <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
+                    </a>&emsp;
+                    {{$tag['alias']}}
+                </td>
+                @foreach($sArticlesController->langList() as $lang)
+                    <td data-id="{{$tag['tagid']}}" data-lang="{{$lang}}">
+                        @if($lang == $sArticlesController->langDefault())
                             <div class="input-group">
-                                <input type="text" class="form-control" name="tag[{{$tag['id']}}][{{$lang}}]" value="{{$tag[$lang]}}" />
+                                <input type="text" class="form-control" name="tag[{{$tag['tagid']}}][{{$lang}}]" value="{{$tag[$lang]}}" />
                                 <span class="input-group-btn">
-                                    <a style="padding: 3px 5px;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTag" title="{{$_lang['spost_auto_translate']}} {{strtoupper($sPost->langDefault())}} => {{strtoupper($lang)}}">
+                                    <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTag" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}">
                                         <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
                                     </a>
                                 </span>
                             </div>
                         @else
                             <div class="input-group">
-                                <input type="text" class="form-control" name="tag[{{$tag['id']}}][{{$lang}}]" value="{{$tag[$lang]}}" />
+                                <input type="text" class="form-control" name="tag[{{$tag['tagid']}}][{{$lang}}]" value="{{$tag[$lang]}}" />
                                 <span class="input-group-btn">
-                                    <button style="padding: 0 5px;" class="btn btn-light js_translate" type="button" title="{{$_lang['spost_auto_translate']}} {{strtoupper($sPost->langDefault())}} => {{strtoupper($lang)}}">
+                                    <button style="padding:0 5px;color:#0057b8;" class="btn btn-light js_translate" type="button" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}">
                                         <i class="fa fa-language" style="font-size: xx-large;"></i>
                                     </button>
                                 </span>
                                 <span class="input-group-btn">
-                                    <a style="padding: 3px 5px;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTag" title="{{$_lang['spost_auto_translate']}} {{strtoupper($sPost->langDefault())}} => {{strtoupper($lang)}}">
+                                    <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTag" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}">
                                         <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
                                     </a>
                                 </span>
                             </div>
                         @endif
-                        {!! $sPost->filterContent($tag[$lang.'_content'], 'img'); !!}
                     </td>
                 @endforeach
             </tr>
-        @endforeach--}}
+        @endforeach
         </tbody>
     </table>
-</div>
-
-<div class="modal fade" id="editTag" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">#</div>
-            <div class="modal-body">
-                <p>{{$_lang['spost_tag_texts']}} <span class="tagName text-primary">#</span> @if($sArticlesController->langDefault() != 'base') {{$_lang['spost_on_lang']}} <span class="tagLang text-muted text-uppercase"></span> @endif</p>
-                <textarea id="{{$sArticlesController->langDefault()}}_tagContent" cols="30" rows="10"></textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">@lang('global.cancel')</button>
-                <button data-id="" data-lang="" class="btn btn-success js_save_texts">@lang('global.save')</button>
-            </div>
-        </div>
-    </div>
 </div>
 
 @push('scripts.bot')
@@ -72,32 +63,133 @@
             </a>
         </div>
     </div>
-    {{--<script>
+    <div class="modal fade" id="addTag" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">@lang('sArticles::global.add_tag')</div>
+                <div class="modal-body">
+                    <p>@lang('sArticles::global.add_new_tag') @if($lang_default != 'base') @lang('sArticles::global.on_lang') <span class="badge bg-seigerit">{{strtoupper($lang_default)}}</span> @endif</p>
+                    <input type="text" name="add_tag" value="" class="form-control"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">@lang('global.cancel')</button>
+                    <span class="btn btn-success js_add_tag">@lang('global.add')</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editTagAlias" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">#</div>
+                <div class="modal-body">
+                    <p>@lang('sArticles::global.tag_alias') <span class="tagName text-primary">#</span></p>
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tag_alias_help')" style="font-size: x-large;margin: 3px 3px 0 0;"></i>
+                        </span>
+                        <input id="tagAlias" type="text" value="" class="form-control"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">@lang('global.cancel')</button>
+                    <button data-id="" data-lang="" class="btn btn-success js_save_alias">@lang('global.save')</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editTag" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">#</div>
+                <div class="modal-body">
+                    <p>@lang('sArticles::global.tag_texts') <span class="tagName text-primary">#</span> @if($sArticlesController->langDefault() != 'base') @lang('sArticles::global.on_lang') <span class="tagLang text-uppercase badge bg-seigerit"></span> @endif</p>
+                    <textarea id="tagContent" cols="30" rows="10"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">@lang('global.cancel')</button>
+                    <button data-id="" data-lang="" class="btn btn-success js_save_texts">@lang('global.save')</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('.js_add_tag').on('click', function () {
+            var _value = $(document).find('[name="add_tag"]').val();
+            jQuery.ajax({
+                url: '{!!$url!!}&get=addTag',
+                type: 'POST',
+                dataType: 'JSON',
+                data: 'value=' + _value,
+                success: function (ajax) {
+                    if (ajax.status == 1) {
+                        window.location.reload();
+                    }
+                }
+            });
+            $('#addTag').modal('hide');
+        });
+        $('#editTagAlias').on('show.bs.modal', function(e) {
+            var source = $(e.relatedTarget).parents('td');
+            var dataId = source.data('id');
+            var dataLang = '{{$sArticlesController->langDefault()}}';
+            $.ajax({
+                url: '{!!$url!!}&get=tagGetTexts',
+                type: 'POST',
+                dataType: 'JSON',
+                data: 'tagId=' + dataId,
+                success: function (ajax) {
+                    $('.js_save_alias').attr('data-id', dataId);
+                    $('.js_save_alias').attr('data-lang', dataLang);
+                    $('#editTagAlias').find('#tagAlias').val(ajax['alias']);
+                    $('#editTagAlias').find('.modal-header, .tagName').text('#'+ajax[dataLang]);
+                }
+            });
+        });
         $('#editTag').on('show.bs.modal', function(e) {
+            tinymce.get('tagContent').setContent('');
             var source = $(e.relatedTarget).parents('td');
             var dataId = source.data('id');
             var dataLang = source.data('lang');
             $.ajax({
-                url: '{!!$url!!}&get=tagTexts',
+                url: '{!!$url!!}&get=tagGetTexts',
                 type: 'POST',
                 dataType: 'JSON',
                 data: 'tagId=' + dataId + '&lang=' + dataLang,
                 success: function (ajax) {
                     $('.js_save_texts').attr('data-id', dataId);
                     $('.js_save_texts').attr('data-lang', dataLang);
-                    $('#editTag').find('#{{$sPost->langDefault()}}_tagContent').val(ajax[dataLang+'_content']);
-                    tinymce.get('{{$sPost->langDefault()}}_tagContent').setContent(ajax[dataLang+'_content']);
+                    $('#editTag').find('#tagContent').val(ajax[dataLang+'_content']);
+                    tinymce.get('tagContent').setContent(ajax[dataLang+'_content']);
                 }
             });
             $(this).find('.modal-header, .tagName').text('#'+source.find('[type="text"]').val());
             $(this).find('.tagLang').text(dataLang);
         });
-
+        $(document).on('click', '.js_save_alias', function () {
+            documentDirty = false;
+            var dataId = $(this).attr('data-id');
+            var dataLang = $(this).attr('data-lang');
+            var tagAlias = $('#tagAlias').val();
+            $.ajax({
+                url: '{!!$url!!}&get=tagSetAlias',
+                type: 'POST',
+                dataType: 'JSON',
+                data: 'tagId=' + dataId + '&alias=' + tagAlias,
+                success: function (ajax) {
+                    if (ajax.status == 1) {
+                        window.location.reload();
+                    } else {
+                        $('#editTag').modal('hide');
+                    }
+                }
+            });
+        });
         $(document).on('click', '.js_save_texts', function () {
             documentDirty = false;
             var dataId = $(this).attr('data-id');
             var dataLang = $(this).attr('data-lang');
-            var tagContent = tinymce.get('{{$sPost->langDefault()}}_tagContent').getContent();
+            var tagContent = tinymce.get('tagContent').getContent();
             $.ajax({
                 url: '{!!$url!!}&get=tagSetTexts',
                 type: 'POST',
@@ -108,5 +200,29 @@
                 }
             });
         });
-    </script>--}}
+        $(document).on("click", ".js_translate", function () {
+            var _this = $(this).parents('td');
+            var source = _this.data('id');
+            var target = _this.data('lang');
+            $.ajax({
+                url: '{!!$url!!}&get=tagTranslate',
+                type: 'POST',
+                data: 'source=' + source + '&target=' + target,
+                success: function (ajax) {
+                    _this.find('input').val(ajax);
+                }
+            });
+        });
+        $(".sectionTrans").on("blur", "input", function () {
+            var _this = $(this).parents('td');
+            var source = _this.data('id');
+            var target = _this.data('lang');
+            var _value = _this.find('input').val();
+            $.ajax({
+                url: '{!!$url!!}&get=tagTranslateUpdate',
+                type: 'POST',
+                data: 'source=' + source + '&target=' + target + '&value=' + _value,
+            });
+        });
+    </script>
 @endpush
