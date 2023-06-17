@@ -169,6 +169,9 @@ class sArticlesController
         $result = false;
         $tag = sArticlesTag::find($source);
         if ($tag) {
+            if ($target == $this->langDefault()) {
+                $tag->base = $value;
+            }
             $tag->{$target} = $value;
             $tag->update();
             $result = true;

@@ -86,7 +86,6 @@
                     @php($article->feature = $article->features->pluck('fid')->toArray())
                     <select id="features" class="form-control select2" name="features[]" multiple onchange="documentDirty=true;">
                         @foreach($features as $feature)
-                            <option value="0"></option>
                             <option value="{{$feature->fid}}" @if(in_array($feature->fid, $article->feature)) selected @endif>{{$feature->base}}</option>
                         @endforeach
                     </select>
@@ -112,10 +111,11 @@
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
                 </div>
                 <div class="col">
+                    @php($article->tag = $article->tags()->pluck('tagid')->toArray())
                     <select id="type" class="form-control select2" name="tags[]" multiple onchange="documentDirty=true;">
-                        {{--@foreach(\sPost\Models\sPostTag::all() as $tag)
-                            <option value="{{$tag->id}}" @if(in_array($tag->id, $tags)) selected @endif>{!! $tag->{$sPost->langDefault()} !!} ({{$tag->alias}})</option>
-                        @endforeach--}}
+                        @foreach($tags as $tag)
+                            <option value="{{$tag->tagid}}" @if(in_array($tag->tagid, $article->tag)) selected @endif>{{$tag->base}}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>

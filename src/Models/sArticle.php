@@ -23,18 +23,15 @@ class sArticle extends Model
      */
     protected static function booted()
     {
-        $controller = new sArticlesController();
-        $locale = evo()->getConfig('lang', $controller->langDefault());
-
-        static::addGlobalScope('translates', function (Builder $builder) use ($locale) {
-            $builder->leftJoin('s_article_translates', function ($leftJoin) use ($locale) {
+        static::addGlobalScope('translates', function (Builder $builder) {
+            $builder->leftJoin('s_article_translates', function ($leftJoin) {
                 $leftJoin->on('s_articles.id', '=', 's_article_translates.article')
-                    ->where('lang', function ($leftJoin) use ($locale) {
+                    ->where('lang', function ($leftJoin) {
                         $leftJoin->select('lang')
                             ->from('s_article_translates')
                             ->whereRaw(DB::getTablePrefix().'s_article_translates.article = '.DB::getTablePrefix().'s_articles.id')
-                            ->whereIn('lang', [$locale, 'base'])
-                            ->orderByRaw('FIELD(lang, "'.$locale.'", "base")')
+                            ->whereIn('lang', [evo()->getLocale(), 'base'])
+                            ->orderByRaw('FIELD(lang, "'.evo()->getLocale().'", "base")')
                             ->limit(1);
                     });
             });
@@ -49,6 +46,16 @@ class sArticle extends Model
         return $this
             ->belongsToMany(sArticlesFeature::class, 's_article_features', 'article', 'feature')
             ->orderBy('s_articles_features.position');
+    }
+
+    /**
+     * Get the tags for the Article.
+     */
+    public function tags()
+    {
+        return $this
+            ->belongsToMany(sArticlesTag::class, 's_article_tags', 'article', 'tag')
+            ->orderBy('s_articles_tags.base');
     }
 
     /**

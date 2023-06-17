@@ -66,6 +66,11 @@ class CreateSArticlesTable extends Migration
             $table->mediumText('base_content')->default('');
             $table->timestamps();
         });
+
+        Schema::create('s_article_tags', function (Blueprint $table) {
+            $table->integer('article')->index();
+            $table->integer('tag')->index();
+        });
     }
 
     /**
@@ -75,6 +80,7 @@ class CreateSArticlesTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('s_article_tags');
         Schema::dropIfExists('s_articles_tags');
         Schema::dropIfExists('s_article_features');
         Schema::dropIfExists('s_articles_features');

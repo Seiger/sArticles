@@ -38,6 +38,7 @@ switch ($data['get']) {
         $data['content_url'] = '&i='.request()->i;
         $data['tvs_url'] = '&i='.request()->i;
         $data['features'] = sArticlesFeature::orderBy('base')->get();
+        $data['tags'] = sArticlesTag::orderBy('base')->get();
         $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
         if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
@@ -68,6 +69,7 @@ switch ($data['get']) {
         $article->published_at = $publishedAt;
         $article->save();
         $article->features()->sync(request()->features ?? []);
+        $article->tags()->sync(request()->tags ?? []);
         $sArticlesController->setArticlesListing();
         $back = str_replace('&i=0', '&i=' . $article->id, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
@@ -190,7 +192,6 @@ switch ($data['get']) {
             if (count($features)) {
                 $values = [];
                 $fields = array_keys($features);
-
                 foreach ($features['fid'] as $idx => $fid) {
                     $array = [];
                     foreach ($fields as $field) {
@@ -206,7 +207,6 @@ switch ($data['get']) {
                         $values[$array['alias']] = $array;
                     }
                 }
-
                 foreach ($sArticlesFeatures as $sArticlesFeature) {
                     if (isset($values[$sArticlesFeature->alias])) {
                         foreach ($values[$sArticlesFeature->alias] as $field => $item) {
@@ -218,7 +218,6 @@ switch ($data['get']) {
                         $sArticlesFeature->delete();
                     }
                 }
-
                 if (count($values)) {
                     foreach ($values as $value) {
                         $sArticlesFeature = new sArticlesFeature();
@@ -254,7 +253,6 @@ switch ($data['get']) {
             evo()->setConfig('s_articles_resource', $resource);
             evo()->clearCache('full');
         }
-
         $keys = request()->input('settings.key', []);
         $settings = [];
         if (count($keys)) {
@@ -268,7 +266,6 @@ switch ($data['get']) {
                 ];
             }
         }
-
         $f = fopen(MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php', "w");
         fwrite($f, '<?php return [' . "\r\n");
         if (count($settings)) {
@@ -285,7 +282,6 @@ switch ($data['get']) {
         fwrite($f, "];");
         fclose($f);
         sleep(10);
-
         $back = request()->back ?? '&get=settings';
         return header('Location: ' . $sArticlesController->url . $back);
     case "tags":
@@ -331,6 +327,9 @@ switch ($data['get']) {
         $tag = sArticlesTag::find($_POST['tagId']);
         foreach ($_POST['texts'] as $field => $text) {
             $tag->{$_POST['lang'] . '_' . $field} = $text;
+            if ($_POST['lang'] == $defaultLng) {
+                $tag->{'base_' . $field} = $text;
+            }
         }
         $result =  $tag->update();
         die($result);
