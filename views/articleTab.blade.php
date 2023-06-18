@@ -20,7 +20,7 @@
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-6">
-                    <label for="parent" class="warning">@lang('global.resource_parent')</label>
+                    <label for="parent" class="warning">@lang('sArticles::global.section')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('global.resource_parent_help')"></i>
                 </div>
                 <div class="col">

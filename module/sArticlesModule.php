@@ -142,6 +142,7 @@ switch ($data['get']) {
             ->orderBy('site_tmplvar_templates.rank', 'ASC')
             ->orderBy('site_tmplvars.rank', 'ASC')
             ->orderBy('site_tmplvars.id', 'ASC')
+            ->whereNotIn('name', ['menu_footer', 'menu_main'])
             ->where('site_tmplvar_templates.templateid', $template)
             ->get();
         $data['tvValues'] = data_is_json($data['article']->tmplvars, true) ?? [];

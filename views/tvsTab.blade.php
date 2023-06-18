@@ -3,7 +3,7 @@
 
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=tvsSave" onsubmit="documentDirty=false;">
     <input type="hidden" name="back" value="&get=tvs&i={{request()->i ?? 0}}" />
-    <input type="hidden" name="offer" value="{{request()->i ?? 0}}" />
+    <input type="hidden" name="article" value="{{request()->i ?? 0}}" />
     @foreach($tvs as $tv)
         @php($tv->value = $tvValues[$tv->name] ?? '')
         <div class="row form-row">
@@ -11,10 +11,9 @@
                 <div class="row form-row">
                     <div class="col-auto col-title-auto">
                         <label for="{{$tv->name}}" class="warning">
-                            {{$tv->caption}}
+                            {{$tv->caption}} @if(!empty($tv->description))<i class="fa fa-question-circle" data-tooltip="{{$tv->description}}"></i>@endif
                             @if(evo()->hasPermission('edit_template'))<br/><small class="text-muted">[*{{$tv->name}}*]</small>@endif
                         </label>
-                        @if(!empty($tv->description))<i class="fa fa-question-circle" data-tooltip="{{$tv->description}}"></i>@endif
                     </div>
                     <div class="col">
                         {!! renderFormElement(
@@ -22,7 +21,7 @@
                             $tv->id,
                             $tv->default_text,
                             $tv->elements,
-                            '$tvPBV',
+                            $tv->value,
                             '',
                             $tv->toArray(),
                             $tvs->toArray(),
