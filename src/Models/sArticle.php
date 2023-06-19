@@ -100,7 +100,7 @@ class sArticle extends Model
             $base_url = MODX_SITE_URL . trim($base_url, '/');
         }
         if (!str_ends_with($base_url, '/')) {
-            $base_url = str_replace(evo()->getConfig('friendly_url_suffix', ''), '', $base_url) . '/';
+            $base_url = rtrim($base_url, evo()->getConfig('friendly_url_suffix', '')) . '/';
         }
         return $base_url.$this->alias.evo()->getConfig('friendly_url_suffix', '');
     }
