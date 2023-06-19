@@ -35,7 +35,7 @@
                     <label for="introtext" class="warning">@lang('global.resource_summary')</label>
                 </div>
                 <div class="col">
-                    <textarea id="introtext" class="form-control" name="introtext" rows="5" wrap="soft" onchange="documentDirty=true;">{{$content->introtext ?? ''}}</textarea>
+                    <textarea id="introtext" class="form-control" name="introtext" rows="3" wrap="soft" onchange="documentDirty=true;">{{$content->introtext ?? ''}}</textarea>
                 </div>
             </div>
             <div class="row form-row form-row-richtext">

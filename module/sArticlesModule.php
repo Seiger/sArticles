@@ -40,7 +40,7 @@ switch ($data['get']) {
         $data['features'] = sArticlesFeature::orderBy('base')->get();
         $data['tags'] = sArticlesTag::orderBy('base')->get();
         $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
-        if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
+        if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
         break;
@@ -82,7 +82,7 @@ switch ($data['get']) {
     case "content":
         $data['tabs'] = ['article', 'content'];
         $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
-        if ($template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
+        if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
         $content = sArticleTranslate::whereArticle((int)request()->i)->whereLang(request()->lang)->first();
@@ -95,7 +95,7 @@ switch ($data['get']) {
         $data['constructor'] = [];
         $constructor = data_is_json($content->constructor ?? '', true);
         $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
-        $editor = "introtext,content";
+        $editor = "content";
         if (is_array($settings)) {
             foreach ($settings as $setting) {
                 $data['constructor'][] = array_merge($setting, ['value' => ($constructor[$setting['key']] ?? '')]);
