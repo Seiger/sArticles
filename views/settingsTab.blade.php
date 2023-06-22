@@ -28,7 +28,7 @@
                                     </div>
                                     <div class="col">
                                         <select id="rating" class="form-control" name="settings[type][]" onchange="documentDirty=true;">
-                                            @foreach(['Text', 'Textarea', 'RichText'] as $value)
+                                            @foreach(['Text', 'Textarea', 'RichText', 'Image'] as $value)
                                                 <option value="{{$value}}" @if($setting['type'] == $value) selected @endif>{{$value}}</option>
                                             @endforeach
                                         </select>
@@ -129,7 +129,7 @@
                                 </div>
                                 <div class="col">
                                     <select id="rating" class="form-control" name="settings[type][]" onchange="documentDirty=true;">
-                                        @foreach(['Text', 'Textarea', 'RichText'] as $value)
+                                        @foreach(['Text', 'Textarea', 'RichText', 'Image'] as $value)
                                             <option value="{{$value}}">{{$value}}</option>
                                         @endforeach
                                     </select>

@@ -28,6 +28,7 @@
     'image_help' => 'The main image of the article. Also used as a preview image.',
     'key' => 'Key',
     'management_additional_fields' => 'Management of additional fields',
+    'main_tag_article' => 'Main Tag',
     'new_field' => 'New field',
     'no_text' => 'No text added',
     'number_votes' => 'Number of votes',

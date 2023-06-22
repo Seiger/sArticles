@@ -100,13 +100,25 @@
                         <label for="{{$item['key']}}" class="warning">{{$item['name']}}</label>
                     </div>
                     <div class="col">
-                        <div class="input-group">
-                            @if($item['type'] == 'Text')
-                                <input type="text" id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" onchange="documentDirty=true;">
-                            @else
+                        @switch($item['type'])
+                            @case('Text')
+                                <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                @break
+                            @case('Image')
+                                <div class="input-group mb-3">
+                                    <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                    <div class="input-group-append">
+                                        <button onclick="BrowseServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div id="image_for_{{$item['key']}}" data-image="{{$item['value']}}" onclick="BrowseServer('{{$item['key']}}')" class="image_for_field" style="background-image: url('{{MODX_SITE_URL . $item['value']}}');"></div>
+                                    <script>document.getElementById('{{$item['key']}}').addEventListener('change', evoRenderImageCheck, false);</script>
+                                </div>
+                                @break
+                            @default
                                 <textarea id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" rows="3" wrap="soft" onchange="documentDirty=true;">{{$item['value']}}</textarea>
-                            @endif
-                        </div>
+                        @endswitch
                     </div>
                 </div>
             @endforeach

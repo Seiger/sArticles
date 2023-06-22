@@ -107,12 +107,13 @@
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title">
-                    <label for="tags" class="warning">@lang('sArticles::global.tags_article')</label>
+                    <label for="tags" class="warning">@lang('sArticles::global.main_tag_article')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
                 </div>
                 <div class="col">
                     @php($article->tag = $article->tags()->pluck('tagid')->toArray())
-                    <select id="type" class="form-control select2" name="tags[]" multiple onchange="documentDirty=true;">
+                    <select id="type" class="form-control select2" name="tags[]" onchange="documentDirty=true;">
+                        <option></option>
                         @foreach($tags as $tag)
                             <option value="{{$tag->tagid}}" @if(in_array($tag->tagid, $article->tag)) selected @endif>{{$tag->base}}</option>
                         @endforeach
@@ -133,6 +134,21 @@
                         <div id="image_for_cover" class="image_for_field" data-image="{{$article->coverSrc ?? ''}}" onclick="BrowseServer('cover')" style="background-image: url('{{$article->coverSrc ?? ''}}');"></div>
                         <script>document.getElementById('cover').addEventListener('change', evoRenderImageCheck, false);</script>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row-col col-lg-6 col-md-6 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title">
+                    <label for="tags" class="warning">@lang('sArticles::global.tags_article')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
+                </div>
+                <div class="col">
+                    <select id="type" class="form-control select2" name="tags[]" multiple onchange="documentDirty=true;">
+                        @foreach($tags as $tag)
+                            <option value="{{$tag->tagid}}" @if(in_array($tag->tagid, $article->tag)) selected @endif>{{$tag->base}}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
         </div>
