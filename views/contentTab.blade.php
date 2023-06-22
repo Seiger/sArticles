@@ -5,7 +5,7 @@
     <div class="row form-row">
         <div class="row-col col-lg-12 col-12">
             <div class="row form-row">
-                <div class="col-auto col-title">
+                <div class="col-auto col-title-9">
                     <label for="pagetitle" class="warning">@lang('global.resource_title')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('global.resource_title_help')"></i>
                 </div>
@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="row form-row">
-                <div class="col-auto col-title">
+                <div class="col-auto col-title-9">
                     <label for="longtitle" class="warning">@lang('global.long_title')</label>
                 </div>
                 <div class="col">
@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="row form-row">
-                <div class="col-auto col-title">
+                <div class="col-auto col-title-9">
                     <label for="introtext" class="warning">@lang('global.resource_summary')</label>
                 </div>
                 <div class="col">
@@ -39,11 +39,23 @@
                 </div>
             </div>
             <div class="row form-row form-row-richtext">
-                <div class="col-auto col-title">
-                    <label for="content" class="warning">@lang('global.resource_content')</label>
+                <div class="col-auto col-title-9">
+                    <label for="content" class="warning">@lang('global.resource_content')</label><br><br>
+                    @foreach($buttons as $button){!! $button !!}<br><br>@endforeach
                 </div>
-                <div class="col">
-                    <textarea id="content" class="form-control" name="content" cols="40" rows="15" onchange="documentDirty=true;">{{$content->content ?? ''}}</textarea>
+                <div id="builder" class="col builder">
+                    @foreach($chunks as $chunk)
+                        <div class="row col row-col-wrap col-12 b-draggable">
+                            <div class="col-12 b-item">
+                                <div class="row align-items-center">
+                                    <div class="col-auto"><i title="@lang('sArticles::global.sort_order')" class="fa fa-sort b-move"></i></div>
+                                    <div class="col">{!! $chunk !!}</div>
+                                    <div class="col-auto"><i title="@lang('global.remove')" onclick="onDeleteField($(this))" class="fa fa-minus-circle text-danger b-btn-del"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                    <i class="b-resize b-resize-r"></i>
                 </div>
             </div>
             <div class="row form-row">
@@ -58,7 +70,7 @@
                 </div>
             </div>
             <div class="row form-row">
-                <div class="col-auto col-title">
+                <div class="col-auto col-title-9">
                     <label for="seodescription" class="warning">@lang('sArticles::global.seodescription')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seodescription_help')"></i>
                 </div>
@@ -69,7 +81,7 @@
                 </div>
             </div>
             <div class="row form-row">
-                <div class="col-auto col-title">
+                <div class="col-auto col-title-9">
                     <label for="seorobots" class="warning">@lang('sArticles::global.seorobots')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seorobots_help')"></i>
                 </div>
@@ -118,6 +130,11 @@
             </a>
         </div>
     </div>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/bootstrap.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
     <div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -132,4 +149,40 @@
             </div>
         </div>
     </div>
+    <div class="draft-elements">
+        @foreach($elements as $element)
+            <div class="element">
+                <div class="row col row-col-wrap col-12 b-draggable">
+                    <div class="col-12 b-item">
+                        <div class="row align-items-center">
+                            <div class="col-auto"><i title="@lang('sArticles::global.sort_order')" class="fa fa-sort b-move"></i></div>
+                            <div class="col">{!! $element !!}</div>
+                            <div class="col-auto"><i title="@lang('global.remove')" onclick="onDeleteField($(this))" class="fa fa-minus-circle text-danger b-btn-del"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+    <style>.draft-elements{display:none;}</style>
+    <script>
+        $(document).on("click","[data-element]",function(){
+            let attr=$(this).attr('data-element');
+            if (attr=='richtext'){tinymce.remove()}
+            let cnts=$('.builder').find('.b-draggable').length+1;
+            console.log(cnts);
+            let elem=$('#'+attr).closest('.element').html();
+            let enew=elem.replace('id="'+attr+'"','id="'+attr+cnts+'"')
+                .replace('id="image_for_'+attr+'"','id="image_for_'+attr+cnts+'"')
+                .replace('BrowseServer(\''+attr+'\')','BrowseServer(\''+attr+cnts+'\')')
+                .replace('BrowseServer(\''+attr+'\')','BrowseServer(\''+attr+cnts+'\')')
+                .replace('getElementById(\''+attr+'\')','getElementById(\''+attr+cnts+'\')')
+                .replace(/builder\[9999\]\[/g,'builder['+cnts+'][');
+            $(".b-resize").before(enew);documentDirty=true;
+            if(attr=='richtext'){tinymce.init({{evo()->getConfig('tinymce5_theme')??'custom'}})}
+        });
+        sortableTabs();
+        function sortableTabs(){$('#builder').sortable({animation:150,onChange:function(){$('#builder').find('.b-draggable').each(function(index){let parent=$('#builder').find('.b-draggable').eq(index);let elemId=parent.find('[name^="builder\["]').first().attr('name').replace("builder[","").split("][")[0];parent.find('.col [name^="builder\['+elemId+'\]"]').each(function(position){this.name = this.name.replace("builder["+elemId+"]","builder["+index+"]")})});tinymce.remove();tinymce.init({{evo()->getConfig('tinymce5_theme')??'custom'}})}})}
+        function onDeleteField(target){let parent=target.closest('.b-draggable');alertify.confirm("@lang('sSettings::global.are_you_sure')","@lang('sSettings::global.deleted_irretrievably')",function(){alertify.error("@lang('sSettings::global.deleted')");parent.remove()},function(){alertify.success("@lang('sSettings::global.canceled')")}).set('labels',{ok:"@lang('global.delete')",cancel:"@lang('global.cancel')"}).set({transition:'zoom'});documentDirty=true}
+    </script>
 @endpush

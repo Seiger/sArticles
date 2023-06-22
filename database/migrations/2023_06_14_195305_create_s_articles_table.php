@@ -71,6 +71,14 @@ class CreateSArticlesTable extends Migration
             $table->integer('article')->index();
             $table->integer('tag')->index();
         });
+
+        Schema::create('s_articles_polls', function (Blueprint $table) {
+            $table->id('pollid');
+            $table->jsonb('question')->default(new Expression('(JSON_ARRAY())'));
+            $table->jsonb('answers')->default(new Expression('(JSON_ARRAY())'));
+            $table->jsonb('votes')->default(new Expression('(JSON_ARRAY())'));
+            $table->timestamps();
+        });
     }
 
     /**
@@ -80,6 +88,7 @@ class CreateSArticlesTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('s_articles_polls');
         Schema::dropIfExists('s_article_tags');
         Schema::dropIfExists('s_articles_tags');
         Schema::dropIfExists('s_article_features');

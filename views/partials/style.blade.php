@@ -29,6 +29,7 @@
     .modal-header{margin-top:1rem;}
     table .post-thumbnail{width:70px;height:45px;}
     .badge.bg-seigerit{background-color:#0057b8 !important;color:#ffd700;font-size:85%;}
+    .input-group .badge.bg-seigerit{font-size:150%;}
     #copyright{position:fixed;bottom:0;right:0;background-color:#0057b8;padding:3px 7px;border-radius:5px;}
     #copyright img{width:9em;}
     .input-group-text{padding:0.1rem 0.75rem;}
@@ -50,4 +51,27 @@
         .sectionTrans .btn-group .btn .fa, .sectionTrans .btn-group .btn .fas{display:inline-block;}
         .sectionTrans .btn-group .btn span{display:none;}
     }
+    .builder .row{display:flex;flex-wrap:wrap;margin-left:-.25rem;margin-right:-.25rem;cursor:default}
+    .builder .col-4, .builder .col-8, .builder .col-12, .builder .col, .builder .col-auto{position:relative;width:100%;min-height:0;padding-left:.25rem;padding-right:.25rem}
+    .builder .col{flex-basis:0;flex-grow:1;max-width:100%}
+    .builder .col-auto{-ms-flex:0 0 auto;flex:0 0 auto;width:auto;max-width:none}
+    .builder .col-4{flex:0 0 33.3333%;max-width:33.3333%}
+    .builder .col-8{flex:0 0 66.6667%;max-width:66.6667%}
+    .builder .col-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}
+    .builder .align-items-center{align-items:center}
+    .builder label{margin:0;user-select:none}
+    .builder input[type="text"]{cursor:auto}
+    .builder .row-col{position:relative;padding:.25rem .25rem 0 .25rem !important;margin-right:-1px !important;min-height:2.4rem;height:100%;border:1px solid}
+    .builder .b-resize{position:absolute;top:0;right:-1px;bottom:0;width:.35rem;cursor:col-resize;transition:background-color .25s}
+    .builder .fa{font-size:.75rem}
+    .builder .b-item{position:relative;padding:.25rem .5rem;margin-bottom:.25rem;border:1px solid}
+    .builder .b-btn-del{opacity:.5;transition:.5s opacity}
+    .builder .b-btn-del:hover{opacity:1}
+    .builder .b-resize{background-color:#0057b8}
+    .builder .b-item, .builder .b-tab, .builder .b-item, .builder .row-col, .builder .b-resize, .builder .b-settings .row{border-color:#e0e0e0}
+    .builder .row-col-wrap:hover .row-col, .builder .row-col-wrap:hover .b-resize, .builder .b-btn-wrap, .builder .b-resize, .builder .b-settings .col-12:first-child{border-color:#ccc}
+    .builder .row-col-wrap:hover .b-resize, .builder .b-settings .b-btn-group label{border-color:#ccc}
+    .builder .row-col-wrap:hover .b-resize:hover, .builder .b-resize:hover, .builder .b-resize:active{background-color:#1976d2}
+    .darkness .builder .b-resize{background-color:#ffd700}
+    .darkness .builder .row-col-wrap:hover .b-resize{background-color:#65686d}
 </style>

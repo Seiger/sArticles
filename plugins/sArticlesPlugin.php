@@ -16,21 +16,23 @@ Event::listen('evolution.OnPageNotFound', function($params) {
         unset($aliasArr[0]);
     }
     $alias = implode('/', $aliasArr);
-
     $goTo = Arr::exists(sArticles::documentListing(), $alias);
-
     if (!$goTo && evo()->getLoginUserID('mgr')) {
         $alias = Arr::last($aliasArr);
         $article = sArticles::getArticleByAlias($alias ?? '');
-
         if ($article && isset($article->article) && (int)$article->article > 0) {
             $goTo = true;
         }
     }
-
     if ($goTo) {
         evo()->sendForward(evo()->getConfig('s_articles_resource', 1));
         exit();
+    }
+
+    $find = Arr::last($aliasArr);
+    $check = implode('/', $aliasArr);
+    if ($check == 'sarticles/poll/'.$find) {
+        die(sArticles::showPoll((int)$find));
     }
 });
 
@@ -44,21 +46,17 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
     }
     $alias = implode('/', $aliasArr);
     $document = sArticles::documentListing()[$alias] ?? false;
-
     if (!$document && evo()->getLoginUserID('mgr')) {
         $alias = Arr::last($aliasArr);
         $article = sArticles::getArticleByAlias($alias ?? '');
-
         if ($article && isset($article->article) && (int)$article->article > 0) {
             $document = (int)$article->article;
         }
     }
-
     if ($document) {
         $article = sArticle::find($document);
         $article->constructor = data_is_json($article->constructor, true);
         $article->tmplvars = data_is_json($article->tmplvars, true);
-
         if ($article->tmplvars && count($article->tmplvars)) {
             foreach ($article->tmplvars as $name => $value) {
                 if (isset($params['documentObject'][$name]) && is_array($params['documentObject'][$name])) {
@@ -66,9 +64,7 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
                 }
             }
         }
-
         unset($article->tmplvars);
-
-        evo()->documentObject = array_merge($params['documentObject'], Arr::dot($article->toArray()));
+        return array_merge($params['documentObject'], Arr::dot($article->toArray()));
     }
 });

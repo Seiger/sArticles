@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
+use Seiger\sArticles\Models\sArticlesPoll;
 
 class sArticles
 {
@@ -76,6 +77,38 @@ class sArticles
         }
 
         return $articlesListing ?? [];
+    }
+
+    /**
+     * Show Poll or result votes
+     *
+     * @param $id
+     * @return void
+     */
+    public function showPoll($id)
+    {
+        $result = '';
+        $poll = sArticlesPoll::find($id);
+        if ($poll) {
+            if (request()->isMethod('POST') && request()->post('poll')) {
+                $vote = explode('-', request()->post('poll'));
+                if ($vote[0] == $poll->pollid && isset($vote[1])) {
+                    $vote = strval($vote[1]);
+                    $votes = data_is_json($poll->votes, true);
+                    $votes[$vote] = $votes[$vote] + 1;
+                    $votes['total'] = $votes['total'] + 1;
+                    $poll->votes = json_encode($votes);
+                    $poll->update();
+                    $_SESSION['polls'][] = $poll->pollid;
+                }
+            }
+            if (in_array($poll->pollid, ($_SESSION['polls'] ?? []))) {
+                $result = view('partials.articlePollVotes', ['poll' => $poll])->render();
+            } else {
+                $result = view('partials.articlePoll', ['poll' => $poll])->render();
+            }
+        }
+        return $result;
     }
 
     /**

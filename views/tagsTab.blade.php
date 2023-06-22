@@ -57,10 +57,12 @@
 @push('scripts.bot')
     <div id="actions">
         <div class="btn-group">
-            <a id="Button2" class="btn btn-info" href="#" data-toggle="modal" data-target="#addTag">
-                <i class="fa fa-hashtag"></i>
-                <span>@lang('sArticles::global.add_tag')</span>
-            </a>
+            <div class="btn-group">
+                <a id="Button2" class="btn btn-primary" href="#" data-toggle="modal" data-target="#addTag">
+                    <i class="fa fa-plus"></i>
+                    <span>@lang('sArticles::global.add_tag')</span>
+                </a>
+            </div>
         </div>
     </div>
     <div class="modal fade" id="addTag" tabindex="-1" role="dialog" aria-hidden="true">

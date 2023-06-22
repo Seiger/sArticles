@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticlesFeature;
+use Seiger\sArticles\Models\sArticlesPoll;
 use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticleTranslate;
 
@@ -25,7 +26,7 @@ $data['url'] = $sArticlesController->url;
 
 switch ($data['get']) {
     default:
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles', 'tags', 'polls'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
@@ -93,21 +94,90 @@ switch ($data['get']) {
         $data['content_url'] = '&i=' . request()->i;
         $data['tvs_url'] = '&i='.request()->i;
         $data['constructor'] = [];
-        $constructor = data_is_json($content->constructor ?? '', true);
-        $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
-        $editor = "content";
-        if (is_array($settings)) {
-            foreach ($settings as $setting) {
-                $data['constructor'][] = array_merge($setting, ['value' => ($constructor[$setting['key']] ?? '')]);
-                if ($setting['type'] == 'RichText') {
-                    $editor .= ",".$setting['key'];
+        $editor = [];
+        $buttons = [];
+        $elements = [];
+        $templates = [];
+        $fields = glob(MODX_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
+        if (count($fields)) {
+            foreach ($fields as $field) {
+                $template = str_replace('config.php', 'template.php', $field);
+                if (is_file($template)) {
+                    $field = require $field;
+                    $id = $field['id'];
+                    $templates[$id] = $template;
+                    $buttons[] = '<button data-element="' . $id . '" type="button" class="btn btn-primary btn-lg btn-block">' . $field['title'] . '</button>'.($field['script'] ?? '');
+                    ob_start();
+                    include $template;
+                    $elements[] = ob_get_contents();
+                    ob_end_clean();
+                    if (strtolower($field['type']) == 'richtext') {
+                        foreach (range(0, 100) as $y) {
+                            $editor[] = $id . $y;
+                        }
+                    }
                 }
             }
         }
-        $data['editor'] = $sArticlesController->textEditor($editor);
+        $chunks = [];
+        $builder = data_is_json($content->builder ?? '', true);
+        if (is_array($builder) && count($builder)) {
+            foreach ($builder as $i => $item) {
+                $key = array_key_first($item);
+                if (isset($templates[$key])) {
+                    $id = $key . $i;
+                    $value = $item[$key];
+                    ob_start();
+                    include $templates[$key];
+                    $chunks[] = ob_get_contents();
+                    ob_end_clean();
+                }
+            }
+        }
+        $constructor = data_is_json($content->constructor ?? '', true);
+        $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
+        if (is_array($settings)) {
+            foreach ($settings as $setting) {
+                $data['constructor'][] = array_merge($setting, ['value' => ($constructor[$setting['key']] ?? '')]);
+                if (strtolower($setting['type']) == 'richtext') {
+                    $editor[] = $setting['key'];
+                }
+            }
+        }
         $data['content'] = $content;
+        $data['editor'] = $sArticlesController->textEditor(implode(',', $editor));
+        $data['buttons'] = $buttons;
+        $data['elements'] = $elements;
+        $data['chunks'] = $chunks;
         break;
     case "contentSave":
+        $contentField = '';
+        $renders = [];
+        $fields = glob(MODX_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
+        if (count($fields)) {
+            foreach ($fields as $field) {
+                $render = str_replace('config.php', 'render.php', $field);
+                if (is_file($render)) {
+                    $field = require $field;
+                    $id = $field['id'];
+                    $renders[$id] = $render;
+                }
+            }
+        }
+        $contentBuilder = request()->builder;
+        if (is_array($contentBuilder) && count($contentBuilder)) {
+            foreach ($contentBuilder as $position => $item) {
+                $id = array_key_first($item);
+                if (isset($renders[$id])) {
+                    $value = $item[$id];
+                    ob_start();
+                    include $renders[$id];
+                    $contentField .= ob_get_contents();
+                    ob_end_clean();
+                }
+            }
+        }
+        $contentField = str_replace([chr(9), chr(10), chr(13), '  '], '', $contentField);
         $content = sArticleTranslate::whereArticle((int)request()->article)->whereLang(request()->lang)->firstOrNew();
         if (!$content->tid) {
             $content->article = (int)request()->article;
@@ -116,10 +186,11 @@ switch ($data['get']) {
         $content->pagetitle = request()->pagetitle;
         $content->longtitle = request()->longtitle;
         $content->introtext = request()->introtext;
-        $content->content = request()->input('content');
+        $content->content = $contentField;
         $content->seotitle = request()->seotitle;
         $content->seodescription = request()->seodescription;
         $content->seorobots = request()->seorobots;
+        $content->builder = json_encode(request()->builder);
         $content->constructor = json_encode(request()->constructor);
         if ($content->article == 0) {
             $article = new sArticle();
@@ -129,6 +200,58 @@ switch ($data['get']) {
         }
         $content->save();
         $back = str_replace('&i=0', '&i=' . $content->article, (request()->back ?? '&get=articles'));
+        return header('Location: ' . $sArticlesController->url . $back);
+    case "poll":
+        $data['tabs'] = ['poll'];
+        $data['poll'] = sArticles::getArticle(request()->i);
+        $data['poll_url'] = '&i='.request()->i;
+        $poll = sArticlesPoll::find(request()->i);
+        if ($poll) {
+            $data['question'] = $poll->question;
+            $data['answers'] = data_is_json($poll->answers ?? '', true);
+            $data['votes'] = data_is_json($poll->votes ?? '', true);
+        }
+        break;
+    case "pollSave":
+        $answers = [];
+        if (is_array(request()->answers)) {
+            $firstArrayKey = array_key_first(request()->answers);
+            if (is_array(request()->answers[$firstArrayKey]) && count(request()->answers[$firstArrayKey])) {
+                foreach (request()->answers[$firstArrayKey] as $key => $answer) {
+                    foreach ($sArticlesController->langList() as $item) {
+                        $answers[$key][$item] = request()->answers[$item][$key];
+                    }
+                }
+            }
+        }
+        $poll = sArticlesPoll::find(request()->poll);
+        if (!$poll) {
+            $poll = new sArticlesPoll();
+        }
+        $poll->question = json_encode(request()->question);
+        $poll->answers = json_encode($answers);
+        $votes = data_is_json($poll->votes ?? '', true);
+        if (!$votes) {
+            $votes = [];
+            $votes['total'] = 0;
+        }
+        if (count($answers)) {
+            foreach ($answers as $key => $answer) {
+                if (!isset($votes[$key])) {
+                    $votes[strval($key)] = 0;
+                }
+            }
+        }
+        $poll->votes = json_encode($votes);
+        $poll->save();
+        $back = str_replace('&i=0', '&i=' . $poll->pollid, (request()->back ?? '&get=polls'));
+        return header('Location: ' . $sArticlesController->url . $back);
+    case "pollDelete":
+        $poll = sArticlesPoll::find(request()->i);
+        if ($poll) {
+            $poll->delete();
+        }
+        $back = '&get=polls';
         return header('Location: ' . $sArticlesController->url . $back);
     case "tvs":
         $data['tabs'] = ['article', 'content', 'tvs'];
@@ -176,7 +299,7 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables('features');
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles', 'tags', 'polls'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
@@ -237,7 +360,7 @@ switch ($data['get']) {
         $back = request()->back ?? '&get=features';
         return header('Location: ' . $sArticlesController->url . $back);
     case "settings":
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles', 'tags', 'polls'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
@@ -287,7 +410,7 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "tags":
         $sArticlesController->setModifyTables('tags');
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles', 'tags', 'polls'];
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
