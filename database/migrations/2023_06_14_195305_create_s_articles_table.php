@@ -23,6 +23,7 @@ class CreateSArticlesTable extends Migration
             $table->integer('position')->default(0);
             $table->string('alias', 255)->index();
             $table->string('cover', 255)->default('');
+            $table->jsonb('relevants')->default(new Expression('(JSON_ARRAY())'));
             $table->jsonb('tmplvars')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamp('published_at')->nullable();
             $table->timestamps();

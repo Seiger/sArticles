@@ -182,7 +182,6 @@
             let attr=$(this).attr('data-element');
             if (attr=='richtext'){tinymce.remove()}
             let cnts=$('.builder').find('.b-draggable').length+1;
-            console.log(cnts);
             let elem=$('#'+attr).closest('.element').html();
             let enew=elem.replace('id="'+attr+'"','id="'+attr+cnts+'"')
                 .replace('id="image_for_'+attr+'"','id="image_for_'+attr+cnts+'"')

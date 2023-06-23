@@ -52,6 +52,7 @@
     'published_help' => 'Mark to publish immediately after saving.',
     'rating' => 'Rating',
     'rating_help' => 'Offer rating. May change automatically if voting is enabled on the site.',
+    'relevant_articles' => 'Relevant articles',
     'tag_alias_help' => 'The tag alias must be unique and only in Latin characters without spaces and special characters. If such an alias already exists, a number will be added at the end.',
     'tag_alias' => 'Tag alias',
     'tag_texts' => 'Tag texts',

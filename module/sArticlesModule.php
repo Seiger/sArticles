@@ -67,6 +67,7 @@ switch ($data['get']) {
         $article->alias = $sArticlesController->validateAlias($alias, request()->article);
         $article->position = (int)request()->position;
         $article->cover = request()->cover;
+        $article->relevants = json_encode(request()->relevants);
         $article->published_at = $publishedAt;
         $article->save();
         $article->features()->sync(request()->features ?? []);
@@ -383,6 +384,7 @@ switch ($data['get']) {
             foreach ($keys as $idx => $key) {
                 $key = Str::slug($key);
                 $key = Str::lower($key);
+                $key = Str::replace('-', '_', $key);
                 $settings[$key] = [
                     'key' => $key,
                     'name' => request()->input('settings')['name'][$idx],

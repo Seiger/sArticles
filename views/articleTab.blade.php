@@ -122,6 +122,36 @@
             </div>
         </div>
         <div class="row-col col-lg-6 col-md-6 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title">
+                    <label for="tags" class="warning">@lang('sArticles::global.tags_article')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
+                </div>
+                <div class="col">
+                    <select id="type" class="form-control select2" name="tags[]" multiple onchange="documentDirty=true;">
+                        @foreach($tags as $tag)
+                            <option value="{{$tag->tagid}}" @if(in_array($tag->tagid, $article->tag)) selected @endif>{{$tag->base}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row-col col-lg-6 col-md-6 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title">
+                    <label for="tags" class="warning">@lang('sArticles::global.relevant_articles')</label>
+                </div>
+                <div class="col">
+                    @php($articleRelevants = data_is_json($article->relevants, true))
+                    <select id="relevants" class="form-control select2" name="relevants[]" multiple onchange="documentDirty=true;">
+                        @foreach(sArticles::all() as $item)
+                            <option value="{{$item->id}}" @if(in_array($item->id, $articleRelevants ?? [])) selected @endif>{{$item->pagetitle}} ({{$item->id}})</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row form-row-image">
                 <div class="col-auto col-title">
                     <label for="cover" class="warning">@lang('sArticles::global.image')</label>
@@ -134,21 +164,6 @@
                         <div id="image_for_cover" class="image_for_field" data-image="{{$article->coverSrc ?? ''}}" onclick="BrowseServer('cover')" style="background-image: url('{{$article->coverSrc ?? ''}}');"></div>
                         <script>document.getElementById('cover').addEventListener('change', evoRenderImageCheck, false);</script>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="row-col col-lg-6 col-md-6 col-12">
-            <div class="row form-row">
-                <div class="col-auto col-title">
-                    <label for="tags" class="warning">@lang('sArticles::global.tags_article')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
-                </div>
-                <div class="col">
-                    <select id="type" class="form-control select2" name="tags[]" multiple onchange="documentDirty=true;">
-                        @foreach($tags as $tag)
-                            <option value="{{$tag->tagid}}" @if(in_array($tag->tagid, $article->tag)) selected @endif>{{$tag->base}}</option>
-                        @endforeach
-                    </select>
                 </div>
             </div>
         </div>
