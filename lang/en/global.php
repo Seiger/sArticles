@@ -10,6 +10,7 @@
     'author' => 'Author',
     'auto_translate' => 'Auto translation',
     'availability' => 'Availability',
+    'article_views' => 'Number of article views',
     'badge' => 'Badge',
     'color' => 'Color',
     'confirm_delete' => 'Confirm deletion',

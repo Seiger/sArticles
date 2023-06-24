@@ -10,6 +10,7 @@
     'author' => 'Автор',
     'auto_translate' => 'Автоперевод',
     'availability' => 'Доступность',
+    'article_views' => 'Количество просмотров статьи',
     'badge' => 'Иконка',
     'color' => 'Цвет',
     'confirm_delete' => 'Подтвердить удаление',

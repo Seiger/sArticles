@@ -10,6 +10,7 @@
     'author' => 'Автор',
     'auto_translate' => 'Автопереклад',
     'availability' => 'Доступність',
+    'article_views' => 'Кількість переглядів статті',
     'badge' => 'Значок',
     'color' => 'Колір',
     'confirm_delete' => 'Підтвердити видалення',
