@@ -143,7 +143,7 @@
                     <label for="tags" class="warning">@lang('sArticles::global.relevant_articles')</label>
                 </div>
                 <div class="col">
-                    @php($articleRelevants = data_is_json($article->relevants, true))
+                    @php($articleRelevants = data_is_json($article->relevants ?? '', true) ?: [])
                     <select id="relevants" class="form-control select2" name="relevants[]" multiple onchange="documentDirty=true;">
                         @foreach(sArticles::all() as $item)
                             <option value="{{$item->id}}" @if(in_array($item->id, $articleRelevants ?? [])) selected @endif>{{$item->pagetitle}} ({{$item->id}})</option>
