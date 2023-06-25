@@ -40,6 +40,7 @@ class CreateSArticlesTable extends Migration
             $table->string('seotitle', 100)->default('');
             $table->string('seodescription', 255)->default('');
             $table->enum('seorobots', ['index,follow', 'noindex,nofollow'])->default('index,follow');
+            $table->jsonb('builder')->default(new Expression('(JSON_ARRAY())'));
             $table->jsonb('constructor')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamps();
         });
