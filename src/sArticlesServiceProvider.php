@@ -53,6 +53,9 @@ class sArticlesServiceProvider extends ServiceProvider
                 dirname(__DIR__) . '/builder/slider/config.php' => public_path('assets/modules/sarticles/builder/slider/config.php'),
                 dirname(__DIR__) . '/builder/slider/render.php' => public_path('assets/modules/sarticles/builder/slider/render.php'),
                 dirname(__DIR__) . '/builder/slider/template.php' => public_path('assets/modules/sarticles/builder/slider/template.php'),
+                dirname(__DIR__) . '/builder/note/config.php' => public_path('assets/modules/sarticles/builder/note/config.php'),
+                dirname(__DIR__) . '/builder/note/render.php' => public_path('assets/modules/sarticles/builder/note/render.php'),
+                dirname(__DIR__) . '/builder/note/template.php' => public_path('assets/modules/sarticles/builder/note/template.php'),
             ]);
         }
 

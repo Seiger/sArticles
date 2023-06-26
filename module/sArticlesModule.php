@@ -26,7 +26,10 @@ $data['url'] = $sArticlesController->url;
 
 switch ($data['get']) {
     default:
-        $data['tabs'] = ['articles', 'tags', 'polls'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+            $data['tabs'][] = 'polls';
+        }
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
@@ -105,16 +108,18 @@ switch ($data['get']) {
                 $template = str_replace('config.php', 'template.php', $field);
                 if (is_file($template)) {
                     $field = require $field;
-                    $id = $field['id'];
-                    $templates[$id] = $template;
-                    $buttons[] = '<button data-element="' . $id . '" type="button" class="btn btn-primary btn-lg btn-block">' . $field['title'] . '</button>'.($field['script'] ?? '');
-                    ob_start();
-                    include $template;
-                    $elements[] = ob_get_contents();
-                    ob_end_clean();
-                    if (strtolower($field['type']) == 'richtext') {
-                        foreach (range(0, 100) as $y) {
-                            $editor[] = $id . $y;
+                    if ((int)$field['active']) {
+                        $id = $field['id'];
+                        $templates[$id] = $template;
+                        $buttons[] = '<button data-element="' . $id . '" type="button" class="btn btn-primary btn-lg btn-block">' . $field['title'] . '</button>' . ($field['script'] ?? '');
+                        ob_start();
+                        include $template;
+                        $elements[] = ob_get_contents();
+                        ob_end_clean();
+                        if (strtolower($field['type']) == 'richtext') {
+                            foreach (range(0, 100) as $y) {
+                                $editor[] = $id . $y;
+                            }
                         }
                     }
                 }
@@ -300,7 +305,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables('features');
-        $data['tabs'] = ['articles', 'tags', 'polls'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+            $data['tabs'][] = 'polls';
+        }
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
@@ -361,7 +369,10 @@ switch ($data['get']) {
         $back = request()->back ?? '&get=features';
         return header('Location: ' . $sArticlesController->url . $back);
     case "settings":
-        $data['tabs'] = ['articles', 'tags', 'polls'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+            $data['tabs'][] = 'polls';
+        }
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
@@ -371,11 +382,16 @@ switch ($data['get']) {
         }
         break;
     case "settingsSave":
+        $tbl = evo()->getDatabase()->getFullTableName('system_settings');
         if (request()->has('parent') && request()->parent != evo()->getConfig('s_articles_resource')) {
             $resource = request()->parent;
-            $tbl = evo()->getDatabase()->getFullTableName('system_settings');
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_resource', '{$resource}')");
             evo()->setConfig('s_articles_resource', $resource);
+        }
+        if (request()->has('polls_on') && request()->polls_on != evo()->getConfig('s_articles_polls_on')) {
+            $polls_on = request()->polls_on;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_polls_on', '{$polls_on}')");
+            evo()->setConfig('s_articles_polls_on', $polls_on);
             evo()->clearCache('full');
         }
         $keys = request()->input('settings.key', []);
@@ -412,7 +428,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "tags":
         $sArticlesController->setModifyTables('tags');
-        $data['tabs'] = ['articles', 'tags', 'polls'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+            $data['tabs'][] = 'polls';
+        }
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';

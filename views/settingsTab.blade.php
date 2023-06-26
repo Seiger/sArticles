@@ -46,7 +46,7 @@
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
-                <div class="col-auto col-title-6">
+                <div class="col-auto col-title-7">
                     <label for="parent" class="warning">@lang('sArticles::global.resource')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.resource_help')"></i>
                 </div>
@@ -68,6 +68,20 @@
                         <b id="parentName">{{evo()->getConfig('s_articles_resource', 1)}} ({{entities($parentname)}})</b>
                         <input type="hidden" name="parent" value="{{evo()->getConfig('s_articles_resource', 1)}}" onchange="documentDirty=true;" />
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-lg-3 col-md-3 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title-7">
+                    <label for="parent" class="warning">@lang('sArticles::global.polls')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.polls_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" id="publishedcheck" class="form-checkbox form-control" name="publishedcheck" value="" onchange="documentDirty=true;" onclick="changestate(document.form.published);" @if(evo()->getConfig('s_articles_polls_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="published" name="polls_on" value="{{evo()->getConfig('s_articles_polls_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>

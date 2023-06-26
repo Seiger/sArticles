@@ -47,6 +47,7 @@
     'polls' => 'Polls',
     'polls_help' => 'List of Polls and their status.',
     'polls_icon' => 'fa fa-poll',
+    'polls_on_off_help' => 'Enabling the survey functionality on the site.',
     'position' => 'Position',
     'position_help' => 'Directory output priority. Sorting by default is from 0 to ∞. Only numbers.',
     'published_at_help' => 'Select a publication date, or click on the icon next to it to delete a publication date.',

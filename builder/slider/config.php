@@ -1,4 +1,5 @@
 <?php return [
+    'active' => 1,
     'title' => 'Slider',
     'type' => 'gallery',
     'id' => 'slider',
