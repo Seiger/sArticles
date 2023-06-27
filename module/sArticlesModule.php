@@ -64,6 +64,17 @@ switch ($data['get']) {
                 $alias = $requestId;
             }
         }
+        $votes = data_is_json($article->votes ?? '', true);
+        if (!$votes) {
+            $votes = [];
+            $votes['total'] = 1;
+            $votes['1'] = 0;
+            $votes['2'] = 0;
+            $votes['3'] = 0;
+            $votes['3'] = 0;
+            $votes['4'] = 0;
+            $votes['5'] = 1;
+        }
         $article->published = (int)request()->published;
         $article->parent = (int)request()->parent;
         $article->author = (int)request()->author;
@@ -71,6 +82,7 @@ switch ($data['get']) {
         $article->position = (int)request()->position;
         $article->cover = request()->cover;
         $article->relevants = json_encode(request()->relevants);
+        $article->votes = json_encode($votes);
         $article->published_at = $publishedAt;
         $article->save();
         $article->features()->sync(request()->features ?? []);

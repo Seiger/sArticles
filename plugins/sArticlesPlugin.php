@@ -34,6 +34,9 @@ Event::listen('evolution.OnPageNotFound', function($params) {
     if ($check == 'sarticles/poll/'.$find) {
         die(sArticles::showPoll((int)$find));
     }
+    if ($check == 'sarticles/rating/'.$find) {
+        die(sArticles::ratingVotes((int)$find));
+    }
 });
 
 /*

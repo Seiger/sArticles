@@ -112,6 +112,42 @@ class sArticles
     }
 
     /**
+     * Rating of Article votes
+     *
+     * @param $id
+     * @return void
+     */
+    public function ratingVotes($id)
+    {
+        $result = '';
+        $article = sArticle::find($id);
+        if ($article) {
+            if (!in_array($article->id, ($_SESSION['article-rating'] ?? []))) {
+                if (request()->isMethod('POST') && request()->post('vote')) {
+                    $rating = 5;
+                    $vote = strval(request()->post('vote'));
+                    $votes = data_is_json($article->votes, true);
+                    $votes[$vote] = $votes[$vote] + 1;
+                    $votes['total'] = $votes['total'] + 1;
+                    $sum = 0;
+                    foreach ($votes as $k => $v) {
+                        if ($k != 'total') {
+                            $sum = ($k * $v) + $sum;
+                        }
+                    }
+                    $rating = round($sum / $votes['total']);
+                    $article->rating = $rating;
+                    $article->votes = json_encode($votes);
+                    $article->update();
+                    $_SESSION['article-rating'][] = $article->id;
+                    $result = $rating;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Module url
      *
      * @return string

@@ -15,6 +15,7 @@
                     <input type="checkbox" id="publishedcheck" class="form-checkbox form-control" name="publishedcheck" value="" onchange="documentDirty=true;" onclick="changestate(document.form.published);" @if(isset($article->published) && $article->published) checked @endif>
                     <input type="hidden" id="published" name="published" value="{{$article->published ?? 0}}" onchange="documentDirty=true;">
                     &emsp;<i class="fa fa-eye" data-tooltip="@lang('sArticles::global.article_views')"> <b>{{$article->views ?? 0}}</b></i>
+                    &emsp;<i class="fa fa-star" data-tooltip="@lang('sArticles::global.rating')"> <b>{{$article->rating ?? 0}}</b></i>
                 </div>
             </div>
         </div>
