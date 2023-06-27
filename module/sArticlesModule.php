@@ -415,7 +415,7 @@ switch ($data['get']) {
                 $key = Str::replace('-', '_', $key);
                 $settings[$key] = [
                     'key' => $key,
-                    'name' => request()->input('settings')['name'][$idx],
+                    'name' => addslashes(request()->input('settings')['name'][$idx]),
                     'type' => request()->input('settings')['type'][$idx],
                 ];
             }
