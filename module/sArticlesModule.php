@@ -209,7 +209,7 @@ switch ($data['get']) {
         $content->seotitle = request()->seotitle;
         $content->seodescription = request()->seodescription;
         $content->seorobots = request()->seorobots;
-        $content->builder = json_encode(request()->builder);
+        $content->builder = json_encode(array_values(request()->builder ?? []));
         $content->constructor = json_encode(request()->constructor);
         if ($content->article == 0) {
             $article = new sArticle();
