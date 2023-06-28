@@ -38,12 +38,12 @@
 @push('scripts.bot')
     <div id="actions">
         <div class="btn-group">
+            <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
+                <i class="fa fa-times-circle"></i><span>@lang('sArticles::global.to_list_articles')</span>
+            </a>
             <a id="Button1" class="btn btn-success" href="javascript:void(0);" onclick="saveForm('#form');">
                 <i class="fa fa-floppy-o"></i>
                 <span>@lang('global.save')</span>
-            </a>
-            <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
-                <i class="fa fa-times-circle"></i><span>@lang('global.cancel')</span>
             </a>
             <a id="Button3" class="btn btn-danger" data-href="{{$url}}&get=articleDelete&i={{$article->id}}" data-delete="{{$article->id}}" data-name="{{$article->pagetitle}}">
                 <i class="fa fa-trash"></i> <span>@lang('global.remove')</span>

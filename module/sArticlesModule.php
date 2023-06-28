@@ -202,7 +202,7 @@ switch ($data['get']) {
             $content->lang = request()->lang;
         }
         $content->pagetitle = request()->pagetitle;
-        $content->longtitle = request()->longtitle;
+        $content->longtitle = request()->input('longtitle', '');
         $content->introtext = request()->introtext;
         $content->content = $contentField;
         $content->seotitle = request()->seotitle;
@@ -404,7 +404,11 @@ switch ($data['get']) {
             $polls_on = request()->polls_on;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_polls_on', '{$polls_on}')");
             evo()->setConfig('s_articles_polls_on', $polls_on);
-            evo()->clearCache('full');
+        }
+        if (request()->has('long_title_on') && request()->long_title_on != evo()->getConfig('s_articles_long_title_on')) {
+            $long_title_on = request()->long_title_on;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_long_title_on', '{$long_title_on}')");
+            evo()->setConfig('s_articles_long_title_on', $long_title_on);
         }
         $keys = request()->input('settings.key', []);
         $settings = [];
@@ -435,7 +439,8 @@ switch ($data['get']) {
         }
         fwrite($f, "];");
         fclose($f);
-        sleep(10);
+        evo()->clearCache('full');
+        sleep(5);
         $back = request()->back ?? '&get=settings';
         return header('Location: ' . $sArticlesController->url . $back);
     case "tags":

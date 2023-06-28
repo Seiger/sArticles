@@ -22,14 +22,16 @@
                     @endif--}}
                 </div>
             </div>
-            <div class="row form-row">
-                <div class="col-auto col-title-9">
-                    <label for="longtitle" class="warning">@lang('global.long_title')</label>
+            @if(evo()->getConfig('s_articles_long_title_on', 1) == 1)
+                <div class="row form-row">
+                    <div class="col-auto col-title-9">
+                        <label for="longtitle" class="warning">@lang('global.long_title')</label>
+                    </div>
+                    <div class="col">
+                        <input type="text" id="longtitle" class="form-control" name="longtitle" maxlength="255" value="{{$content->longtitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
+                    </div>
                 </div>
-                <div class="col">
-                    <input type="text" id="longtitle" class="form-control" name="longtitle" maxlength="255" value="{{$content->longtitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
-                </div>
-            </div>
+            @endif
             <div class="row form-row">
                 <div class="col-auto col-title-9">
                     <label for="introtext" class="warning">@lang('global.resource_summary')</label>
@@ -130,12 +132,12 @@
 @push('scripts.bot')
     <div id="actions">
         <div class="btn-group">
+            <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
+                <i class="fa fa-times-circle"></i><span>@lang('sArticles::global.to_list_articles')</span>
+            </a>
             <a id="Button1" class="btn btn-success" href="javascript:void(0);" onclick="saveForm('#form');">
                 <i class="fa fa-floppy-o"></i>
                 <span>@lang('global.save')</span>
-            </a>
-            <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
-                <i class="fa fa-times-circle"></i><span>@lang('global.cancel')</span>
             </a>
             <a id="Button3" class="btn btn-danger" data-href="{{$url}}&get=articleDelete&i={{request()->i ?? 0}}" data-toggle="modal" data-target="#confirmDelete" data-id="{{request()->i ?? 0}}" data-name="{{$content->pagetitle ?? ''}}">
                 <i class="fa fa-trash"></i> <span>@lang('global.remove')</span>
