@@ -76,6 +76,15 @@ class CreateSArticlesTable extends Migration
             $table->integer('tag')->index();
         });
 
+        Schema::create('s_articles_authors', function (Blueprint $table) {
+            $table->id('autid');
+            $table->string('alias', 255)->index();
+            $table->string('image', 255)->default('');
+            $table->string('base_name', 255)->default('');
+            $table->string('base_office', 255)->default('');
+            $table->timestamps();
+        });
+
         Schema::create('s_articles_polls', function (Blueprint $table) {
             $table->id('pollid');
             $table->jsonb('question')->default(new Expression('(JSON_ARRAY())'));
@@ -93,6 +102,7 @@ class CreateSArticlesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('s_articles_polls');
+        Schema::dropIfExists('s_articles_authors');
         Schema::dropIfExists('s_article_tags');
         Schema::dropIfExists('s_articles_tags');
         Schema::dropIfExists('s_article_features');

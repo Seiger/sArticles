@@ -52,7 +52,6 @@
     @include('sArticles::partials.style')
     <script>
         function evoRenderImageCheck(a) {
-            console.log(a);
             var b = document.getElementById('image_for_' + a.target.id),
                 c = new Image;
             a.target.value ? (c.src = "<?php echo evo()->getConfig('site_url')?>" + a.target.value, c.onerror = function () {

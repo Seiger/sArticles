@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Seiger\sArticles\Models\sArticlesAuthor;
 use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticle;
@@ -108,6 +109,26 @@ class sArticlesController
                     if (count($needs)) {
                         $need = implode(', ', $needs);
                         $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_tags')."` {$need}";
+                        evo()->getDatabase()->query($query);
+                    }
+                    break;
+                case 'authors': // Authors table
+                    $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_articles_authors'));
+                    if ($query) {
+                        $fields = evo()->getDatabase()->makeArray($query);
+                        foreach ($fields as $field) {
+                            $columns[$field['Field']] = $field;
+                        }
+                        foreach ($lang as $item) {
+                            if (!isset($columns[$item.'_name'])) {
+                                $needs[] = "ADD `{$item}_name` varchar(255) COMMENT '" . strtoupper($item) . " Name version'";
+                                $needs[] = "ADD `{$item}_office` varchar(255) COMMENT '" . strtoupper($item) . " Office position version'";
+                            }
+                        }
+                    }
+                    if (count($needs)) {
+                        $need = implode(', ', $needs);
+                        $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_authors')."` {$need}";
                         evo()->getDatabase()->query($query);
                     }
                     break;
@@ -305,6 +326,9 @@ class sArticlesController
                 break;
             case "tag" :
                 $aliases = sArticlesTag::where('s_articles_tags.tagid', '<>', $id)->get('alias')->pluck('alias')->toArray();
+                break;
+            case "author" :
+                $aliases = sArticlesAuthor::where('s_articles_authors.autid', '<>', $id)->get('alias')->pluck('alias')->toArray();
                 break;
         }
 

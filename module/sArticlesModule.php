@@ -9,6 +9,7 @@ use EvolutionCMS\Models\SiteTmplvarTemplate;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
+use Seiger\sArticles\Models\sArticlesAuthor;
 use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesPoll;
 use Seiger\sArticles\Models\sArticlesTag;
@@ -26,7 +27,7 @@ $data['url'] = $sArticlesController->url;
 
 switch ($data['get']) {
     default:
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles', 'authors', 'tags'];
         if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
@@ -220,6 +221,77 @@ switch ($data['get']) {
         $content->save();
         $back = str_replace('&i=0', '&i=' . $content->article, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
+    case "authors":
+        $sArticlesController->setModifyTables('authors');
+        $data['tabs'] = ['articles', 'authors', 'tags'];
+        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+            $data['tabs'][] = 'polls';
+        }
+        if (evo()->hasPermission('settings')) {
+            $data['tabs'][] = 'features';
+            $data['tabs'][] = 'settings';
+        }
+        $data['authors'] = sArticlesAuthor::orderBy('base_name')->get();
+        $data['editor'] = '';
+        break;
+    case "addAuthor":
+        $responce = ['status' => 0];
+        $name = request()->get('name') ?? '';
+        $office = request()->get('office') ?? '';
+        if (!empty($name) && $name = trim($name)) {
+            $author = sArticlesAuthor::where($defaultLng.'_name', $name)->first();
+            if (!$author) {
+                $author = new sArticlesAuthor();
+                $alias = $sArticlesController->validateAlias(Str::slug($name), $author->autid, 'author');
+                $author->alias = $alias;
+                $author->base_name = $name;
+                $author->base_office = $office;
+                $author->{$defaultLng.'_name'} = $name;
+                $author->{$defaultLng.'_office'} = $office;
+                $author->save();
+                $responce['status'] = 1;
+            }
+        }
+        die(json_encode($responce));
+    case "authorImageChange":
+        $author = sArticlesAuthor::find(request()->input('author', 0));
+        if ($author) {
+            $author->image = request()->input('image', '');
+            $author->update();
+        }
+        break;
+    case "authorGetTexts":
+        $texts = sArticlesAuthor::find($_POST['dataId'])->toArray();
+        die(json_encode($texts ?? []));
+    case "authorSetAlias":
+        $responce = ['status' => 0];
+        $author = sArticlesAuthor::find($_POST['dataId']);
+        if ($author) {
+            $alias = $sArticlesController->validateAlias($_POST['alias'], $author->autid, 'author');
+            $author->alias = $alias;
+            $author->update();
+            $responce['status'] = 1;
+        }
+        die(json_encode($responce));
+    case "authorTextUpdate":
+        $result = false;
+        $author = sArticlesAuthor::find($_POST['dataId']);
+        if ($author) {
+            if ($_POST['target'] == $sArticlesController->langDefault().'_name') {
+                $author->base_name = $_POST['value'];
+            }
+            if ($_POST['target'] == $sArticlesController->langDefault().'_office') {
+                $author->base_office = $_POST['value'];
+            }
+            $author->{$_POST['target']} = $_POST['value'];
+            $author->update();
+            $result = true;
+        }
+        die($result);
+    case "authorDelete":
+        sArticlesAuthor::find(request()->input('i', 0))->delete();
+        $back = '&get=authors';
+        return header('Location: ' . $sArticlesController->url . $back);
     case "poll":
         $data['tabs'] = ['poll'];
         $data['poll'] = sArticles::getArticle(request()->i);
@@ -318,7 +390,7 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables('features');
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles', 'authors', 'tags'];
         if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
@@ -382,7 +454,7 @@ switch ($data['get']) {
         $back = request()->back ?? '&get=features';
         return header('Location: ' . $sArticlesController->url . $back);
     case "settings":
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles', 'authors', 'tags'];
         if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
@@ -451,7 +523,7 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "tags":
         $sArticlesController->setModifyTables('tags');
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles', 'authors', 'tags'];
         if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }

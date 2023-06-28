@@ -68,11 +68,11 @@
                     <label for="author" class="warning">@lang('sArticles::global.author')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.author_help')"></i>
                 </div>
-                @php($author = (int)$article->author > 0 ? $article->author : evo()->getLoginUserID())
+                @php($author = (int)$article->author > 0 ? $article->author : 0)
                 <div class="col">
                     <select id="author" class="form-control select2" name="author" onchange="documentDirty=true;">
-                        @foreach(\EvolutionCMS\Models\UserAttribute::all() as $user)
-                            <option value="{{$user->internalKey}}" @if($author == $user->internalKey) selected @endif>{{$user->fullname}}</option>
+                        @foreach(\Seiger\sArticles\Models\sArticlesAuthor::all() as $user)
+                            <option value="{{$user->autid}}" @if($author == $user->autid) selected @endif>{{$user->base_name}}</option>
                         @endforeach
                     </select>
                 </div>
