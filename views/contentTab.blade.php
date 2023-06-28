@@ -209,7 +209,17 @@
             if(attr=='richtext'){tinymce.init({{evo()->getConfig('tinymce5_theme')??'custom'}})}
         });
         sortableTabs();
-        function sortableTabs(){$('#builder').sortable({animation:150,onChange:function(){$('#builder').find('.b-draggable').each(function(index){let parent=$('#builder').find('.b-draggable').eq(index);let elemId=parent.find('[name^="builder\["]').first().attr('name').replace("builder[","").split("][")[0];parent.find('.col [name^="builder\['+elemId+'\]"]').each(function(position){this.name = this.name.replace("builder["+elemId+"]","builder["+index+"]")})});tinymce.remove();tinymce.init({{evo()->getConfig('tinymce5_theme')??'custom'}})}})}
+        function sortableTabs(){$('#builder').sortable({animation:150,onChange:function(){
+                tinymce.remove();
+                $('#builder').find('.b-draggable').each(function(index){
+                    let parent=$('#builder').find('.b-draggable').eq(index);
+                    let elemId=parent.find('[name^="builder\["]').first().attr('name').replace("builder[","").split("][")[0];
+                    parent.find('.b-item [name^="builder\['+elemId+'\]"]').each(function(position){
+                        this.name = this.name.replace("builder["+elemId+"]","builder["+index+"]");
+                    })
+                });
+                tinymce.init({{evo()->getConfig('tinymce5_theme')??'custom'}})}
+        })}
         function onDeleteField(target){let parent=target.closest('.b-draggable');alertify.confirm("@lang('sSettings::global.are_you_sure')","@lang('sSettings::global.deleted_irretrievably')",function(){alertify.error("@lang('sSettings::global.deleted')");parent.remove()},function(){alertify.success("@lang('sSettings::global.canceled')")}).set('labels',{ok:"@lang('global.delete')",cancel:"@lang('global.cancel')"}).set({transition:'zoom'});documentDirty=true}
     </script>
 @endpush
