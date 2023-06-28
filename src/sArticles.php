@@ -62,7 +62,7 @@ class sArticles
     }
 
     /**
-     * List offer aliases
+     * List articles aliases
      *
      * @return array
      */

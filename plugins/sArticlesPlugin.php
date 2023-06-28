@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Seiger\sArticles\Models\sArticle;
 
 /**
- * Catch the offer by alias
+ * Catch the Article by alias
  */
 Event::listen('evolution.OnPageNotFound', function($params) {
     $goTo = false;
