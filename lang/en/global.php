@@ -60,6 +60,7 @@
     'tag_alias_help' => 'The tag alias must be unique and only in Latin characters without spaces and special characters. If such an alias already exists, a number will be added at the end.',
     'tag_alias' => 'Tag alias',
     'tag_texts' => 'Tag texts',
+    'tag_texts_on_off_help' => 'Enable text preview functionality for the tag.',
     'tags_article_help' => 'Add tags to the article from the suggested list. To manage tags, visit the tags page.',
     'tags_article' => 'Article tags',
     'tags' => 'Tags',

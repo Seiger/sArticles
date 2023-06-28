@@ -25,11 +25,13 @@
                         @if($lang == $sArticlesController->langDefault())
                             <div class="input-group">
                                 <input type="text" class="form-control" name="tag[{{$tag['tagid']}}][{{$lang}}]" value="{{$tag[$lang]}}" />
-                                <span class="input-group-btn">
-                                    <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTag" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}">
-                                        <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
-                                    </a>
-                                </span>
+                                @if(evo()->getConfig('s_articles_tag_texts_on', 1) == 1)
+                                    <span class="input-group-btn">
+                                        <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTag" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}">
+                                            <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
+                                        </a>
+                                    </span>
+                                @endif
                             </div>
                         @else
                             <div class="input-group">
@@ -39,11 +41,13 @@
                                         <i class="fa fa-language" style="font-size: xx-large;"></i>
                                     </button>
                                 </span>
-                                <span class="input-group-btn">
-                                    <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTag" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}">
-                                        <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
-                                    </a>
-                                </span>
+                                @if(evo()->getConfig('s_articles_tag_texts_on', 1) == 1)
+                                    <span class="input-group-btn">
+                                        <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTag" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}">
+                                            <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
+                                        </a>
+                                    </span>
+                                @endif
                             </div>
                         @endif
                     </td>

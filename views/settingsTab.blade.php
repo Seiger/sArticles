@@ -86,6 +86,20 @@
             </div>
         </div>
     </div>
+    <div class="row form-row">
+        <div class="row-col col-lg-3 col-md-3 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title-7">
+                    <label for="tag_texts_on" class="warning">@lang('sArticles::global.tag_texts')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tag_texts_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" id="tag_texts_on_check" class="form-checkbox form-control" name="tag_texts_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.tag_texts_on);" @if(evo()->getConfig('s_articles_tag_texts_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="tag_texts_on" name="tag_texts_on" value="{{evo()->getConfig('s_articles_tag_texts_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="split my-2"></div>
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">

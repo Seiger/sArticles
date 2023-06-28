@@ -406,6 +406,11 @@ switch ($data['get']) {
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_polls_on', '{$polls_on}')");
             evo()->setConfig('s_articles_polls_on', $polls_on);
         }
+        if (request()->has('tag_texts_on') && request()->tag_texts_on != evo()->getConfig('s_articles_tag_texts_on')) {
+            $tag_texts_on = request()->tag_texts_on;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_tag_texts_on', '{$tag_texts_on}')");
+            evo()->setConfig('s_articles_tag_texts_on', $tag_texts_on);
+        }
         if (request()->has('long_title_on') && request()->long_title_on != evo()->getConfig('s_articles_long_title_on')) {
             $long_title_on = request()->long_title_on;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_long_title_on', '{$long_title_on}')");
