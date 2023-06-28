@@ -3,5 +3,6 @@
     'title' => 'Poll',
     'type' => 'poll',
     'id' => 'poll',
+    'order' => 7,
     'script' => '',
 ];

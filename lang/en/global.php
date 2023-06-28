@@ -1,5 +1,6 @@
 <?php return [
     'add' => 'Add',
+    'add_block' => 'Add a block',
     'add_help' => 'Add new Article',
     'add_tag' => 'Add tag',
     'add_new_tag' => 'Add a new tag',

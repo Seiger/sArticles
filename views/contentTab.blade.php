@@ -42,21 +42,35 @@
             </div>
             <div class="row form-row form-row-richtext">
                 <div class="col-auto col-title-9">
-                    <label for="content" class="warning">@lang('global.resource_content')</label><br><br>
+                    <label for="content" class="warning">@lang('sArticles::global.add_block')</label><br><br>
                     @foreach($buttons as $button){!! $button !!}<br><br>@endforeach
                 </div>
                 <div id="builder" class="col builder">
-                    @foreach($chunks as $chunk)
+                    @if(count($chunks))
+                        @foreach($chunks as $chunk)
+                            <div class="row col row-col-wrap col-12 b-draggable">
+                                <div class="col-12 b-item">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto"><i title="@lang('sArticles::global.sort_order')" class="fa fa-sort b-move"></i></div>
+                                        <div class="col">{!! $chunk !!}</div>
+                                        <div class="col-auto"><i title="@lang('global.remove')" onclick="onDeleteField($(this))" class="fa fa-minus-circle text-danger b-btn-del"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
                         <div class="row col row-col-wrap col-12 b-draggable">
                             <div class="col-12 b-item">
                                 <div class="row align-items-center">
                                     <div class="col-auto"><i title="@lang('sArticles::global.sort_order')" class="fa fa-sort b-move"></i></div>
-                                    <div class="col">{!! $chunk !!}</div>
+                                    <div class="col">
+                                        <div class="col"><textarea id="richtext1" name="builder[1][richtext]" rows="3" onchange="documentDirty=true;"></textarea></div>
+                                    </div>
                                     <div class="col-auto"><i title="@lang('global.remove')" onclick="onDeleteField($(this))" class="fa fa-minus-circle text-danger b-btn-del"></i></div>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @endif
                     <i class="b-resize b-resize-r"></i>
                 </div>
             </div>

@@ -3,5 +3,6 @@
     'title' => 'RichText',
     'type' => 'richtext',
     'id' => 'richtext',
+    'order' => 1,
     'script' => '',
 ];

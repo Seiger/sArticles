@@ -116,14 +116,14 @@ switch ($data['get']) {
         $templates = [];
         $fields = glob(MODX_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
         if (count($fields)) {
-            foreach ($fields as $field) {
+            foreach ($fields as $idx => $field) {
                 $template = str_replace('config.php', 'template.php', $field);
                 if (is_file($template)) {
                     $field = require $field;
                     if ((int)$field['active']) {
                         $id = $field['id'];
                         $templates[$id] = $template;
-                        $buttons[] = '<button data-element="' . $id . '" type="button" class="btn btn-primary btn-lg btn-block">' . $field['title'] . '</button>' . ($field['script'] ?? '');
+                        $buttons[($field['order'] ?? ($idx + 100))] = '<button data-element="' . $id . '" type="button" class="btn btn-primary btn-sm btn-block">' . $field['title'] . '</button>' . ($field['script'] ?? '');
                         ob_start();
                         include $template;
                         $elements[] = ob_get_contents();
@@ -137,6 +137,7 @@ switch ($data['get']) {
                 }
             }
         }
+        ksort($buttons);
         $chunks = [];
         $builder = data_is_json($content->builder ?? '', true);
         if (is_array($builder) && count($builder)) {

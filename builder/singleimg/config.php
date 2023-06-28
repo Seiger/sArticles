@@ -3,5 +3,6 @@
     'title' => 'SingleImg',
     'type' => 'img',
     'id' => 'singleimg',
+    'order' => 2,
     'script' => '',
 ];

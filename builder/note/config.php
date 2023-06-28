@@ -3,5 +3,6 @@
     'title' => 'Note',
     'type' => 'note',
     'id' => 'note',
+    'order' => 8,
     'script' => '',
 ];
