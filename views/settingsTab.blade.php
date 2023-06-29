@@ -1,7 +1,6 @@
-<h3>@lang('sArticles::global.management_additional_fields')</h3>
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=settingsSave" onsubmit="documentDirty=false;">
     <input type="hidden" name="back" value="&get=settings" />
-
+    <h3>@lang('sArticles::global.management_additional_fields')</h3>
     <div class="row form-row widgets sortable">
         @php($settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php')
         @foreach($settings as $setting)
@@ -43,6 +42,7 @@
         @endforeach
     </div>
     <div class="split my-2"></div>
+    <h3>@lang('sArticles::global.management_base_functionality')</h3>
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
@@ -87,6 +87,7 @@
         </div>
     </div>
     <div class="split my-2"></div>
+    <h3>@lang('sArticles::global.management_fields_on')</h3>
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
@@ -112,6 +113,30 @@
                     <input type="checkbox" id="long_title_on_check" class="form-checkbox form-control" name="long_title_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.long_title_on);" @if(evo()->getConfig('s_articles_long_title_on', 1) == 1) checked @endif>
                     <input type="hidden" id="long_title_on" name="long_title_on" value="{{evo()->getConfig('s_articles_long_title_on', 1)}}" onchange="documentDirty=true;">
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="split my-2"></div>
+    <h3>@lang('sArticles::global.management_fields_name')</h3>
+    <div class="row form-row">
+        <div class="col-auto col-title-9">
+            <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
+            <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seotitle_help')"></i>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <input type="text" id="seotitle" class="form-control" name="seotitle" value="{{evo()->getConfig('s_articles_name_seotitle', '')}}" onchange="documentDirty=true;">
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="col-auto col-title-9">
+            <label for="seodescription" class="warning">@lang('sArticles::global.seodescription')</label>
+            <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seodescription_help')"></i>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <input type="text" id="seodescription" class="form-control" name="seodescription" value="{{evo()->getConfig('s_articles_name_seodescription', '')}}" onchange="documentDirty=true;">
             </div>
         </div>
     </div>

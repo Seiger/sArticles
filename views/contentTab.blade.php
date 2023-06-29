@@ -107,7 +107,11 @@
         <div class="row-col col-lg-12 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-9">
-                    <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
+                    @if(trim(evo()->getConfig('s_articles_name_seotitle', '')))
+                        <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
+                    @else
+                        <label for="seotitle" class="warning">{{evo()->getConfig('s_articles_name_seotitle', '')}}</label>
+                    @endif
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seotitle_help')"></i>
                 </div>
                 <div class="col">
@@ -118,7 +122,11 @@
             </div>
             <div class="row form-row">
                 <div class="col-auto col-title-9">
-                    <label for="seodescription" class="warning">@lang('sArticles::global.seodescription')</label>
+                    @if(trim(evo()->getConfig('s_articles_name_seodescription', '')))
+                        <label for="seotitle" class="warning">@lang('sArticles::global.seodescription')</label>
+                    @else
+                        <label for="seotitle" class="warning">{{evo()->getConfig('s_articles_name_seodescription', '')}}</label>
+                    @endif
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seodescription_help')"></i>
                 </div>
                 <div class="col">

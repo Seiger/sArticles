@@ -488,6 +488,16 @@ switch ($data['get']) {
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_long_title_on', '{$long_title_on}')");
             evo()->setConfig('s_articles_long_title_on', $long_title_on);
         }
+        if (request()->has('seotitle') && request()->seotitle != evo()->getConfig('s_articles_name_seotitle')) {
+            $seotitle = request()->seotitle;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_name_seotitle', '{$seotitle}')");
+            evo()->setConfig('s_articles_name_seotitle', $seotitle);
+        }
+        if (request()->has('seodescription') && request()->seodescription != evo()->getConfig('s_articles_name_seodescription')) {
+            $seodescription = request()->seodescription;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_name_seodescription', '{$seodescription}')");
+            evo()->setConfig('s_articles_name_seodescription', $seodescription);
+        }
         $keys = request()->input('settings.key', []);
         $settings = [];
         if (count($keys)) {
