@@ -11,7 +11,7 @@
                 </div>
                 <div class="col">
                     {{--@if($lang == $sArticlesController->langDefault())--}}
-                        <input type="text" id="pagetitle" class="form-control" name="pagetitle" maxlength="255" value="{{$content->pagetitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true"/>
+                    <input type="text" id="pagetitle" class="form-control" name="pagetitle" maxlength="255" value="{{$content->pagetitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true"/>
                     {{--@else
                         <div class="input-group">
                             <input type="text" id="pagetitle" class="form-control" name="pagetitle" maxlength="255" value="{{$content->pagetitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true" style="width: calc(100% - 52px);"/>
@@ -74,6 +74,37 @@
                     <i class="b-resize b-resize-r"></i>
                 </div>
             </div>
+            @foreach($constructor as $item)
+                <div class="row form-row">
+                    <div class="col-auto col-title">
+                        <label for="{{$item['key']}}" class="warning">{{$item['name']}}</label>
+                    </div>
+                    <div class="col">
+                        @switch($item['type'])
+                            @case('Text')
+                                <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                @break
+                            @case('Image')
+                                <div class="input-group mb-3">
+                                    <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                    <div class="input-group-append">
+                                        <button onclick="BrowseServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div id="image_for_{{$item['key']}}" data-image="{{$item['value']}}" onclick="BrowseServer('{{$item['key']}}')" class="image_for_field" style="background-image: url('{{MODX_SITE_URL . $item['value']}}');"></div>
+                                    <script>document.getElementById('{{$item['key']}}').addEventListener('change', evoRenderImageCheck, false);</script>
+                                </div>
+                                @break
+                            @default
+                                <textarea id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" rows="3" wrap="soft" onchange="documentDirty=true;">{{$item['value']}}</textarea>
+                        @endswitch
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        <div class="split my-2"></div>
+        <div class="row-col col-lg-12 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-9">
                     <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
@@ -109,35 +140,6 @@
                     </select>
                 </div>
             </div>
-            <div class="split my-2"></div>
-            @foreach($constructor as $item)
-                <div class="row form-row">
-                    <div class="col-auto col-title">
-                        <label for="{{$item['key']}}" class="warning">{{$item['name']}}</label>
-                    </div>
-                    <div class="col">
-                        @switch($item['type'])
-                            @case('Text')
-                                <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                @break
-                            @case('Image')
-                                <div class="input-group mb-3">
-                                    <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                    <div class="input-group-append">
-                                        <button onclick="BrowseServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div id="image_for_{{$item['key']}}" data-image="{{$item['value']}}" onclick="BrowseServer('{{$item['key']}}')" class="image_for_field" style="background-image: url('{{MODX_SITE_URL . $item['value']}}');"></div>
-                                    <script>document.getElementById('{{$item['key']}}').addEventListener('change', evoRenderImageCheck, false);</script>
-                                </div>
-                                @break
-                            @default
-                                <textarea id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" rows="3" wrap="soft" onchange="documentDirty=true;">{{$item['value']}}</textarea>
-                        @endswitch
-                    </div>
-                </div>
-            @endforeach
             <div class="split my-2"></div>
         </div>
     </div>
