@@ -78,7 +78,7 @@ switch ($data['get']) {
         }
         $article->published = (int)request()->published;
         $article->parent = (int)request()->parent;
-        $article->author = (int)request()->author;
+        $article->author_id = (int)request()->author_id;
         $article->alias = $sArticlesController->validateAlias($alias, request()->article);
         $article->position = (int)request()->position;
         $article->cover = request()->cover;

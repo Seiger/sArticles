@@ -65,13 +65,13 @@
         <div class="row-col col-lg-3 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-6">
-                    <label for="author" class="warning">@lang('sArticles::global.author')</label>
+                    <label for="author_id" class="warning">@lang('sArticles::global.author')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.author_help')"></i>
                 </div>
                 @php($author = (int)$article->author > 0 ? $article->author : 0)
                 <div class="col">
-                    <select id="author" class="form-control select2" name="author" onchange="documentDirty=true;">
-                        @foreach(\Seiger\sArticles\Models\sArticlesAuthor::all() as $user)
+                    <select id="author_id" class="form-control select2" name="author_id" onchange="documentDirty=true;">
+                        @foreach(\Seiger\sArticles\Models\sArticlesAuthor::orderBy('base_name')->get() as $user)
                             <option value="{{$user->autid}}" @if($author == $user->autid) selected @endif>{{$user->base_name}}</option>
                         @endforeach
                     </select>

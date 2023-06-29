@@ -18,7 +18,7 @@ class CreateSArticlesTable extends Migration
             $table->id();
             $table->tinyInteger('published')->default(0)->index();
             $table->integer('parent')->default(0)->index();
-            $table->integer('author')->default(0)->index();
+            $table->integer('author_id')->default(0)->index();
             $table->integer('views')->default(0)->index();
             $table->integer('position')->default(0);
             $table->integer('rating')->default(5);
