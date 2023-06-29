@@ -473,6 +473,11 @@ switch ($data['get']) {
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_resource', '{$resource}')");
             evo()->setConfig('s_articles_resource', $resource);
         }
+        if (request()->has('rating_on') && request()->rating_on != evo()->getConfig('s_articles_rating_on')) {
+            $rating_on = request()->rating_on;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_rating_on', '{$rating_on}')");
+            evo()->setConfig('s_articles_rating_on', $rating_on);
+        }
         if (request()->has('polls_on') && request()->polls_on != evo()->getConfig('s_articles_polls_on')) {
             $polls_on = request()->polls_on;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_polls_on', '{$polls_on}')");

@@ -31,11 +31,11 @@ Event::listen('evolution.OnPageNotFound', function($params) {
 
     $find = Arr::last($aliasArr);
     $check = implode('/', $aliasArr);
-    if ($check == 'sarticles/poll/'.$find) {
-        die(sArticles::showPoll((int)$find));
-    }
-    if ($check == 'sarticles/rating/'.$find) {
+    if ($check == 'sarticles/rating/'.$find && evo()->getConfig('s_articles_rating_on', 1) == 1) {
         die(sArticles::ratingVotes((int)$find));
+    }
+    if ($check == 'sarticles/poll/'.$find && evo()->getConfig('s_articles_polls_on', 1) == 1) {
+        die(sArticles::showPoll((int)$find));
     }
 });
 

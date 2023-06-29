@@ -75,6 +75,20 @@
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
+                <div class="col-title-8">
+                    <label for="rating_on" class="warning">@lang('sArticles::global.rating')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.rating')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" id="rating_on_check" class="form-checkbox form-control" name="rating_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.rating_on);" @if(evo()->getConfig('s_articles_rating_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="rating_on" name="rating_on" value="{{evo()->getConfig('s_articles_rating_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-lg-3 col-md-3 col-12">
+            <div class="row form-row">
                 <div class="col-auto col-title-7">
                     <label for="parent" class="warning">@lang('sArticles::global.polls')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.polls_on_off_help')"></i>
