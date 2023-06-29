@@ -108,9 +108,9 @@
             <div class="row form-row">
                 <div class="col-auto col-title-9">
                     @if(trim(evo()->getConfig('s_articles_name_seotitle', '')))
-                        <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
-                    @else
                         <label for="seotitle" class="warning">{{evo()->getConfig('s_articles_name_seotitle', '')}}</label>
+                    @else
+                        <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
                     @endif
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seotitle_help')"></i>
                 </div>
@@ -123,9 +123,9 @@
             <div class="row form-row">
                 <div class="col-auto col-title-9">
                     @if(trim(evo()->getConfig('s_articles_name_seodescription', '')))
-                        <label for="seotitle" class="warning">@lang('sArticles::global.seodescription')</label>
-                    @else
                         <label for="seotitle" class="warning">{{evo()->getConfig('s_articles_name_seodescription', '')}}</label>
+                    @else
+                        <label for="seotitle" class="warning">@lang('sArticles::global.seodescription')</label>
                     @endif
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seodescription_help')"></i>
                 </div>
