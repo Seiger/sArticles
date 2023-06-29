@@ -8,7 +8,7 @@
     'add_author' => 'Add Author',
     'answer' => 'Answer',
     'answers' => 'Answers',
-    'author_help' => 'Choose the author of the article among the registered users of the site.',
+    'author_help' => 'Select the author of the article from among the registered authors on the "Authors" tab.',
     'author' => 'Author',
     'authors' => 'Authors',
     'authors_help' => 'List of authors.',

@@ -68,11 +68,10 @@
                     <label for="author_id" class="warning">@lang('sArticles::global.author')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.author_help')"></i>
                 </div>
-                @php($author = (int)$article->author > 0 ? $article->author : 0)
                 <div class="col">
                     <select id="author_id" class="form-control select2" name="author_id" onchange="documentDirty=true;">
                         @foreach(\Seiger\sArticles\Models\sArticlesAuthor::orderBy('base_name')->get() as $user)
-                            <option value="{{$user->autid}}" @if($author == $user->autid) selected @endif>{{$user->base_name}}</option>
+                            <option value="{{$user->autid}}" @if($article->author_id == $user->autid) selected @endif>{{$user->base_name}}</option>
                         @endforeach
                     </select>
                 </div>
