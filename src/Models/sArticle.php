@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
+use Seiger\sArticles\Models\sArticlesAuthor;
 use Seiger\sArticles\Models\sArticlesFeature;
 
 class sArticle extends Model
@@ -61,6 +62,14 @@ class sArticle extends Model
                 ->when($search->count(), fn($query) => $query->where(fn($query) => $search->map(fn($word) => $fields->map(fn($field) => $query->orWhere($field, 'like', "%{$word}%")))))
                 ->orderByDesc('points');
         }
+    }
+
+    /**
+     * Get the author associated with the article.
+     */
+    public function author()
+    {
+        return $this->hasOne(sArticlesAuthor::class, 'autid', 'parent');
     }
 
     /**
