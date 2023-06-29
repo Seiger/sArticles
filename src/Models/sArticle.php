@@ -69,7 +69,7 @@ class sArticle extends Model
      */
     public function author()
     {
-        return $this->hasOne(sArticlesAuthor::class, 'autid', 'parent');
+        return $this->hasOne(sArticlesAuthor::class, 'autid', 'author');
     }
 
     /**
