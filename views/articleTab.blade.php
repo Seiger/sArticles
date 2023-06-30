@@ -40,7 +40,7 @@
                             @endif
                         @endif
                         <i id="plock" class="fa fa-folder" onclick="enableParentSelection(!allowParentSelection);"></i>
-                        <b id="parentName">{{($article->parent ?? 0)}} ({{entities($parentname)}})</b>
+                        <b id="parentName">{{entities($parentname)}}</b>
                         <input type="hidden" name="parent" value="{{($article->parent ?? 0)}}" onchange="documentDirty=true;" />
                     </div>
                 </div>

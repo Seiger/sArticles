@@ -13,7 +13,7 @@
         <tr>
             <th style="text-align:center;">@lang('global.name')</th>
             <th style="width:110px;text-align:center;">@lang('sArticles::global.section')</th>
-            <th style="width:70px;text-align:center;">@lang('sArticles::global.availability')</th>
+            <th style="width:70px;text-align:center;">@lang('sArticles::global.availability') (<i class="fa fa-eye" data-tooltip="@lang('sArticles::global.article_views')"></i>)</th>
             <th id="action-btns">@lang('global.onlineusers_action')</th>
         </tr>
         </thead>
@@ -24,13 +24,13 @@
             <tr>
                 <td>
                     <img src="{{$article->coverSrc}}" alt="{{$article->coverSrc}}" class="post-thumbnail">
-                    <a href="{{$article->link}}" target="_blank"><b>{{$article->pagetitle ?? __('sArticles::global.no_text')}}</b> <small>({{$article->id}})</small></a>
+                    <a href="{{$article->link}}" target="_blank"><b>{{$article->pagetitle ?? __('sArticles::global.no_text')}}</b></a>
                 </td>
                 <td>
                     @if($article->parent > 1)
                         <a href="@makeUrl($article->parent)" target="_blank">{{$parents[$article->parent]}} <small>({{$article->parent}})</small></a>
                     @else
-                        <a href="@makeUrl(1)" target="_blank">{{evo()->getConfig('site_name')}} <small>({{$article->parent}})</small></a>
+                        <a href="@makeUrl(1)" target="_blank">{{evo()->getConfig('site_name')}}</a>
                     @endif
                 </td>
                 <td>

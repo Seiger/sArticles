@@ -75,7 +75,7 @@
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
-                <div class="col-title-8">
+                <div class="col-title-7">
                     <label for="rating_on" class="warning">@lang('sArticles::global.rating')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.rating')"></i>
                 </div>
