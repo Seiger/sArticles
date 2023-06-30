@@ -13,7 +13,7 @@
         <tr>
             <th style="text-align:center;">@lang('global.name')</th>
             <th style="width:110px;text-align:center;">@lang('sArticles::global.section')</th>
-            <th style="width:70px;text-align:center;">@lang('sArticles::global.availability') (<i class="fa fa-eye" data-tooltip="@lang('sArticles::global.article_views')"></i>)</th>
+            <th style="width:70px;text-align:center;">@lang('sArticles::global.availability') <small>(<i class="fa fa-eye" data-tooltip="@lang('sArticles::global.article_views')"></i>)</small></th>
             <th id="action-btns">@lang('global.onlineusers_action')</th>
         </tr>
         </thead>
@@ -28,7 +28,7 @@
                 </td>
                 <td>
                     @if($article->parent > 1)
-                        <a href="@makeUrl($article->parent)" target="_blank">{{$parents[$article->parent]}} <small>({{$article->parent}})</small></a>
+                        <a href="@makeUrl($article->parent)" target="_blank">{{$parents[$article->parent]}}</a>
                     @else
                         <a href="@makeUrl(1)" target="_blank">{{evo()->getConfig('site_name')}}</a>
                     @endif
