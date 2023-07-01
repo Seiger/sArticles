@@ -13,7 +13,7 @@
         <tr>
             <th style="text-align:center;">@lang('global.name')</th>
             <th style="width:110px;text-align:center;">@lang('sArticles::global.section')</th>
-            <th style="width:70px;text-align:center;">@lang('sArticles::global.availability') <small>(<i class="fa fa-eye" data-tooltip="@lang('sArticles::global.article_views')"></i>)</small></th>
+            <th style="width:105px;text-align:center;">@lang('sArticles::global.availability') <small>(<i class="fa fa-eye" data-tooltip="@lang('sArticles::global.article_views')"></i>)</small></th>
             <th id="action-btns">@lang('global.onlineusers_action')</th>
         </tr>
         </thead>

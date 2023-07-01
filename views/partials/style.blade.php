@@ -74,4 +74,5 @@
     .builder .row-col-wrap:hover .b-resize:hover, .builder .b-resize:hover, .builder .b-resize:active{background-color:#1976d2}
     .darkness .builder .b-resize{background-color:#ffd700}
     .darkness .builder .row-col-wrap:hover .b-resize{background-color:#65686d}
+    .sbuttons-wraper{position:sticky;top:5px;text-align:center;}
 </style>

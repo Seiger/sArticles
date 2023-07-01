@@ -42,8 +42,10 @@
             </div>
             <div class="row form-row form-row-richtext">
                 <div class="col-auto col-title-9">
-                    <label for="content" class="warning">@lang('sArticles::global.add_block')</label><br><br>
-                    @foreach($buttons as $button){!! $button !!}<br><br>@endforeach
+                    <div class="sbuttons-wraper">
+                        <label for="content" class="warning">@lang('sArticles::global.add_block')</label><br><br>
+                        @foreach($buttons as $button){!! $button !!}<br><br>@endforeach
+                    </div>
                 </div>
                 <div id="builder" class="col builder">
                     @if(count($chunks))
