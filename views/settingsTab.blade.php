@@ -53,10 +53,10 @@
                 <div class="col">
                     <div>
                         @php($parentlookup = false)
-                        @if(evo()->getConfig('s_articles_resource', 1) == 0)
+                        @if(evo()->getConfig('sart_resource', 1) == 0)
                             @php($parentname = evo()->getConfig('site_name'))
                         @else
-                            @php($parentlookup = evo()->getConfig('s_articles_resource', 1))
+                            @php($parentlookup = evo()->getConfig('sart_resource', 1))
                         @endif
                         @if($parentlookup !== false && is_numeric($parentlookup))
                             @php($parentname = \EvolutionCMS\Models\SiteContent::withTrashed()->select('pagetitle')->find($parentlookup)->pagetitle)
@@ -65,8 +65,8 @@
                             @endif
                         @endif
                         <i id="plock" class="fa fa-folder" onclick="enableParentSelection(!allowParentSelection);"></i>
-                        <b id="parentName">{{evo()->getConfig('s_articles_resource', 1)}} ({{entities($parentname)}})</b>
-                        <input type="hidden" name="parent" value="{{evo()->getConfig('s_articles_resource', 1)}}" onchange="documentDirty=true;" />
+                        <b id="parentName">{{evo()->getConfig('sart_resource', 1)}} ({{entities($parentname)}})</b>
+                        <input type="hidden" name="parent" value="{{evo()->getConfig('sart_resource', 1)}}" onchange="documentDirty=true;" />
                     </div>
                 </div>
             </div>
@@ -80,8 +80,8 @@
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.rating')"></i>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="rating_on_check" class="form-checkbox form-control" name="rating_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.rating_on);" @if(evo()->getConfig('s_articles_rating_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="rating_on" name="rating_on" value="{{evo()->getConfig('s_articles_rating_on', 1)}}" onchange="documentDirty=true;">
+                    <input type="checkbox" id="rating_on_check" class="form-checkbox form-control" name="rating_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.rating_on);" @if(evo()->getConfig('sart_rating_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="rating_on" name="rating_on" value="{{evo()->getConfig('sart_rating_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
@@ -94,8 +94,8 @@
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.polls_on_off_help')"></i>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="publishedcheck" class="form-checkbox form-control" name="publishedcheck" value="" onchange="documentDirty=true;" onclick="changestate(document.form.published);" @if(evo()->getConfig('s_articles_polls_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="published" name="polls_on" value="{{evo()->getConfig('s_articles_polls_on', 1)}}" onchange="documentDirty=true;">
+                    <input type="checkbox" id="publishedcheck" class="form-checkbox form-control" name="publishedcheck" value="" onchange="documentDirty=true;" onclick="changestate(document.form.published);" @if(evo()->getConfig('sart_polls_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="published" name="polls_on" value="{{evo()->getConfig('sart_polls_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
@@ -110,8 +110,8 @@
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tag_texts_on_off_help')"></i>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="tag_texts_on_check" class="form-checkbox form-control" name="tag_texts_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.tag_texts_on);" @if(evo()->getConfig('s_articles_tag_texts_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="tag_texts_on" name="tag_texts_on" value="{{evo()->getConfig('s_articles_tag_texts_on', 1)}}" onchange="documentDirty=true;">
+                    <input type="checkbox" id="tag_texts_on_check" class="form-checkbox form-control" name="tag_texts_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.tag_texts_on);" @if(evo()->getConfig('sart_tag_texts_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="tag_texts_on" name="tag_texts_on" value="{{evo()->getConfig('sart_tag_texts_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
@@ -124,8 +124,8 @@
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.long_title_on_off_help')"></i>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="long_title_on_check" class="form-checkbox form-control" name="long_title_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.long_title_on);" @if(evo()->getConfig('s_articles_long_title_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="long_title_on" name="long_title_on" value="{{evo()->getConfig('s_articles_long_title_on', 1)}}" onchange="documentDirty=true;">
+                    <input type="checkbox" id="long_title_on_check" class="form-checkbox form-control" name="long_title_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.long_title_on);" @if(evo()->getConfig('sart_long_title_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="long_title_on" name="long_title_on" value="{{evo()->getConfig('sart_long_title_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
@@ -139,7 +139,7 @@
         </div>
         <div class="col">
             <div class="input-group">
-                <input type="text" id="seotitle" class="form-control" name="seotitle" value="{{evo()->getConfig('s_articles_name_seotitle', '')}}" onchange="documentDirty=true;">
+                <input type="text" id="seotitle" class="form-control" name="seotitle" value="{{evo()->getConfig('sart_name_seotitle', '')}}" onchange="documentDirty=true;">
             </div>
         </div>
     </div>
@@ -150,7 +150,7 @@
         </div>
         <div class="col">
             <div class="input-group">
-                <input type="text" id="seodescription" class="form-control" name="seodescription" value="{{evo()->getConfig('s_articles_name_seodescription', '')}}" onchange="documentDirty=true;">
+                <input type="text" id="seodescription" class="form-control" name="seodescription" value="{{evo()->getConfig('sart_name_seodescription', '')}}" onchange="documentDirty=true;">
             </div>
         </div>
     </div>

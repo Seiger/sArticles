@@ -25,16 +25,16 @@ Event::listen('evolution.OnPageNotFound', function($params) {
         }
     }
     if ($goTo) {
-        evo()->sendForward(evo()->getConfig('s_articles_resource', 1));
+        evo()->sendForward(evo()->getConfig('sart_resource', 1));
         exit();
     }
 
     $find = Arr::last($aliasArr);
     $check = implode('/', $aliasArr);
-    if ($check == 'sarticles/rating/'.$find && evo()->getConfig('s_articles_rating_on', 1) == 1) {
+    if ($check == 'sarticles/rating/'.$find && evo()->getConfig('sart_rating_on', 1) == 1) {
         die(sArticles::ratingVotes((int)$find));
     }
-    if ($check == 'sarticles/poll/'.$find && evo()->getConfig('s_articles_polls_on', 1) == 1) {
+    if ($check == 'sarticles/poll/'.$find && evo()->getConfig('sart_polls_on', 1) == 1) {
         die(sArticles::showPoll((int)$find));
     }
 });

@@ -28,7 +28,7 @@ $data['url'] = $sArticlesController->url;
 switch ($data['get']) {
     default:
         $data['tabs'] = ['articles', 'authors', 'tags'];
-        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
@@ -44,7 +44,7 @@ switch ($data['get']) {
         $data['tvs_url'] = '&i='.request()->i;
         $data['features'] = sArticlesFeature::orderBy('base')->get();
         $data['tags'] = sArticlesTag::orderBy('base')->get();
-        $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
+        $template = SiteContent::find(evo()->getConfig('sart_resource', 0))->template ?? null;
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
@@ -99,7 +99,7 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "content":
         $data['tabs'] = ['article', 'content'];
-        $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? null;
+        $template = SiteContent::find(evo()->getConfig('sart_resource', 0))->template ?? null;
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
@@ -224,7 +224,7 @@ switch ($data['get']) {
     case "authors":
         $sArticlesController->setModifyTables('authors');
         $data['tabs'] = ['articles', 'authors', 'tags'];
-        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
@@ -349,7 +349,7 @@ switch ($data['get']) {
         $data['article'] = sArticles::getArticle(request()->i);
         $data['article_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
-        $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? 0;
+        $template = SiteContent::find(evo()->getConfig('sart_resource', 0))->template ?? 0;
         $data['tvs'] = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
             ->join('site_tmplvar_templates', 'site_tmplvar_templates.tmplvarid', '=', 'site_tmplvars.id')
@@ -363,7 +363,7 @@ switch ($data['get']) {
         break;
     case "tvsSave":
         $article = sArticles::getArticle((int)request()->article);
-        $template = SiteContent::find(evo()->getConfig('s_articles_resource', 0))->template ?? 0;
+        $template = SiteContent::find(evo()->getConfig('sart_resource', 0))->template ?? 0;
         $tvs = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
             ->join('site_tmplvar_templates', 'site_tmplvar_templates.tmplvarid', '=', 'site_tmplvars.id')
@@ -391,7 +391,7 @@ switch ($data['get']) {
     case "features":
         $sArticlesController->setModifyTables('features');
         $data['tabs'] = ['articles', 'authors', 'tags'];
-        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
@@ -455,7 +455,7 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "settings":
         $data['tabs'] = ['articles', 'authors', 'tags'];
-        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
@@ -468,40 +468,40 @@ switch ($data['get']) {
         break;
     case "settingsSave":
         $tbl = evo()->getDatabase()->getFullTableName('system_settings');
-        if (request()->has('parent') && request()->parent != evo()->getConfig('s_articles_resource')) {
+        if (request()->has('parent') && request()->parent != evo()->getConfig('sart_resource')) {
             $resource = request()->parent;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_resource', '{$resource}')");
-            evo()->setConfig('s_articles_resource', $resource);
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_resource', '{$resource}')");
+            evo()->setConfig('sart_resource', $resource);
         }
-        if (request()->has('rating_on') && request()->rating_on != evo()->getConfig('s_articles_rating_on')) {
+        if (request()->has('rating_on') && request()->rating_on != evo()->getConfig('sart_rating_on')) {
             $rating_on = request()->rating_on;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_rating_on', '{$rating_on}')");
-            evo()->setConfig('s_articles_rating_on', $rating_on);
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_rating_on', '{$rating_on}')");
+            evo()->setConfig('sart_rating_on', $rating_on);
         }
-        if (request()->has('polls_on') && request()->polls_on != evo()->getConfig('s_articles_polls_on')) {
+        if (request()->has('polls_on') && request()->polls_on != evo()->getConfig('sart_polls_on')) {
             $polls_on = request()->polls_on;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_polls_on', '{$polls_on}')");
-            evo()->setConfig('s_articles_polls_on', $polls_on);
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_polls_on', '{$polls_on}')");
+            evo()->setConfig('sart_polls_on', $polls_on);
         }
-        if (request()->has('tag_texts_on') && request()->tag_texts_on != evo()->getConfig('s_articles_tag_texts_on')) {
+        if (request()->has('tag_texts_on') && request()->tag_texts_on != evo()->getConfig('sart_tag_texts_on')) {
             $tag_texts_on = request()->tag_texts_on;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_tag_texts_on', '{$tag_texts_on}')");
-            evo()->setConfig('s_articles_tag_texts_on', $tag_texts_on);
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_tag_texts_on', '{$tag_texts_on}')");
+            evo()->setConfig('sart_tag_texts_on', $tag_texts_on);
         }
-        if (request()->has('long_title_on') && request()->long_title_on != evo()->getConfig('s_articles_long_title_on')) {
+        if (request()->has('long_title_on') && request()->long_title_on != evo()->getConfig('sart_long_title_on')) {
             $long_title_on = request()->long_title_on;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_long_title_on', '{$long_title_on}')");
-            evo()->setConfig('s_articles_long_title_on', $long_title_on);
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_long_title_on', '{$long_title_on}')");
+            evo()->setConfig('sart_long_title_on', $long_title_on);
         }
-        if (request()->has('seotitle') && request()->seotitle != evo()->getConfig('s_articles_name_seotitle')) {
+        if (request()->has('seotitle') && request()->seotitle != evo()->getConfig('sart_name_seotitle')) {
             $seotitle = request()->seotitle;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_name_seotitle', '{$seotitle}')");
-            evo()->setConfig('s_articles_name_seotitle', $seotitle);
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_name_seotitle', '{$seotitle}')");
+            evo()->setConfig('sart_name_seotitle', $seotitle);
         }
-        if (request()->has('seodescription') && request()->seodescription != evo()->getConfig('s_articles_name_seodescription')) {
+        if (request()->has('seodescription') && request()->seodescription != evo()->getConfig('sart_name_seodescription')) {
             $seodescription = request()->seodescription;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('s_articles_name_seodescription', '{$seodescription}')");
-            evo()->setConfig('s_articles_name_seodescription', $seodescription);
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_name_seodescription', '{$seodescription}')");
+            evo()->setConfig('sart_name_seodescription', $seodescription);
         }
         $keys = request()->input('settings.key', []);
         $settings = [];
@@ -539,7 +539,7 @@ switch ($data['get']) {
     case "tags":
         $sArticlesController->setModifyTables('tags');
         $data['tabs'] = ['articles', 'authors', 'tags'];
-        if (evo()->getConfig('s_articles_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
