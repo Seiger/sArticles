@@ -21,8 +21,8 @@
                 <td data-id="{{$author->autid}}">
                     <div class="input-group mb-3">
                         <select name="gender" class="change_gender">
-                            <option value="man">Чоловік</option>
-                            <option value="woman">Жінка</option>
+                            <option value="man" @if($author->gender == 'man') selected @endif>Чоловік</option>
+                            <option value="woman" @if($author->gender == 'woman') selected @endif>Жінка</option>
                         </select>
                     </div>
                     {{$author->alias}}&emsp;
