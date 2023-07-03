@@ -79,6 +79,7 @@ class CreateSArticlesTable extends Migration
         Schema::create('s_articles_authors', function (Blueprint $table) {
             $table->id('autid');
             $table->string('alias', 255)->index();
+            $table->string('gender', 255)->default('man');
             $table->string('image', 255)->default('');
             $table->string('base_name', 255)->default('');
             $table->string('base_office', 255)->default('');

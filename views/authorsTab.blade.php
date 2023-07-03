@@ -19,6 +19,12 @@
                     <script>document.getElementById('cover{{$author->autid}}').addEventListener('change', evoRenderImageCheck, false);</script>
                 </td>
                 <td data-id="{{$author->autid}}">
+                    <div class="input-group mb-3">
+                        <select name="gender" class="change_gender">
+                            <option value="man">Чоловік</option>
+                            <option value="woman">Жінка</option>
+                        </select>
+                    </div>
                     {{$author->alias}}&emsp;
                     <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editAuthorAlias" title="@lang('sArticles::global.edit_alias')">
                         <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
@@ -174,6 +180,16 @@
                 url: '{!!$url!!}&get=authorTextUpdate',
                 type: 'POST',
                 data: 'dataId=' + dataId + '&target=' + target + '&value=' + _value,
+            });
+        });
+        $(document).on('change', '.change_gender', function () {
+            let dataId = $(this).parents('td').data('id');
+            let dataGender = $(this).val();
+            $.ajax({
+                url: '{!!$url!!}&get=authorSetGender',
+                type: 'POST',
+                dataType: 'JSON',
+                data: 'dataId=' + dataId + '&gender=' + dataGender
             });
         });
     </script>

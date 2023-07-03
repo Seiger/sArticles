@@ -273,6 +273,15 @@ switch ($data['get']) {
             $responce['status'] = 1;
         }
         die(json_encode($responce));
+    case "authorSetGender":
+        $responce = ['status' => 0];
+        $author = sArticlesAuthor::find($_POST['dataId']);
+        if ($author) {
+            $author->gender = $_POST['gender'];
+            $author->update();
+            $responce['status'] = 1;
+        }
+        die(json_encode($responce));
     case "authorTextUpdate":
         $result = false;
         $author = sArticlesAuthor::find($_POST['dataId']);
