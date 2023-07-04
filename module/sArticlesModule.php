@@ -493,6 +493,16 @@ switch ($data['get']) {
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_polls_on', '{$polls_on}')");
             evo()->setConfig('sart_polls_on', $polls_on);
         }
+        if (request()->has('in_main_menu') && request()->in_main_menu != evo()->getConfig('sart_in_main_menu')) {
+            $in_main_menu = request()->in_main_menu;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_in_main_menu', '{$in_main_menu}')");
+            evo()->setConfig('sart_in_main_menu', $in_main_menu);
+        }
+        if (request()->has('main_menu_order') && request()->main_menu_order != evo()->getConfig('sart_main_menu_order')) {
+            $main_menu_order = request()->main_menu_order;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_main_menu_order', '{$main_menu_order}')");
+            evo()->setConfig('sart_main_menu_order', $main_menu_order);
+        }
         if (request()->has('tag_texts_on') && request()->tag_texts_on != evo()->getConfig('sart_tag_texts_on')) {
             $tag_texts_on = request()->tag_texts_on;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_tag_texts_on', '{$tag_texts_on}')");

@@ -71,3 +71,26 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
         return array_merge($params['documentObject'], Arr::dot($article->toArray()));
     }
 });
+
+/**
+ * Add Menu item
+ */
+Event::listen('evolution.OnManagerMenuPrerender', function($params) {
+    if (evo()->getConfig('sart_in_main_menu', 0) == 1) {
+        $menu['sarticles'] = [
+            'sarticles',
+            'main',
+            '<i class="' . __('sArticles::global.articles_icon') . '"></i><span class="menu-item-text">' . __('sArticles::global.articles') . '</span>',
+            sArticles::moduleUrl(),
+            __('sArticles::global.articles'),
+            "",
+            "",
+            "main",
+            0,
+            evo()->getConfig('sart_main_menu_order', 11),
+            '',
+        ];
+
+        return serialize(array_merge($params['menu'], $menu));
+    }
+});

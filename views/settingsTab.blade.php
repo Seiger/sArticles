@@ -41,12 +41,12 @@
             </div>
         @endforeach
     </div>
-    <div class="split my-2"></div>
+    <div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_base_functionality')</h3>
     <div class="row form-row">
-        <div class="row-col col-lg-3 col-md-3 col-12">
+        <div class="row-col col-12">
             <div class="row form-row">
-                <div class="col-auto col-title-7">
+                <div class="col-auto">
                     <label for="parent" class="warning">@lang('sArticles::global.resource')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.resource_help')"></i>
                 </div>
@@ -73,9 +73,9 @@
         </div>
     </div>
     <div class="row form-row">
-        <div class="row-col col-lg-3 col-md-3 col-12">
+        <div class="row-col col-12">
             <div class="row form-row">
-                <div class="col-title-7">
+                <div class="col-auto">
                     <label for="rating_on" class="warning">@lang('sArticles::global.rating')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.rating')"></i>
                 </div>
@@ -87,9 +87,9 @@
         </div>
     </div>
     <div class="row form-row">
-        <div class="row-col col-lg-3 col-md-3 col-12">
+        <div class="row-col col-12">
             <div class="row form-row">
-                <div class="col-auto col-title-7">
+                <div class="col-auto">
                     <label for="parent" class="warning">@lang('sArticles::global.polls')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.polls_on_off_help')"></i>
                 </div>
@@ -100,7 +100,38 @@
             </div>
         </div>
     </div>
-    <div class="split my-2"></div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
+                    <label for="in_main_menu" class="warning">@lang('sArticles::global.in_main_menu')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.in_main_menu_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" id="in_main_menucheck" class="form-checkbox form-control" name="in_main_menucheck" value="" onchange="documentDirty=true;" onclick="changestate(document.form.in_main_menu);" @if(evo()->getConfig('sart_in_main_menu', 0) == 1) checked @endif>
+                    <input type="hidden" id="in_main_menu" name="in_main_menu" value="{{evo()->getConfig('sart_in_main_menu', 0)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-lg-3 col-md-3 col-12">
+            <div class="row form-row">
+                <div class="col-auto">
+                    <label for="main_menu_order" class="warning">@lang('sArticles::global.main_menu_order')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.main_menu_order_help')"></i>
+                </div>
+                <div class="input-group col">
+                    <div class="input-group-prepend">
+                        <span class="btn btn-secondary" onclick="let elm = document.form.main_menu_order;let v=parseInt(elm.value+'')-1;elm.value=v>0? v:0;elm.focus();documentDirty=true;return false;" style="cursor: pointer;"><i class="fa fa-angle-left"></i></span>
+                        <span class="btn btn-secondary" onclick="let elm = document.form.main_menu_order;let v=parseInt(elm.value+'')+1;elm.value=v>0? v:0;elm.focus();documentDirty=true;return false;" style="cursor: pointer;"><i class="fa fa-angle-right"></i></span>
+                    </div>
+                    <input type="text" id="main_menu_order" name="main_menu_order" class="form-control" value="{{evo()->getConfig('sart_main_menu_order', 11)}}" maxlength="11" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_fields_on')</h3>
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
@@ -130,7 +161,7 @@
             </div>
         </div>
     </div>
-    <div class="split my-2"></div>
+    <div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_fields_name')</h3>
     <div class="row form-row">
         <div class="col-auto col-title-9">
@@ -154,7 +185,7 @@
             </div>
         </div>
     </div>
-    <div class="split my-2"></div>
+    <div class="split my-3"></div>
 </form>
 
 @push('scripts.bot')
