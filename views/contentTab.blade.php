@@ -86,6 +86,14 @@
                             @case('Text')
                                 <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
                                 @break
+                            @case('File')
+                                <div class="input-group mb-3">
+                                    <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                    <div class="input-group-append">
+                                        <button onclick="BrowseFileServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                    </div>
+                                </div>
+                                @break
                             @case('Image')
                                 <div class="input-group mb-3">
                                     <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
