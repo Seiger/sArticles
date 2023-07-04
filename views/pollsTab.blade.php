@@ -3,6 +3,7 @@
         <thead>
         <tr>
             <th style="text-align:center;">@lang('global.name')</th>
+            <th style="width:55px;text-align:center;">@lang('sArticles::global.votes')</th>
             <th id="action-btns">@lang('global.onlineusers_action')</th>
         </tr>
         </thead>
@@ -11,14 +12,15 @@
         @foreach($polls as $poll)
             <tr>
                 <td>
-                    <b>{{$poll->question[$sArticlesController->langDefault()] ?? __('sArticles::global.no_text')}}</b> <small>({{$poll->pollid}})</small>
+                    <b>{{trim($poll->question[$sArticlesController->langDefault()] ?? '') ?: __('sArticles::global.no_text')}}</b>
                 </td>
+                <td>@php($votes = data_is_json($poll->votes ?? '', true)){{$votes['total'] ?? 0}}</td>
                 <td style="text-align:center;">
                     <div class="btn-group">
                         <a href="{{$url}}&get=poll&i={{$poll->pollid}}" class="btn btn-outline-success">
                             <i class="fa fa-pencil"></i> <span>@lang('global.edit')</span>
                         </a>
-                        <a href="#" data-href="{{$url}}&get=pollDelete&i={{$poll->pollid}}" data-delete="{{$poll->pollid}}" data-name="{{$poll->question[$sArticlesController->langDefault()]}}" class="btn btn-outline-danger">
+                        <a href="#" data-href="{{$url}}&get=pollDelete&i={{$poll->pollid}}" data-delete="{{$poll->pollid}}" data-name="{{$poll->question[$sArticlesController->langDefault()] ?? ''}}" class="btn btn-outline-danger">
                             <i class="fa fa-trash"></i> <span>@lang('global.remove')</span>
                         </a>
                     </div>

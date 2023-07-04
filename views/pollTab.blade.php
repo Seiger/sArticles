@@ -48,6 +48,9 @@
 @push('scripts.bot')
     <div id="actions">
         <div class="btn-group">
+            <a id="Button5" class="btn btn-secondary" href="{!!$url!!}&get=polls">
+                <i class="fa fa-times-circle"></i><span>@lang('sArticles::global.to_list_polls')</span>
+            </a>
             <a id="Button1" class="btn btn-success" href="javascript:void(0);" onclick="saveForm('#form');">
                 <i class="fa fa-floppy-o"></i>
                 <span>@lang('global.save')</span>
@@ -55,9 +58,6 @@
             <span id="Button2" class="btn btn-primary" title="@lang('sArticles::global.add_answer')" onclick="addItem()">
                 <i class="fa fa-plus"></i> <span>@lang('global.add')</span>
             </span>
-            <a id="Button5" class="btn btn-secondary" href="{!!$url!!}&get=polls">
-                <i class="fa fa-times-circle"></i><span>@lang('global.cancel')</span>
-            </a>
         </div>
     </div>
     <div class="draft-element">

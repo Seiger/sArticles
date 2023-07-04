@@ -303,9 +303,8 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "poll":
         $data['tabs'] = ['poll'];
-        $data['poll'] = sArticles::getArticle(request()->i);
         $data['poll_url'] = '&i='.request()->i;
-        $poll = sArticlesPoll::find(request()->i);
+        $data['poll'] = $poll = sArticlesPoll::find(request()->i);
         if ($poll) {
             $data['question'] = $poll->question;
             $data['answers'] = data_is_json($poll->answers ?? '', true);
@@ -328,7 +327,7 @@ switch ($data['get']) {
         if (!$poll) {
             $poll = new sArticlesPoll();
         }
-        $poll->question = json_encode(request()->question);
+        $poll->question = request()->question;
         $poll->answers = json_encode($answers);
         $votes = data_is_json($poll->votes ?? '', true);
         if (!$votes) {
@@ -344,6 +343,7 @@ switch ($data['get']) {
         }
         $poll->votes = json_encode($votes);
         $poll->save();
+        Cache::forget('sArticles-polls-list');
         $back = str_replace('&i=0', '&i=' . $poll->pollid, (request()->back ?? '&get=polls'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "pollDelete":
@@ -351,6 +351,7 @@ switch ($data['get']) {
         if ($poll) {
             $poll->delete();
         }
+        Cache::forget('sArticles-polls-list');
         $back = '&get=polls';
         return header('Location: ' . $sArticlesController->url . $back);
     case "tvs":
