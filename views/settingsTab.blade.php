@@ -53,10 +53,10 @@
                 <div class="col">
                     <div>
                         @php($parentlookup = false)
-                        @if(evo()->getConfig('sart_resource', 1) == 0)
+                        @if(evo()->getConfig('sart_blank', 1) == 0)
                             @php($parentname = evo()->getConfig('site_name'))
                         @else
-                            @php($parentlookup = evo()->getConfig('sart_resource', 1))
+                            @php($parentlookup = evo()->getConfig('sart_blank', 1))
                         @endif
                         @if($parentlookup !== false && is_numeric($parentlookup))
                             @php($parentname = \EvolutionCMS\Models\SiteContent::withTrashed()->select('pagetitle')->find($parentlookup)->pagetitle)
@@ -65,8 +65,8 @@
                             @endif
                         @endif
                         <i id="plock" class="fa fa-folder" onclick="enableParentSelection(!allowParentSelection);"></i>
-                        <b id="parentName">{{evo()->getConfig('sart_resource', 1)}} ({{entities($parentname)}})</b>
-                        <input type="hidden" name="parent" value="{{evo()->getConfig('sart_resource', 1)}}" onchange="documentDirty=true;" />
+                        <b id="parentName">{{evo()->getConfig('sart_blank', 1)}} ({{entities($parentname)}})</b>
+                        <input type="hidden" name="parent" value="{{evo()->getConfig('sart_blank', 1)}}" onchange="documentDirty=true;" />
                     </div>
                 </div>
             </div>

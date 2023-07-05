@@ -25,7 +25,7 @@ Event::listen('evolution.OnPageNotFound', function($params) {
         }
     }
     if ($goTo) {
-        evo()->sendForward(evo()->getConfig('sart_resource', 1));
+        evo()->sendForward(evo()->getConfig('sart_blank', 1));
         exit();
     }
 

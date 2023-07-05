@@ -44,7 +44,7 @@ switch ($data['get']) {
         $data['tvs_url'] = '&i='.request()->i;
         $data['features'] = sArticlesFeature::orderBy('base')->get();
         $data['tags'] = sArticlesTag::orderBy('base')->get();
-        $template = SiteContent::find(evo()->getConfig('sart_resource', 0))->template ?? null;
+        $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? null;
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
@@ -99,7 +99,7 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "content":
         $data['tabs'] = ['article', 'content'];
-        $template = SiteContent::find(evo()->getConfig('sart_resource', 0))->template ?? null;
+        $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? null;
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
@@ -359,7 +359,7 @@ switch ($data['get']) {
         $data['article'] = sArticles::getArticle(request()->i);
         $data['article_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
-        $template = SiteContent::find(evo()->getConfig('sart_resource', 0))->template ?? 0;
+        $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? 0;
         $data['tvs'] = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
             ->join('site_tmplvar_templates', 'site_tmplvar_templates.tmplvarid', '=', 'site_tmplvars.id')
@@ -373,7 +373,7 @@ switch ($data['get']) {
         break;
     case "tvsSave":
         $article = sArticles::getArticle((int)request()->article);
-        $template = SiteContent::find(evo()->getConfig('sart_resource', 0))->template ?? 0;
+        $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? 0;
         $tvs = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
             ->join('site_tmplvar_templates', 'site_tmplvar_templates.tmplvarid', '=', 'site_tmplvars.id')
@@ -478,10 +478,10 @@ switch ($data['get']) {
         break;
     case "settingsSave":
         $tbl = evo()->getDatabase()->getFullTableName('system_settings');
-        if (request()->has('parent') && request()->parent != evo()->getConfig('sart_resource')) {
+        if (request()->has('parent') && request()->parent != evo()->getConfig('sart_blank')) {
             $resource = request()->parent;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_resource', '{$resource}')");
-            evo()->setConfig('sart_resource', $resource);
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_blank', '{$resource}')");
+            evo()->setConfig('sart_blank', $resource);
         }
         if (request()->has('rating_on') && request()->rating_on != evo()->getConfig('sart_rating_on')) {
             $rating_on = request()->rating_on;
