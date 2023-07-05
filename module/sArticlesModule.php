@@ -28,11 +28,13 @@ $data['url'] = $sArticlesController->url;
 switch ($data['get']) {
     default:
         $data['tabs'] = ['articles', 'authors', 'tags'];
-        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
-            $data['tabs'][] = 'features';
+            if (evo()->getConfig('sart_features_on', 1) == 1) {
+                $data['tabs'][] = 'features';
+            }
             $data['tabs'][] = 'settings';
         }
         break;
@@ -228,7 +230,9 @@ switch ($data['get']) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
-            $data['tabs'][] = 'features';
+            if (evo()->getConfig('sart_features_on', 1) == 1) {
+                $data['tabs'][] = 'features';
+            }
             $data['tabs'][] = 'settings';
         }
         $data['authors'] = sArticlesAuthor::orderBy('base_name')->get();
@@ -469,7 +473,9 @@ switch ($data['get']) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
-            $data['tabs'][] = 'features';
+            if (evo()->getConfig('sart_features_on', 1) == 1) {
+                $data['tabs'][] = 'features';
+            }
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
@@ -563,7 +569,9 @@ switch ($data['get']) {
             $data['tabs'][] = 'polls';
         }
         if (evo()->hasPermission('settings')) {
-            $data['tabs'][] = 'features';
+            if (evo()->getConfig('sart_features_on', 1) == 1) {
+                $data['tabs'][] = 'features';
+            }
             $data['tabs'][] = 'settings';
         }
         $data['tags'] = sArticlesTag::orderBy($defaultLng)->get();

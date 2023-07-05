@@ -29,6 +29,7 @@
     'features_article_help' => 'List of special article.',
     'features_help' => 'List of special articles.',
     'features_icon' => 'fas fa-highlighter',
+    'features_on_off_help' => 'Enabling the functionality of features on the site.',
     'field_type' => 'Field type',
     'image' => 'Image',
     'image_help' => 'The main image of the article. Also used as a preview image.',

@@ -77,22 +77,24 @@
                 </div>
             </div>
         </div>
-        <div class="row-col col-lg-6 col-md-6 col-12">
-            <div class="row form-row">
-                <div class="col-auto col-title">
-                    <label for="features" class="warning">@lang('sArticles::global.features')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_article_help')"></i>
-                </div>
-                <div class="col">
-                    @php($article->feature = $article->features->pluck('fid')->toArray())
-                    <select id="features" class="form-control select2" name="features[]" multiple onchange="documentDirty=true;">
-                        @foreach($features as $feature)
-                            <option value="{{$feature->fid}}" @if(in_array($feature->fid, $article->feature)) selected @endif>{{$feature->base}}</option>
-                        @endforeach
-                    </select>
+        @if(evo()->getConfig('sart_features_on', 1) == 1)
+            <div class="row-col col-lg-6 col-md-6 col-12">
+                <div class="row form-row">
+                    <div class="col-auto col-title">
+                        <label for="features" class="warning">@lang('sArticles::global.features')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_article_help')"></i>
+                    </div>
+                    <div class="col">
+                        @php($article->feature = $article->features->pluck('fid')->toArray())
+                        <select id="features" class="form-control select2" name="features[]" multiple onchange="documentDirty=true;">
+                            @foreach($features as $feature)
+                                <option value="{{$feature->fid}}" @if(in_array($feature->fid, $article->feature)) selected @endif>{{$feature->base}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-7">
