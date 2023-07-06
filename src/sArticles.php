@@ -1,5 +1,6 @@
 <?php namespace Seiger\sArticles;
 
+use EvolutionCMS\Models\UserAttribute;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -140,6 +141,21 @@ class sArticles
                     $article->votes = json_encode($votes);
                     $article->update();
                     $_SESSION['article-rating'][] = $article->id;
+                    $user = null;
+                    if (evo()->isLoggedIn() && evo()->getLoginUserID()) {
+                        $user = UserAttribute::where('internalKey', evo()->getLoginUserID())->first();
+                        if ($user) {
+                            if (is_null($user->vote_articles)) {
+                                $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('user_attributes')."` ADD `vote_articles` json";
+                                evo()->getDatabase()->query($query);
+                            }
+                            $votes = data_is_json($user->vote_articles ?? '', true) ?: [];
+                            $votes[] = $article->id;
+                            $user->vote_articles = json_encode($votes);
+                            $user->update();
+                            $_SESSION['article-rating'] = $votes;
+                        }
+                    }
                     $result = $rating;
                 }
             }
