@@ -82,6 +82,7 @@ class CreateSArticlesTable extends Migration
             $table->string('gender', 255)->default('man');
             $table->string('image', 255)->default('');
             $table->string('base_name', 255)->default('');
+            $table->string('base_lastname', 255)->default('');
             $table->string('base_office', 255)->default('');
             $table->timestamps();
         });

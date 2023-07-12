@@ -141,7 +141,6 @@ class sArticles
                     $article->votes = json_encode($votes);
                     $article->update();
                     $_SESSION['article-rating'][] = $article->id;
-                    $user = null;
                     if (evo()->isLoggedIn() && evo()->getLoginUserID()) {
                         $user = UserAttribute::where('internalKey', evo()->getLoginUserID())->first();
                         if ($user) {

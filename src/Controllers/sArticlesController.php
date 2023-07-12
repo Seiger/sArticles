@@ -122,6 +122,7 @@ class sArticlesController
                         foreach ($lang as $item) {
                             if (!isset($columns[$item.'_name'])) {
                                 $needs[] = "ADD `{$item}_name` varchar(255) COMMENT '" . strtoupper($item) . " Name version'";
+                                $needs[] = "ADD `{$item}_lastname` varchar(255) COMMENT '" . strtoupper($item) . " Lastname version'";
                                 $needs[] = "ADD `{$item}_office` varchar(255) COMMENT '" . strtoupper($item) . " Office position version'";
                             }
                         }

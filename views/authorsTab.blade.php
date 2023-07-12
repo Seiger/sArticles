@@ -37,6 +37,10 @@
                                 <span class="input-group-text">@lang('global.user_first_name')</span>
                             </div>
                             <input type="text" class="form-control" name="{{$lang}}_name" value="{{$author->{$lang.'_name'} }}" />
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@lang('global.user_last_name')</span>
+                            </div>
+                            <input type="text" class="form-control" name="{{$lang}}_lastname" value="{{$author->{$lang.'_lastname'} }}" />
                         </div>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -79,6 +83,10 @@
                             <span class="input-group-text">@lang('global.user_first_name')</span>
                         </div>
                         <input type="text" class="form-control" name="add_author_name" value="" />
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">@lang('global.user_last_name')</span>
+                        </div>
+                        <input type="text" class="form-control" name="add_author_lastname" value="" />
                     </div>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -122,12 +130,13 @@
         }
         $('.js_add_author').on('click', function () {
             var _name = $(document).find('[name="add_author_name"]').val();
+            var _lastname = $(document).find('[name="add_author_lastname"]').val();
             var _office = $(document).find('[name="add_author_office"]').val();
             jQuery.ajax({
                 url: '{!!$url!!}&get=addAuthor',
                 type: 'POST',
                 dataType: 'JSON',
-                data: 'name='+_name+'&office='+_office,
+                data: 'name='+_name+'lastname='+_lastname+'&office='+_office,
                 success: function (ajax) {
                     if (ajax.status == 1) {
                         window.location.reload();

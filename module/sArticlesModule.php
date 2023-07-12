@@ -241,6 +241,7 @@ switch ($data['get']) {
     case "addAuthor":
         $responce = ['status' => 0];
         $name = request()->get('name') ?? '';
+        $lastname = request()->get('lastname') ?? '';
         $office = request()->get('office') ?? '';
         if (!empty($name) && $name = trim($name)) {
             $author = sArticlesAuthor::where($defaultLng.'_name', $name)->first();
@@ -249,8 +250,10 @@ switch ($data['get']) {
                 $alias = $sArticlesController->validateAlias(Str::slug($name), $author->autid, 'author');
                 $author->alias = $alias;
                 $author->base_name = $name;
+                $author->base_lastname = $lastname;
                 $author->base_office = $office;
                 $author->{$defaultLng.'_name'} = $name;
+                $author->{$defaultLng.'_lastname'} = $lastname;
                 $author->{$defaultLng.'_office'} = $office;
                 $author->save();
                 $responce['status'] = 1;
@@ -292,6 +295,9 @@ switch ($data['get']) {
         if ($author) {
             if ($_POST['target'] == $sArticlesController->langDefault().'_name') {
                 $author->base_name = $_POST['value'];
+            }
+            if ($_POST['target'] == $sArticlesController->langDefault().'_lastname') {
+                $author->base_lastname = $_POST['value'];
             }
             if ($_POST['target'] == $sArticlesController->langDefault().'_office') {
                 $author->base_office = $_POST['value'];
