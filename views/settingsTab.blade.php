@@ -145,6 +145,11 @@
             </div>
         </div>
     </div>
+    @if(evo()->getConfig('which_editor', 'TinyMCE5') == 'TinyMCE5')
+        @php(evo()->setConfig('tinymce5_theme', evo()->getConfig('sart_tinymce5_theme', 'custom')))
+        @php($files = array_diff(scandir(MODX_BASE_PATH.'assets/plugins/tinymce5/configs'), array('.', '..', 'custom.js')))
+        @include('tinymce5settings::tinymce5settings', ['themes'=>$files])
+    @endif
     <div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_fields_on')</h3>
     <div class="row form-row">

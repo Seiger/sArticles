@@ -132,7 +132,7 @@ switch ($data['get']) {
                         $elements[] = ob_get_contents();
                         ob_end_clean();
                         if (strtolower($field['type']) == 'richtext') {
-                            foreach (range(0, 100) as $y) {
+                            foreach (range(0, 30) as $y) {
                                 $editor[] = $id . $y;
                             }
                         }
@@ -519,6 +519,11 @@ switch ($data['get']) {
             $tag_texts_on = request()->tag_texts_on;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_tag_texts_on', '{$tag_texts_on}')");
             evo()->setConfig('sart_tag_texts_on', $tag_texts_on);
+        }
+        if (request()->has('tinymce5_theme') && request()->tinymce5_theme != evo()->getConfig('sart_tinymce5_theme')) {
+            $tinymce5_theme = request()->tinymce5_theme;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_tinymce5_theme', '{$tinymce5_theme}')");
+            evo()->setConfig('sart_tinymce5_theme', $tinymce5_theme);
         }
         if (request()->has('long_title_on') && request()->long_title_on != evo()->getConfig('sart_long_title_on')) {
             $long_title_on = request()->long_title_on;

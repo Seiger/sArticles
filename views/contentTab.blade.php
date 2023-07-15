@@ -226,7 +226,7 @@
                 .replace('getElementById(\''+attr+'\')','getElementById(\''+attr+cnts+'\')')
                 .replace(/builder\[9999\]\[/g,'builder['+cnts+'][');
             $(".b-resize").before(enew);documentDirty=true;
-            if(attr=='richtext'){tinymce.init({{evo()->getConfig('tinymce5_theme')??'custom'}})}
+            if(attr=='richtext'){tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
         });
         sortableTabs();
         function sortableTabs(){$('#builder').sortable({animation:150,onChange:function(){
@@ -238,7 +238,7 @@
                     this.name = this.name.replace("builder["+elemId+"]","builder["+index+"]");
                 })
             });
-            tinymce.init({{evo()->getConfig('tinymce5_theme')??'custom'}})}
+            tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
         })}
         function onDeleteField(target){let parent=target.closest('.b-draggable');alertify.confirm("@lang('sSettings::global.are_you_sure')","@lang('sSettings::global.deleted_irretrievably')",function(){alertify.error("@lang('sSettings::global.deleted')");parent.remove()},function(){alertify.success("@lang('sSettings::global.canceled')")}).set('labels',{ok:"@lang('global.delete')",cancel:"@lang('global.cancel')"}).set({transition:'zoom'});documentDirty=true}
     </script>

@@ -254,21 +254,31 @@ class sArticlesController
      */
     public function textEditor(string $ids, string $height = '500px', string $editor = ''): string
     {
+        $theme = null;
+        $elements = [];
+        $options = [];
+        $ids = explode(",", $ids);
+
         if (!trim($editor)) {
             $editor = evo()->getConfig('which_editor', 'TinyMCE5');
         }
-        $elements = [];
-        $ids = explode(",", $ids);
+        if ($editor == 'TinyMCE5') {
+            $theme = evo()->getConfig('sart_tinymce5_theme', 'custom');
+        }
 
         foreach ($ids as $id) {
             $elements[] = trim($id);
+            if ($theme) {
+                $options[trim($id)]['theme'] = $theme;
+            }
         }
 
         return implode("", evo()->invokeEvent('OnRichTextEditorInit', [
             'editor' => $editor,
             'elements' => $elements,
             'height' => $height,
-            'contentType' => 'htmlmixed'
+            'contentType' => 'htmlmixed',
+            'options' => $options
         ]));
     }
 
