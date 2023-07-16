@@ -126,13 +126,13 @@ switch ($data['get']) {
                     if ((int)$field['active']) {
                         $id = $field['id'];
                         $templates[$id] = $template;
-                        $buttons[($field['order'] ?? ($idx + 100))] = '<button data-element="' . $id . '" type="button" class="btn btn-primary btn-sm btn-block">' . $field['title'] . '</button>' . ($field['script'] ?? '');
+                        $buttons[($field['order'] ?? ($idx + 25))] = '<button data-element="' . $id . '" data-type="' . $field['type'] . '" type="button" class="btn btn-primary btn-sm btn-block">' . $field['title'] . '</button>' . ($field['script'] ?? '');
                         ob_start();
                         include $template;
                         $elements[] = ob_get_contents();
                         ob_end_clean();
                         if (strtolower($field['type']) == 'richtext') {
-                            foreach (range(0, 30) as $y) {
+                            foreach (range(0, 1000) as $y) {
                                 $editor[] = $id . $y;
                             }
                         }

@@ -216,7 +216,8 @@
     <script>
         $(document).on("click","[data-element]",function(){
             let attr=$(this).attr('data-element');
-            if (attr=='richtext'){tinymce.remove()}
+            let type=$(this).attr('data-type');
+            if (type=='richtext'){tinymce.remove()}
             let cnts=$('.builder').find('.b-draggable').length+1;
             let elem=$('#'+attr).closest('.element').html();
             let enew=elem.replace('id="'+attr+'"','id="'+attr+cnts+'"')
@@ -226,7 +227,7 @@
                 .replace('getElementById(\''+attr+'\')','getElementById(\''+attr+cnts+'\')')
                 .replace(/builder\[9999\]\[/g,'builder['+cnts+'][');
             $(".b-resize").before(enew);documentDirty=true;
-            if(attr=='richtext'){tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
+            if(type=='richtext'){tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
         });
         sortableTabs();
         function sortableTabs(){$('#builder').sortable({animation:150,onChange:function(){
