@@ -71,7 +71,7 @@
                 <div class="col">
                     <select id="author_id" class="form-control select2" name="author_id" onchange="documentDirty=true;">
                         @foreach(\Seiger\sArticles\Models\sArticlesAuthor::orderBy('base_name')->get() as $user)
-                            <option value="{{$user->autid}}" @if($article->author_id == $user->autid) selected @endif>{{$user->base_name}}</option>
+                            <option value="{{$user->autid}}" @if($article->author_id == $user->autid) selected @endif>{{$user->base_name}} {{$user->base_lastname}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -95,18 +95,6 @@
                 </div>
             </div>
         @endif
-        <div class="row-col col-lg-6 col-md-6 col-12">
-            <div class="row form-row">
-                <div class="col-auto col-title-7">
-                    <label for="alias" class="warning">@lang('global.resource_alias')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('global.resource_alias_help')"></i>
-                </div>
-                <div class="input-group col">
-                    <input type="text" id="alias" class="form-control" name="alias" maxlength="255" value="{{$article->alias ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
-                    <a id="preview" href="{{$article->link ?? '/'}}" class="btn btn-outline-secondary form-control" type="button" target="_blank">@lang('global.preview')</a>
-                </div>
-            </div>
-        </div>
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title">
@@ -167,6 +155,18 @@
                         <div id="image_for_cover" class="image_for_field" data-image="{{$article->coverSrc ?? ''}}" onclick="BrowseServer('cover')" style="background-image: url('{{$article->coverSrc ?? ''}}');"></div>
                         <script>document.getElementById('cover').addEventListener('change', evoRenderImageCheck, false);</script>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row-col col-lg-6 col-md-6 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title-7">
+                    <label for="alias" class="warning">@lang('global.resource_alias')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('global.resource_alias_help')"></i>
+                </div>
+                <div class="input-group col">
+                    <input type="text" id="alias" class="form-control" name="alias" maxlength="255" value="{{$article->alias ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
+                    <a id="preview" href="{{$article->link ?? '/'}}" class="btn btn-outline-secondary form-control" type="button" target="_blank">@lang('global.preview')</a>
                 </div>
             </div>
         </div>
