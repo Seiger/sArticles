@@ -32,7 +32,7 @@ class sArticles
     {
         $order = 's_articles.published_at';
         $direc = 'desc';
-        $query = sArticle::orderBy($order, $direc);
+        $query = sArticle::search()->orderBy($order, $direc);
         if (!IN_MANAGER_MODE) {
             $query->active();
         }
