@@ -170,6 +170,19 @@
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
                 <div class="col-title-8">
+                    <label for="cover_title_on" class="warning">@lang('sArticles::global.cover_title')</label>
+                </div>
+                <div class="col">
+                    <input type="checkbox" id="cover_title_on_check" class="form-checkbox form-control" name="cover_title_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.cover_title_on);" @if(evo()->getConfig('sart_cover_title_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="cover_title_on" name="cover_title_on" value="{{evo()->getConfig('sart_cover_title_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-lg-3 col-md-3 col-12">
+            <div class="row form-row">
+                <div class="col-title-8">
                     <label for="long_title_on" class="warning">@lang('global.long_title')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.long_title_on_off_help')"></i>
                 </div>

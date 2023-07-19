@@ -21,6 +21,7 @@
     'confirm_delete' => 'Confirm deletion',
     'content' => 'Content',
     'copyright' => 'Development',
+    'cover_title' => 'Cover Image title',
     'deleted' => 'Record deleted.',
     'description' => 'allows you to manage the writing and publication of articles on the site.',
     'edit_alias' => 'Edit alias',

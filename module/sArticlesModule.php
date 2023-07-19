@@ -158,10 +158,11 @@ switch ($data['get']) {
             }
         }
         $constructor = data_is_json($content->constructor ?? '', true);
+        $data['constructor'] = $constructor;
         $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
         if (is_array($settings)) {
             foreach ($settings as $setting) {
-                $data['constructor'][] = array_merge($setting, ['value' => ($constructor[$setting['key']] ?? '')]);
+                $data['constructor'][$setting['key']] = array_merge($setting, ['value' => ($constructor[$setting['key']] ?? '')]);
                 if (strtolower($setting['type']) == 'richtext') {
                     $editor[] = $setting['key'];
                 }
@@ -525,6 +526,11 @@ switch ($data['get']) {
             $tinymce5_theme = request()->tinymce5_theme;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_tinymce5_theme', '{$tinymce5_theme}')");
             evo()->setConfig('sart_tinymce5_theme', $tinymce5_theme);
+        }
+        if (request()->has('cover_title_on') && request()->cover_title_on != evo()->getConfig('sart_cover_title_on')) {
+            $cover_title_on = request()->cover_title_on;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_cover_title_on', '{$cover_title_on}')");
+            evo()->setConfig('sart_cover_title_on', $cover_title_on);
         }
         if (request()->has('long_title_on') && request()->long_title_on != evo()->getConfig('sart_long_title_on')) {
             $long_title_on = request()->long_title_on;

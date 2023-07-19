@@ -22,6 +22,16 @@
                     @endif--}}
                 </div>
             </div>
+            @if(evo()->getConfig('sart_cover_title_on', 1) == 1)
+                <div class="row form-row">
+                    <div class="col-auto col-title-9">
+                        <label for="longtitle" class="warning">@lang('sArticles::global.cover_title')</label>
+                    </div>
+                    <div class="col">
+                        <input id="cover_title" name="constructor[cover_title]" value="{{$constructor['cover_title']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            @endif
             @if(evo()->getConfig('sart_long_title_on', 1) == 1)
                 <div class="row form-row">
                     <div class="col-auto col-title-9">
@@ -77,40 +87,42 @@
                 </div>
             </div>
             @foreach($constructor as $item)
-                <div class="row form-row">
-                    <div class="col-auto col-title">
-                        <label for="{{$item['key']}}" class="warning">{{$item['name']}}</label>
-                    </div>
-                    <div class="col">
-                        @switch($item['type'])
-                            @case('Text')
-                                <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                @break
-                            @case('File')
-                                <div class="input-group mb-3">
+                @if(trim($item['type']??''))
+                    <div class="row form-row">
+                        <div class="col-auto col-title">
+                            <label for="{{$item['key']}}" class="warning">{{$item['name']}}</label>
+                        </div>
+                        <div class="col">
+                            @switch($item['type'])
+                                @case('Text')
                                     <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                    <div class="input-group-append">
-                                        <button onclick="BrowseFileServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                    @break
+                                @case('File')
+                                    <div class="input-group mb-3">
+                                        <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                        <div class="input-group-append">
+                                            <button onclick="BrowseFileServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                        </div>
                                     </div>
-                                </div>
-                                @break
-                            @case('Image')
-                                <div class="input-group mb-3">
-                                    <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                    <div class="input-group-append">
-                                        <button onclick="BrowseServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                    @break
+                                @case('Image')
+                                    <div class="input-group mb-3">
+                                        <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                        <div class="input-group-append">
+                                            <button onclick="BrowseServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-12">
-                                    <div id="image_for_{{$item['key']}}" data-image="{{$item['value']}}" onclick="BrowseServer('{{$item['key']}}')" class="image_for_field" style="background-image: url('{{MODX_SITE_URL . $item['value']}}');"></div>
-                                    <script>document.getElementById('{{$item['key']}}').addEventListener('change', evoRenderImageCheck, false);</script>
-                                </div>
-                                @break
-                            @default
-                                <textarea id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" rows="3" wrap="soft" onchange="documentDirty=true;">{{$item['value']}}</textarea>
-                        @endswitch
+                                    <div class="col-12">
+                                        <div id="image_for_{{$item['key']}}" data-image="{{$item['value']}}" onclick="BrowseServer('{{$item['key']}}')" class="image_for_field" style="background-image: url('{{MODX_SITE_URL . $item['value']}}');"></div>
+                                        <script>document.getElementById('{{$item['key']}}').addEventListener('change', evoRenderImageCheck, false);</script>
+                                    </div>
+                                    @break
+                                @default
+                                    <textarea id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" rows="3" wrap="soft" onchange="documentDirty=true;">{{$item['value']}}</textarea>
+                            @endswitch
+                        </div>
                     </div>
-                </div>
+                @endif
             @endforeach
         </div>
         <div class="split my-2"></div>
@@ -231,15 +243,15 @@
         });
         sortableTabs();
         function sortableTabs(){$('#builder').sortable({animation:150,onChange:function(){
-            tinymce.remove();
-            $('#builder').find('.b-draggable').each(function(index){
-                let parent=$('#builder').find('.b-draggable').eq(index);
-                let elemId=parent.find('[name^="builder\["]').first().attr('name').replace("builder[","").split("][")[0];
-                parent.find('.b-item [name^="builder\['+elemId+'\]"]').each(function(position){
-                    this.name = this.name.replace("builder["+elemId+"]","builder["+index+"]");
-                })
-            });
-            tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
+                tinymce.remove();
+                $('#builder').find('.b-draggable').each(function(index){
+                    let parent=$('#builder').find('.b-draggable').eq(index);
+                    let elemId=parent.find('[name^="builder\["]').first().attr('name').replace("builder[","").split("][")[0];
+                    parent.find('.b-item [name^="builder\['+elemId+'\]"]').each(function(position){
+                        this.name = this.name.replace("builder["+elemId+"]","builder["+index+"]");
+                    })
+                });
+                tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
         })}
         function onDeleteField(target){let parent=target.closest('.b-draggable');alertify.confirm("@lang('sSettings::global.are_you_sure')","@lang('sSettings::global.deleted_irretrievably')",function(){alertify.error("@lang('sSettings::global.deleted')");parent.remove()},function(){alertify.success("@lang('sSettings::global.canceled')")}).set('labels',{ok:"@lang('global.delete')",cancel:"@lang('global.cancel')"}).set({transition:'zoom'});documentDirty=true}
     </script>
