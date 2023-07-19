@@ -87,9 +87,7 @@ class sArticle extends Model
      */
     public function tags()
     {
-        return $this
-            ->belongsToMany(sArticlesTag::class, 's_article_tags', 'article', 'tag')
-            ->orderBy('s_articles_tags.base');
+        return $this->belongsToMany(sArticlesTag::class, 's_article_tags', 'article', 'tag');
     }
 
     /**

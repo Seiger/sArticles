@@ -89,7 +89,8 @@ switch ($data['get']) {
         $article->published_at = $publishedAt;
         $article->save();
         $article->features()->sync(request()->features ?? []);
-        $article->tags()->sync(request()->tags ?? []);
+        $article->tags()->sync([]);
+        $article->tags()->sync(array_unique(request()->input('tags', [])));
         $sArticlesController->setArticlesListing();
         $back = str_replace('&i=0', '&i=' . $article->id, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
