@@ -127,7 +127,11 @@ switch ($data['get']) {
                     if ((int)$field['active']) {
                         $id = $field['id'];
                         $templates[$id] = $template;
-                        $buttons[($field['order'] ?? ($idx + 25))] = '<button data-element="' . $id . '" data-type="' . $field['type'] . '" type="button" class="btn btn-primary btn-sm btn-block">' . $field['title'] . '</button>' . ($field['script'] ?? '');
+                        $order = ($field['order'] ?? ($idx + 25));
+                        while (isset($buttons[$order])) {
+                            $order++;
+                        }
+                        $buttons[$order] = '<button data-element="' . $id . '" data-type="' . $field['type'] . '" type="button" class="btn btn-primary btn-sm btn-block">' . $field['title'] . '</button>' . ($field['script'] ?? '');
                         ob_start();
                         include $template;
                         $elements[] = ob_get_contents();
