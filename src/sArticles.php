@@ -3,6 +3,7 @@
 use EvolutionCMS\Models\UserAttribute;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Seiger\sArticles\Controllers\sArticlesController;
@@ -160,6 +161,33 @@ class sArticles
             }
         }
         return $result;
+    }
+
+    /**
+     * Rating of Article votes
+     *
+     * @param $id
+     * @return void
+     */
+    public function setComment($id)
+    {
+        $result = [];
+        $uid = evo()->getLoginUserID('web') ?: evo()->getLoginUserID('mgr');
+        $message = request()->get('comment', '');
+        if ($id && $uid && trim($message)) {
+            $commentId = DB::table('s_article_comments')->insertGetId([
+                'article' => $id,
+                'user' => $uid,
+                'comment' => trim($message),
+                'created_at' => now()
+            ]);
+            $comment = DB::table('s_article_comments')->where('comid', $commentId)->first();
+            $user = UserAttribute::where('internalKey', $uid)->first();
+            $usersComments[$uid] = $user;
+            $result['count'] = DB::table('s_article_comments')->where('article', $id)->get()->count();
+            $result['comment'] = view(request()->get('render', ''), ['comment' => $comment, 'usersComments' => $usersComments])->render();
+        }
+        return json_encode($result);
     }
 
     /**

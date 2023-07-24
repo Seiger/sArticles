@@ -37,6 +37,9 @@ Event::listen('evolution.OnPageNotFound', function($params) {
     if ($check == 'sarticles/poll/'.$find && evo()->getConfig('sart_polls_on', 1) == 1) {
         die(sArticles::showPoll((int)$find));
     }
+    if ($check == 'sarticles/comment/'.$find && evo()->getConfig('sart_comment_on', 1) == 1) {
+        die(sArticles::setComment((int)$find));
+    }
 });
 
 /*
