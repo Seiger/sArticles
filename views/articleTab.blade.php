@@ -106,7 +106,7 @@
                     <select id="type" class="form-control select2" name="tags[]" onchange="documentDirty=true;">
                         <option></option>
                         @foreach($tags as $tag)
-                            <option value="{{$tag->tagid}}" @if(in_array($tag->tagid, $article->tag)) selected @endif>{{$tag->base}}</option>
+                            <option value="{{$tag->tagid}}" @if($tag->tagid == $article->tag[0]) selected @endif>{{$tag->base}}</option>
                         @endforeach
                     </select>
                 </div>
