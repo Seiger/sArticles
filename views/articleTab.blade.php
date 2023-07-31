@@ -130,13 +130,15 @@
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title">
-                    <label for="tags" class="warning">@lang('sArticles::global.relevant_articles')</label>
+                    <label for="relevants" class="warning">@lang('sArticles::global.relevant_articles')</label>
                 </div>
                 <div class="col">
                     @php($articleRelevants = data_is_json($article->relevants ?? '', true) ?: [])
                     <select id="relevants" class="form-control select2" name="relevants[]" multiple onchange="documentDirty=true;">
                         @foreach(sArticles::all() as $item)
-                            <option value="{{$item->id}}" @if(in_array($item->id, $articleRelevants)) selected @endif>{{$item->pagetitle}}</option>
+                            @if(($article->id ?? 0) != $item->id)
+                                <option value="{{$item->id}}" @if(in_array($item->id, $articleRelevants)) selected @endif>{{$item->pagetitle}}</option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
