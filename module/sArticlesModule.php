@@ -227,6 +227,7 @@ switch ($data['get']) {
             $content->article = $article->id;
         }
         $content->save();
+        $sArticlesController->setArticlesListing();
         $back = str_replace('&i=0', '&i=' . $content->article, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "authors":
