@@ -57,7 +57,7 @@ switch ($data['get']) {
             }
             $data['tabs'][] = 'settings';
         }
-        $comments = sArticles::comments(10);
+        $comments = sArticles::comments(50);
         $data['comments'] = $comments;
         $data['articles'] = sArticle::whereIn('id', $comments->pluck('article_id')->toArray())->get()->mapWithKeys(function ($item) {
             return [$item->id => $item];
