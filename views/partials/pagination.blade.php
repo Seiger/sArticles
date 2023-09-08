@@ -1,7 +1,17 @@
 @if ($paginator->hasPages())
     {{-- Full link generate --}}
     @php
-        $fullUrl = sArticles::moduleUrl() . (request()->has('search') ? '&search=' . request()->search : '');
+        switch (request()->get('get'))
+       {
+           case 'article_comments':
+               $fullUrl = sArticles::moduleUrl() . '&get='.request()->get('get').'&i='.request()->get('i');
+               break;
+           case 'comments':
+               $fullUrl = sArticles::moduleUrl() . '&get='.request()->get('get');
+               break;
+           default:
+                $fullUrl = sArticles::moduleUrl() . (request()->has('search') ? '&search=' . request()->search : '');
+        }
         $paginator->withPath($fullUrl);
     @endphp
     <style>.dark #translatePagination a {color: #444}</style>

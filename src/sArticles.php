@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
+use Seiger\sArticles\Models\sArticleComment;
 use Seiger\sArticles\Models\sArticlesPoll;
 
 class sArticles
@@ -39,6 +40,23 @@ class sArticles
         }
         $articles = $query->paginate($paginate);
         return $articles;
+    }
+
+    /**
+     *  Get all comments
+     *
+     *  @return object
+     */
+    public function comments($paginate = 30, $artids = [])
+    {
+        $order = 's_article_comments.created_at';
+        $direc = 'desc';
+        $query = sArticleComment::orderBy($order, $direc);
+        if ($artids)
+        {
+            $query->whereIn('article_id', $artids);
+        }
+        return $query->paginate($paginate);
     }
 
     /**
@@ -175,17 +193,42 @@ class sArticles
         $uid = evo()->getLoginUserID('web') ?: evo()->getLoginUserID('mgr');
         $message = request()->get('comment', '');
         if ($id && $uid && trim($message)) {
-            $commentId = DB::table('s_article_comments')->insertGetId([
-                'article' => $id,
-                'user' => $uid,
+            $commentId = sArticleComment::insertGetId([
+                'article_id' => $id,
+                'user_id' => $uid,
+                'lang' => request()->get('lang', 'uk'),
                 'comment' => trim($message),
                 'created_at' => now()
             ]);
-            $comment = DB::table('s_article_comments')->where('comid', $commentId)->first();
+            $comment = sArticleComment::where('comid', $commentId)->first();
             $user = UserAttribute::where('internalKey', $uid)->first();
             $usersComments[$uid] = $user;
-            $result['count'] = DB::table('s_article_comments')->where('article', $id)->get()->count();
+            $result['count'] = sArticleComment::where('article_id', $id)->get()->count();
             $result['comment'] = view(request()->get('render', ''), ['comment' => $comment, 'usersComments' => $usersComments])->render();
+        }
+        return json_encode($result);
+    }
+
+    /**
+     * Approve user comment
+     *
+     * @return void
+     */
+    public function approveComment()
+    {
+        $result = [];
+        $message = request()->get('comment', '');
+        $approved = request()->get('approved');
+        $comid = request()->get('comid', 0);
+        $comment = sArticleComment::find($comid);
+        if ($comment && $message)
+        {
+            sArticleComment::where('comid', $comid)
+                ->update([
+                    'comment' => trim($message),
+                    'approved' => (int)$approved,
+                ]);
+            $result['comment'] =  sArticleComment::where('comid', $comid)->first();
         }
         return json_encode($result);
     }

@@ -90,6 +90,20 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
+                    <label for="comments_on" class="warning">@lang('sArticles::global.comments')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.comments_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" id="comments_on_check" class="form-checkbox form-control" name="comments_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.comments_on);" @if(evo()->getConfig('sart_comments_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="comments_on" name="comments_on" value="{{evo()->getConfig('sart_comments_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
                     <label for="parent" class="warning">@lang('sArticles::global.polls')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.polls_on_off_help')"></i>
                 </div>

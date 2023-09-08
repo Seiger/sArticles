@@ -6,9 +6,11 @@
 use EvolutionCMS\Models\SiteContent;
 use EvolutionCMS\Models\SiteTmplvar;
 use EvolutionCMS\Models\SiteTmplvarTemplate;
+use EvolutionCMS\Models\UserAttribute;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
+use Seiger\sArticles\Models\sArticleComment;
 use Seiger\sArticles\Models\sArticlesAuthor;
 use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesPoll;
@@ -28,6 +30,9 @@ $data['url'] = $sArticlesController->url;
 switch ($data['get']) {
     default:
         $data['tabs'] = ['articles', 'authors', 'tags'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'comments';
+        }
         if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
@@ -38,6 +43,55 @@ switch ($data['get']) {
             $data['tabs'][] = 'settings';
         }
         break;
+    case 'comments':
+        $data['tabs'] = ['articles', 'authors', 'tags'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'comments';
+        }
+        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+            $data['tabs'][] = 'polls';
+        }
+        if (evo()->hasPermission('settings')) {
+            if (evo()->getConfig('sart_features_on', 1) == 1) {
+                $data['tabs'][] = 'features';
+            }
+            $data['tabs'][] = 'settings';
+        }
+        $comments = sArticles::comments(10);
+        $data['comments'] = $comments;
+        $data['articles'] = sArticle::whereIn('id', $comments->pluck('article_id')->toArray())->get()->mapWithKeys(function ($item) {
+            return [$item->id => $item];
+        })->all();
+        $data['usersComments'] = UserAttribute::whereIn('internalKey', $comments->pluck('user_id')->toArray())->get()->mapWithKeys(function ($item) {
+            return [$item->internalKey => $item];
+        })->all();
+        break;
+    case "article_comments":
+        $data['tabs'] = ['article', 'content'];
+        $data['article_url'] = '&i=' . request()->i;
+        $data['content_url'] = '&i=' . request()->i;$data['article_url'] = '&i=' . request()->i;
+        $data['article'] = sArticles::getArticle(request()->i);
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'article_comments';
+            $data['article_comments_url'] = '&i=' . request()->i;
+        }
+        $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? null;
+        if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
+            $data['tabs'][] = 'tvs';
+            $data['tvs_url'] = '&i='.request()->i;
+        }
+        $comments = sArticles::comments(10, [request()->i]);
+        $data['usersComments'] = UserAttribute::whereIn('internalKey', $comments->pluck('user_id')->toArray())->get()->mapWithKeys(function ($item) {
+            return [$item->internalKey => $item];
+        })->all();
+        $data['comments'] = $comments;
+        break;
+    case 'commentDelete':
+        sArticleComment::where('comid', (int)request()->i)->delete();
+        $get = '&get='.( request()->get('article') ? 'article_comments&i='.request()->get('article') : 'comments' );
+        $page = ( request()->get('page') ?'&page='.request()->get('page') : '' );
+        return header('Location: ' . $sArticlesController->url . $get . $page);
+        break;
     case "article":
         $data['tabs'] = ['article', 'content'];
         $data['article'] = sArticles::getArticle(request()->i);
@@ -46,6 +100,10 @@ switch ($data['get']) {
         $data['tvs_url'] = '&i='.request()->i;
         $data['features'] = sArticlesFeature::orderBy('base')->get();
         $data['tags'] = sArticlesTag::orderBy('base')->get();
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'article_comments';
+            $data['article_comments_url'] = '&i=' . request()->i;
+        }
         $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? null;
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
@@ -102,6 +160,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "content":
         $data['tabs'] = ['article', 'content'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'article_comments';
+            $data['article_comments_url'] = '&i=' . request()->i;
+        }
         $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? null;
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
@@ -232,7 +294,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "authors":
         $sArticlesController->setModifyTables('authors');
-        $data['tabs'] = ['articles', 'authors', 'tags'];
+        $data['tabs'] = ['articles',  'authors', 'tags'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'comments';
+        }
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
@@ -372,10 +437,17 @@ switch ($data['get']) {
         $back = '&get=polls';
         return header('Location: ' . $sArticlesController->url . $back);
     case "tvs":
-        $data['tabs'] = ['article', 'content', 'tvs'];
+        $data['tabs'] = ['article', 'content'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1)
+        {
+            $data['tabs'][] = 'article_comments';
+            $data['article_comments_url'] = '&i=' . request()->i;
+        }
+        $data['tabs'][] = 'tvs';
         $data['article'] = sArticles::getArticle(request()->i);
         $data['article_url'] = '&i='.request()->i;
         $data['content_url'] = '&i='.request()->i;
+
         $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? 0;
         $data['tvs'] = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
@@ -417,7 +489,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables('features');
-        $data['tabs'] = ['articles', 'authors', 'tags'];
+        $data['tabs'] = ['articles',  'authors', 'tags'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'comments';
+        }
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
@@ -481,7 +556,10 @@ switch ($data['get']) {
         $back = request()->back ?? '&get=features';
         return header('Location: ' . $sArticlesController->url . $back);
     case "settings":
-        $data['tabs'] = ['articles', 'authors', 'tags'];
+        $data['tabs'] = ['articles',  'authors', 'tags'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'comments';
+        }
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
@@ -501,6 +579,11 @@ switch ($data['get']) {
             $resource = request()->parent;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_blank', '{$resource}')");
             evo()->setConfig('sart_blank', $resource);
+        }
+        if (request()->has('comments_on') && request()->comments_on != evo()->getConfig('sart_comments_on')) {
+            $comments_on = request()->comments_on;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_comments_on', '{$comments_on}')");
+            evo()->setConfig('sart_comments_on', $comments_on);
         }
         if (request()->has('rating_on') && request()->rating_on != evo()->getConfig('sart_rating_on')) {
             $rating_on = request()->rating_on;
@@ -587,7 +670,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "tags":
         $sArticlesController->setModifyTables('tags');
-        $data['tabs'] = ['articles', 'authors', 'tags'];
+        $data['tabs'] = ['articles',  'authors', 'tags'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'comments';
+        }
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }

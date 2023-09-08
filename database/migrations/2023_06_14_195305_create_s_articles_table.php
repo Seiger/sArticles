@@ -87,6 +87,16 @@ class CreateSArticlesTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('s_article_comments', function (Blueprint $table) {
+            $table->id('comid');
+            $table->integer('article_id')->default(0)->index();
+            $table->integer('user_id')->default(0)->index();
+            $table->integer('approved')->default(0)->index();
+            $table->string('lang', 4)->default('base');
+            $table->mediumText('comment')->default('');
+            $table->timestamps();
+        });
+
         Schema::create('s_articles_polls', function (Blueprint $table) {
             $table->id('pollid');
             $table->jsonb('question')->default('(JSON_ARRAY())');
@@ -104,6 +114,7 @@ class CreateSArticlesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('s_articles_polls');
+        Schema::dropIfExists('s_article_comments');
         Schema::dropIfExists('s_articles_authors');
         Schema::dropIfExists('s_article_tags');
         Schema::dropIfExists('s_articles_tags');
