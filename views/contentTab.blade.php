@@ -165,7 +165,7 @@
                 <div class="col">
                     <select id="seorobots" class="form-control" name="seorobots" onchange="documentDirty=true;">
                         @foreach(['index,follow', 'noindex,nofollow'] as $value)
-                            <option value="{{$value}}" @if($content->seorobots ?? 'index,follow' == $value) selected @endif>{{$value}}</option>
+                            <option value="{{$value}}" @if(($content->seorobots ?? 'index,follow') == $value) selected @endif>{{$value}}</option>
                         @endforeach
                     </select>
                 </div>
