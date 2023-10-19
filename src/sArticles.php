@@ -14,6 +14,7 @@ use Seiger\sArticles\Models\sArticlesPoll;
 class sArticles
 {
     public $url = '';
+    const  ALL_PAGES = -1;
 
     public function __construct()
     {
@@ -37,6 +38,9 @@ class sArticles
         $query = sArticle::search()->orderBy($order, $direc);
         if (!IN_MANAGER_MODE) {
             $query->active();
+        }
+        if ($paginate == static::ALL_PAGES) {
+            return $query->get();
         }
         $articles = $query->paginate($paginate);
         return $articles;
