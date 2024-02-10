@@ -12,6 +12,7 @@ use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleComment;
 use Seiger\sArticles\Models\sArticlesAuthor;
+use Seiger\sArticles\Models\sArticlesCategory;
 use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesPoll;
 use Seiger\sArticles\Models\sArticlesTag;
@@ -29,6 +30,7 @@ $data['url'] = $sArticlesController->url;
 
 switch ($data['get']) {
     default:
+        $checkType = request()->type ?? "article";
         $data['tabs'] = ['articles', 'authors', 'tags'];
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
@@ -36,12 +38,16 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
+        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+            $data['tabs'][] = 'categories';
+        }
         if (evo()->hasPermission('settings')) {
             if (evo()->getConfig('sart_features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
             $data['tabs'][] = 'settings';
         }
+        $data['checkType'] = $checkType;
         break;
     case 'comments':
         $data['tabs'] = ['articles', 'authors', 'tags'];
@@ -50,6 +56,9 @@ switch ($data['get']) {
         }
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
+        }
+        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+            $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
             if (evo()->getConfig('sart_features_on', 1) == 1) {
@@ -67,9 +76,11 @@ switch ($data['get']) {
         })->all();
         break;
     case "article_comments":
+        $checkType = request()->type ?? "article";
         $data['tabs'] = ['article', 'content'];
-        $data['article_url'] = '&i=' . request()->i;
-        $data['content_url'] = '&i=' . request()->i;$data['article_url'] = '&i=' . request()->i;
+        $data['article_url'] = '&type='.$checkType.'&i='.request()->i;
+        $data['content_url'] = '&type='.$checkType.'&i='.request()->i;
+        $data['tvs_url'] = '&type='.$checkType.'&i='.request()->i;
         $data['article'] = sArticles::getArticle(request()->i);
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'article_comments';
@@ -85,6 +96,8 @@ switch ($data['get']) {
             return [$item->internalKey => $item];
         })->all();
         $data['comments'] = $comments;
+        $data['generalTabName'] = sArticles::config('types.'.$checkType.'.name', __('sArticles::global.article'));
+        $data['checkType'] = $checkType;
         break;
     case 'commentDelete':
         sArticleComment::where('comid', (int)request()->i)->delete();
@@ -93,12 +106,14 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $get . $page);
         break;
     case "article":
+        $checkType = request()->type ?? "article";
         $data['tabs'] = ['article', 'content'];
         $data['article'] = sArticles::getArticle(request()->i);
-        $data['article_url'] = '&i='.request()->i;
-        $data['content_url'] = '&i='.request()->i;
-        $data['tvs_url'] = '&i='.request()->i;
+        $data['article_url'] = '&type='.$checkType.'&i='.request()->i;
+        $data['content_url'] = '&type='.$checkType.'&i='.request()->i;
+        $data['tvs_url'] = '&type='.$checkType.'&i='.request()->i;
         $data['features'] = sArticlesFeature::orderBy('base')->get();
+        $data['categories'] = sArticlesCategory::orderBy('base')->get();
         $data['tags'] = sArticlesTag::orderBy('base')->get();
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'article_comments';
@@ -108,6 +123,8 @@ switch ($data['get']) {
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
+        $data['generalTabName'] = sArticles::config('types.'.$checkType.'.name', __('sArticles::global.article'));
+        $data['checkType'] = $checkType;
         break;
     case "articleSave":
         $requestId = (int)request()->article;
@@ -142,15 +159,17 @@ switch ($data['get']) {
         $article->alias = $sArticlesController->validateAlias($alias, request()->article);
         $article->position = (int)request()->position;
         $article->cover = request()->cover;
+        $article->type = request()->type ?? "article";
         $article->relevants = json_encode(request()->relevants);
         $article->votes = json_encode($votes);
         $article->published_at = $publishedAt;
         $article->save();
+        $article->categories()->sync(request()->categories ?? []);
         $article->features()->sync(request()->features ?? []);
         $article->tags()->sync([]);
         $article->tags()->sync(array_unique(request()->input('tags', [])));
         $sArticlesController->setArticlesListing();
-        $back = str_replace('&i=0', '&i=' . $article->id, (request()->back ?? '&get=articles'));
+        $back = str_replace(['&i=0', '&type=article'], ['&i=' . $article->id, '&type=' . $article->type], (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "articleDelete":
         DB::table('s_articles')->whereId((int)request()->i)->delete();
@@ -159,6 +178,7 @@ switch ($data['get']) {
         $back = '&get=articles';
         return header('Location: ' . $sArticlesController->url . $back);
     case "content":
+        $checkType = request()->type ?? "article";
         $data['tabs'] = ['article', 'content'];
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'article_comments';
@@ -172,20 +192,23 @@ switch ($data['get']) {
         if (!$content && request()->lang == $sArticlesController->langDefault()) {
             $content = sArticleTranslate::whereArticle((int)request()->i)->whereLang('base')->first();
         }
-        $data['article_url'] = '&i=' . request()->i;
-        $data['content_url'] = '&i=' . request()->i;
-        $data['tvs_url'] = '&i='.request()->i;
+        $data['article_url'] = '&type='.$checkType.'&i='.request()->i;
+        $data['content_url'] = '&type='.$checkType.'&i='.request()->i;
+        $data['tvs_url'] = '&type='.$checkType.'&i='.request()->i;
         $data['constructor'] = [];
         $editor = [];
         $buttons = [];
         $elements = [];
         $templates = [];
         $fields = glob(MODX_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
+        View::getFinder()->setPaths([MODX_BASE_PATH . 'assets/modules/sarticles/builder']);
+
         if (count($fields)) {
             foreach ($fields as $idx => $field) {
-                $template = str_replace('config.php', 'template.php', $field);
-                if (is_file($template)) {
+                if (is_file(dirname($field).'/template.blade.php')) {
+                    $template = basename(dirname($field));
                     $field = require $field;
+
                     if ((int)$field['active']) {
                         $id = $field['id'];
                         $templates[$id] = $template;
@@ -193,21 +216,17 @@ switch ($data['get']) {
                         while (isset($buttons[$order])) {
                             $order++;
                         }
-                        $buttons[$order] = '<button data-element="' . $id . '" data-type="' . $field['type'] . '" type="button" class="btn btn-primary btn-sm btn-block">' . $field['title'] . '</button>' . ($field['script'] ?? '');
-                        ob_start();
-                        include $template;
-                        $elements[] = ob_get_contents();
-                        ob_end_clean();
+                        $buttons[$order] = $sArticlesController->view('partials.addBlockButton', compact(['id', 'field']))->render();
+                        $elements[] = view($template . '.template', compact(['id']))->render();
                         if (strtolower($field['type']) == 'richtext') {
-                            foreach (range(0, 1000) as $y) {
-                                $editor[] = $id . $y;
-                            }
+                            $richtexts[$id] = [];
                         }
                     }
                 }
             }
         }
         ksort($buttons);
+
         $chunks = [];
         $builder = data_is_json($content->builder ?? '', true);
         if (is_array($builder) && count($builder)) {
@@ -216,13 +235,29 @@ switch ($data['get']) {
                 if (isset($templates[$key])) {
                     $id = $key . $i;
                     $value = $item[$key];
-                    ob_start();
-                    include $templates[$key];
-                    $chunks[] = ob_get_contents();
-                    ob_end_clean();
+                    $chunks[] = view($templates[$key] . '.template', compact(['i', 'id', 'value']))->render();
+                    if (isset($richtexts[$key])) {
+                        $richtexts[$key][] = $i;
+                    }
+                    if (isset($value['richtext']) && is_array($value['richtext']) && count($value['richtext'])) {
+                        foreach (range(1, count($value['richtext'])) as $rnum) {
+                            $richtexts[$key][] = $i . $rnum;
+                        }
+                    }
                 }
             }
         }
+
+        foreach ($richtexts as $key => $items) {
+            if (!count($items)) {
+                $items[] = 1;
+            }
+
+            foreach ($items as $item) {
+                $editor[] = $key . $item;
+            }
+        }
+
         $constructor = data_is_json($content->constructor ?? '', true);
         $data['constructor'] = $constructor;
         $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
@@ -234,40 +269,50 @@ switch ($data['get']) {
                 }
             }
         }
+        if (sArticles::config('types.'.$checkType.'.visual_editor_introtext', 0) == 1) {
+            $editor[] = 'introtext';
+        }
+        if (sArticles::config('types.'.$checkType.'.visual_editor_description', 0) == 1) {
+            $editor[] = 'description';
+        }
         $data['content'] = $content;
         $data['editor'] = $sArticlesController->textEditor(implode(',', $editor));
         $data['buttons'] = $buttons;
         $data['elements'] = $elements;
         $data['chunks'] = $chunks;
+        $data['generalTabName'] = sArticles::config('types.'.$checkType.'.name', __('sArticles::global.article'));
+        $data['checkType'] = $checkType;
         break;
     case "contentSave":
         $contentField = '';
         $renders = [];
         $fields = glob(MODX_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
+        View::getFinder()->setPaths([MODX_BASE_PATH . 'assets/modules/sarticles/builder']);
+
         if (count($fields)) {
             foreach ($fields as $field) {
-                $render = str_replace('config.php', 'render.php', $field);
+                $render = str_replace('config.php', 'render.blade.php', $field);
                 if (is_file($render)) {
+                    $render = basename(dirname($render));
                     $field = require $field;
                     $id = $field['id'];
                     $renders[$id] = $render;
                 }
             }
         }
-        $contentBuilder = request()->builder;
+
+        $contentBuilder = request()->input('builder', '');
         if (is_array($contentBuilder) && count($contentBuilder)) {
             foreach ($contentBuilder as $position => $item) {
                 $id = array_key_first($item);
                 if (isset($renders[$id])) {
                     $value = $item[$id];
-                    ob_start();
-                    include $renders[$id];
-                    $contentField .= ob_get_contents();
-                    ob_end_clean();
+                    $contentField .= view($renders[$id] . '.render', compact(['id', 'value']))->render();
                 }
             }
         }
         $contentField = str_replace([chr(9), chr(10), chr(13), '  '], '', $contentField);
+
         $content = sArticleTranslate::whereArticle((int)request()->article)->whereLang(request()->lang)->firstOrNew();
         if (!$content->tid) {
             $content->article = (int)request()->article;
@@ -275,7 +320,8 @@ switch ($data['get']) {
         }
         $content->pagetitle = request()->pagetitle;
         $content->longtitle = request()->input('longtitle', '');
-        $content->introtext = request()->introtext;
+        $content->introtext = request()->input('introtext', '');
+        $content->description = request()->input('description', '');
         $content->content = $contentField;
         $content->seotitle = request()->seotitle;
         $content->seodescription = request()->seodescription;
@@ -285,6 +331,7 @@ switch ($data['get']) {
         if ($content->article == 0) {
             $article = new sArticle();
             $article->alias = $sArticlesController->validateAlias(request()->pagetitle);
+            $article->type = request()->type ?? "article";
             $article->save();
             $content->article = $article->id;
         }
@@ -300,6 +347,9 @@ switch ($data['get']) {
         }
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
+        }
+        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+            $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
             if (evo()->getConfig('sart_features_on', 1) == 1) {
@@ -487,6 +537,91 @@ switch ($data['get']) {
         $article->save();
         $back = str_replace('&i=0', '&i=' . $article->id, (request()->back ?? '&get=tvs'));
         return header('Location: ' . $sArticlesController->url . $back);
+    case "categories":
+        $sArticlesController->setModifyTables('categories');
+        $data['tabs'] = ['articles',  'authors', 'tags'];
+        if (evo()->getConfig('sart_comments_on', 1) == 1) {
+            $data['tabs'][] = 'comments';
+        }
+        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+            $data['tabs'][] = 'polls';
+        }
+        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+            $data['tabs'][] = 'categories';
+        }
+        if (evo()->hasPermission('settings')) {
+            $data['tabs'][] = 'features';
+            $data['tabs'][] = 'settings';
+        }
+        $data['categories'] = sArticlesCategory::orderBy('position')->get();
+        break;
+    case "addCategory":
+        $responce = ['status' => 0];
+        $value = request()->get('value') ?? '';
+        if (!empty($value) && $value = trim($value)) {
+            $category = sArticlesCategory::where($defaultLng, $value)->first();
+            if (!$category) {
+                $category = new sArticlesCategory();
+                $category->alias = Str::slug($value);
+                $category->base = $value;
+                $category->{$defaultLng} = $value;
+                $category->save();
+                $responce['status'] = 1;
+            }
+        }
+        die(json_encode($responce));
+    case "сategorySetAlias":
+        $responce = ['status' => 0];
+        $category = sArticlesCategory::find($_POST['catid']);
+        if ($category) {
+            $alias = $sArticlesController->validateAlias($_POST['alias'], $category->catid, 'category');
+            $category->alias = $alias;
+            $category->update();
+            $responce['status'] = 1;
+        }
+        die(json_encode($responce));
+    case "сategoryTranslate":
+        $result = '';
+        $langDefault = $sArticlesController->langDefault();
+        $category = sArticlesCategory::find($_POST['source']);
+        if ($category) {
+            $text = $category[$langDefault];
+            $result = $sArticlesController->googleTranslate($text, $langDefault, $_POST['target']);
+        }
+
+        if (trim($result)) {
+            $category->{$_POST['target']} = $result;
+            $category->save();
+        }
+        die($result);
+    case "сategoryTranslateUpdate":
+        $result = false;
+        $category = sArticlesCategory::find($_POST['source']);
+        if ($category) {
+            if ($_POST['target'] == $sArticlesController->langDefault()) {
+                $category->base = $_POST['value'];
+            }
+            $category->{$_POST['target']} = $_POST['value'];
+            $category->update();
+            $result = true;
+        }
+        die($result);
+    case "сategoryGetTexts":
+        $texts = sArticlesCategory::whereCatid($_POST['catId'])->first()->toArray();
+        die(json_encode($texts ?? []));
+    case "categoryImageChange":
+        $result = false;
+        $category = sArticlesCategory::whereCatid(request()->input('catId', 0))->first();
+        if ($category) {
+            $category->cover = request()->input('image', '');
+            $category->update();
+            $result = true;
+        }
+        die($result);
+    case "сategoryDelete":
+        DB::table('s_articles_categories')->where('catid', (int)request()->i)->delete();
+        $back = '&get=categories';
+        return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables('features');
         $data['tabs'] = ['articles',  'authors', 'tags'];
@@ -495,6 +630,9 @@ switch ($data['get']) {
         }
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
+        }
+        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+            $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
@@ -563,6 +701,9 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
+        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+            $data['tabs'][] = 'categories';
+        }
         if (evo()->hasPermission('settings')) {
             if (evo()->getConfig('sart_features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
@@ -595,6 +736,11 @@ switch ($data['get']) {
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_polls_on', '{$polls_on}')");
             evo()->setConfig('sart_polls_on', $polls_on);
         }
+        if (request()->has('categories_on') && request()->categories_on != evo()->getConfig('sart_categories_on')) {
+            $categories_on = request()->categories_on;
+            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_categories_on', '{$categories_on}')");
+            evo()->setConfig('sart_categories_on', $categories_on);
+        }
         if (request()->has('in_main_menu') && request()->in_main_menu != evo()->getConfig('sart_in_main_menu')) {
             $in_main_menu = request()->in_main_menu;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_in_main_menu', '{$in_main_menu}')");
@@ -614,16 +760,6 @@ switch ($data['get']) {
             $tinymce5_theme = request()->tinymce5_theme;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_tinymce5_theme', '{$tinymce5_theme}')");
             evo()->setConfig('sart_tinymce5_theme', $tinymce5_theme);
-        }
-        if (request()->has('cover_title_on') && request()->cover_title_on != evo()->getConfig('sart_cover_title_on')) {
-            $cover_title_on = request()->cover_title_on;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_cover_title_on', '{$cover_title_on}')");
-            evo()->setConfig('sart_cover_title_on', $cover_title_on);
-        }
-        if (request()->has('long_title_on') && request()->long_title_on != evo()->getConfig('sart_long_title_on')) {
-            $long_title_on = request()->long_title_on;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_long_title_on', '{$long_title_on}')");
-            evo()->setConfig('sart_long_title_on', $long_title_on);
         }
         if (request()->has('seotitle') && request()->seotitle != evo()->getConfig('sart_name_seotitle')) {
             $seotitle = request()->seotitle;
@@ -649,21 +785,25 @@ switch ($data['get']) {
                 ];
             }
         }
-        $f = fopen(MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php', "w");
-        fwrite($f, '<?php return [' . "\r\n");
-        if (count($settings)) {
-            foreach ($settings as $key => $setting) {
-                if (trim($key)) {
-                    fwrite($f, "\t'" . $key . "' => [" . "\r\n");
-                    foreach ($setting as $k => $v) {
-                        fwrite($f, "\t\t'" . $k . "' => '" . $v . "',\r\n");
+
+        $filters = ['types'];
+        $all = request()->all();
+        ksort($all);
+
+        // Data array formation
+        foreach ($filters as $filter) {
+            foreach ($all as $key => $value) {
+                if (str_starts_with($key, $filter . '__')) {
+                    $key = str_replace($filter . '__', '', $key);
+                    $key = explode('__', $key);
+                    if (ctype_digit(strval($value))) {
+                        $value = intval($value);
                     }
-                    fwrite($f, "\t]" . ",\r\n");
+                    $settings[$filter][$key[0]][$key[1]] = $value;
                 }
             }
         }
-        fwrite($f, "];");
-        fclose($f);
+        $sArticlesController->updateFileConfigs($settings);
         evo()->clearCache('full');
         sleep(5);
         $back = request()->back ?? '&get=settings';
@@ -676,6 +816,9 @@ switch ($data['get']) {
         }
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
+        }
+        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+            $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
             if (evo()->getConfig('sart_features_on', 1) == 1) {

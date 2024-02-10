@@ -10,7 +10,7 @@
                $fullUrl = sArticles::moduleUrl() . '&get='.request()->get('get');
                break;
            default:
-                $fullUrl = sArticles::moduleUrl() . (request()->has('search') ? '&search=' . request()->search : '');
+                $fullUrl = sArticles::moduleUrl() . (request()->has('search') ? '&search=' . request()->search : '') . (request()->has('type') ? '&type=' . request()->type : '');
         }
         $paginator->withPath($fullUrl);
     @endphp

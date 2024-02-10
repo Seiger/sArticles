@@ -7,6 +7,15 @@
 [![Stars](https://img.shields.io/packagist/stars/Seiger/sarticles)](https://packagist.org/packages/seiger/sarticles)
 [![Total Downloads](https://img.shields.io/packagist/dt/seiger/sarticles)](https://packagist.org/packages/seiger/sarticles)
 
+> [!WARNING]  
+> Pay attention when updating from version 1.0.x to 1.1.x.
+> 
+> Content builder templates have been converted to Blade format.
+> 
+> The table of articles and translations of articles have been edited.
+> 
+> Added comment and category tables.
+
 **sArticles** Blog News and Articles Management Module for Evolution CMS admin panel.
 
 ## Install by artisan package installer
@@ -29,4 +38,21 @@ Run make DB structure with command:
 
 ```console
 php artisan migrate
+```
+
+## Events
+
+```php
+/*
+ * Set default value for sArticles field
+ */
+Event::listen('evolution.sArticlesManagerDefaultValueEvent', function($params) {
+    $result = '';
+    if ($params['type'] == 'article') {
+        if ($params['field'] == 'description') {
+            $result = '<p></p>';
+        }
+    }
+    return $result;
+});
 ```

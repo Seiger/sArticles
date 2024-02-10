@@ -30,7 +30,7 @@
                     <div class="tab-page {{$tab}}Tab" id="{{$tab}}Tab">
                         <h2 class="tab">
                             <a onclick="javascript:tabSave('&get={{$tab}}{{${$tab.'_url'} ?? ''}}');" href="{!!$url!!}&get={{$tab}}{{${$tab.'_url'} ?? ''}}">
-                                <span><i class="@lang('sArticles::global.'.$tab.'_icon')" data-tooltip="@lang('sArticles::global.'.$tab.'_help')"></i> @lang('sArticles::global.'.$tab)</span>
+                                <span><i class="@lang('sArticles::global.'.$tab.'_icon')" data-tooltip="@lang('sArticles::global.'.$tab.'_help')"></i> {{$generalTabName ?? __('sArticles::global.'.$tab)}}</span>
                             </a>
                         </h2>
                         <script>tpResources.addTabPage(document.getElementById('{{$tab}}Tab'));</script>
@@ -258,5 +258,5 @@
         }
     </script>
     <img src="{{evo()->getConfig('site_url', '/')}}assets/images/noimage.png" id="img-preview" style="display: none;" class="post-thumbnail">
-    <div id="copyright"><a href="https://seigerit.com/" target="_blank"><img src="{{evo()->getConfig('site_url', '/')}}assets/site/seigerit-yellow.svg"/></a></div>
+    <div id="copyright"><a href="https://seigerit.com/" target="_blank"><img src="{{evo()->getConfig('site_url', '/')}}assets/site/seigerit-blue.svg"/></a></div>
 @endpush

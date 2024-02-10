@@ -1,8 +1,9 @@
-<h3>{{(request()->i ?? 0) == 0 ? __('sArticles::global.add_help') : ($article->pagetitle ?? __('sArticles::global.no_text'))}}</h3>
+<h3>{{(request()->i ?? 0) == 0 ? __('sArticles::global.add_help') .' '. sArticles::config('types.'.$checkType.'.add_button_text', __('sArticles::global.add_article')) : ($article->pagetitle ?? __('sArticles::global.no_text'))}}</h3>
 <div class="split my-3"></div>
 
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=articleSave" onsubmit="documentDirty=false;">
-    <input type="hidden" name="back" value="&get=article&i={{request()->i ?? 0}}" />
+    <input type="hidden" name="back" value="&get=article&type={{$checkType}}&i={{request()->i ?? 0}}" />
+    <input type="hidden" name="type" value="{{$checkType}}" />
     <input type="hidden" name="article" value="{{request()->i ?? 0}}" />
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
@@ -46,22 +47,24 @@
                 </div>
             </div>
         </div>
-        <div class="row-col col-lg-3 col-md-6 col-12">
-            <div class="row form-row form-row-date">
-                <div class="col-auto col-title-9">
-                    <label for="published_at" class="warning">@lang('global.publish_date')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.published_at_help')"></i>
-                </div>
-                <div class="col">
-                    <input id="published_at" class="form-control DatePicker" name="published_at" value="{{$article->published_at ?? ''}}" onblur="documentDirty=true;" placeholder="dd-mm-YYYY hh:mm:ss" autocomplete="off">
-                    <span class="input-group-append">
-                    <a class="btn text-danger" href="javascript:(0);" onclick="document.form.published_at.value='';documentDirty=true; return true;">
-                        <i class="fa fa-calendar-times-o" title="@lang('global.remove_date')"></i>
-                    </a>
-                </span>
+        @if(sArticles::config('types.'.$checkType.'.cover_title_on', 1) == 1)
+            <div class="row-col col-lg-3 col-md-6 col-12">
+                <div class="row form-row form-row-date">
+                    <div class="col-auto col-title-9">
+                        <label for="published_at">@lang('global.publish_date')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.published_at_help')"></i>
+                    </div>
+                    <div class="col">
+                        <input id="published_at" class="form-control DatePicker" name="published_at" value="{{$article->published_at ?? ''}}" onblur="documentDirty=true;" placeholder="dd-mm-YYYY hh:mm:ss" autocomplete="off">
+                        <span class="input-group-append">
+                        <a class="btn text-danger" href="javascript:(0);" onclick="document.form.published_at.value='';documentDirty=true; return true;">
+                            <i class="fa fa-calendar-times-o" title="@lang('global.remove_date')"></i>
+                        </a>
+                    </span>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
         <div class="row-col col-lg-3 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-6">
@@ -72,6 +75,21 @@
                     <select id="author_id" class="form-control select2" name="author_id" onchange="documentDirty=true;">
                         @foreach(\Seiger\sArticles\Models\sArticlesAuthor::orderBy('base_name')->get() as $user)
                             <option value="{{$user->autid}}" @if($article->author_id == $user->autid) selected @endif>{{$user->base_name}} {{$user->base_lastname}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row-col col-lg-6 col-md-6 col-12">
+            <div class="row form-row">
+                <div class="col-auto col-title">
+                    <label for="categories">@lang('sArticles::global.categories')</label>
+                </div>
+                <div class="col">
+                    @php($article->category = $article->categories->pluck('catid')->toArray())
+                    <select id="categories" class="form-control select2" name="categories[]" multiple onchange="documentDirty=true;">
+                        @foreach($categories as $category)
+                            <option value="{{$category->catid}}" @if(in_array($category->catid, $article->category)) selected @endif>{{$category->base}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -135,7 +153,7 @@
                 <div class="col">
                     @php($articleRelevants = data_is_json($article->relevants ?? '', true) ?: [])
                     <select id="relevants" class="form-control select2" name="relevants[]" multiple onchange="documentDirty=true;">
-                        @foreach(sArticles::all(\Seiger\sArticles\sArticles::ALL_PAGES) as $item)
+                        @foreach(sArticles::all() as $item)
                             @if(($article->id ?? 0) != $item->id)
                                 <option value="{{$item->id}}" @if(in_array($item->id, $articleRelevants)) selected @endif>{{$item->pagetitle}}</option>
                             @endif
@@ -179,9 +197,16 @@
 @push('scripts.bot')
     <div id="actions">
         <div class="btn-group">
-            <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
-                <i class="fa fa-times-circle"></i><span>@lang('sArticles::global.to_list_articles')</span>
-            </a>
+            <div class="dropdown">
+                <a href="{{$url}}&get=articles&type={{$checkType}}" class="btn btn-secondary">
+                    <i class="fa fa-times-circle"></i> <span>@lang('sArticles::global.to_list') {{sArticles::config('types.'.$checkType.'.to_button_text', __('sArticles::global.add_article'))}}</span>
+                </a>
+                <div class="dropdown-menu">
+                    <a href="{{$url}}&get=articles" class="btn btn-secondary dropdown-item">
+                        @lang('sArticles::global.to_list_publications')
+                    </a>
+                </div>
+            </div>
             <a id="Button1" class="btn btn-success" href="javascript:void(0);" onclick="saveForm('#form');">
                 <i class="fa fa-floppy-o"></i>
                 <span>@lang('global.save')</span>

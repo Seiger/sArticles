@@ -3,42 +3,44 @@
     <h3>@lang('sArticles::global.management_additional_fields')</h3>
     <div class="row form-row widgets sortable">
         @php($settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php')
-        @foreach($settings as $setting)
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <i style="cursor:pointer;font-size:x-large;" class="fas fa-sort"></i>&emsp; {{$setting['key']}}
-                        <span class="close-icon"><i class="fa fa-times"></i></span>
-                    </div>
-                    <div class="card-block">
-                        <div class="userstable">
-                            <div class="card-body">
-                                <div class="row form-row">
-                                    <div class="col-auto col-title-6">
-                                        <label class="warning">@lang('global.name')</label>
+        @foreach($settings as $key => $setting)
+            @if(!in_array($key, ['types']))
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i style="cursor:pointer;font-size:x-large;" class="fas fa-sort"></i>&emsp; {{$setting['key']}}
+                            <span class="close-icon"><i class="fa fa-times"></i></span>
+                        </div>
+                        <div class="card-block">
+                            <div class="userstable">
+                                <div class="card-body">
+                                    <div class="row form-row">
+                                        <div class="col-auto col-title-6">
+                                            <label class="warning">@lang('global.name')</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="text" class="form-control" name="settings[name][]" maxlength="255" value="{{$setting['name']}}" onchange="documentDirty=true;" spellcheck="true">
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <input type="text" class="form-control" name="settings[name][]" maxlength="255" value="{{$setting['name']}}" onchange="documentDirty=true;" spellcheck="true">
+                                    <div class="row form-row">
+                                        <div class="col-auto col-title-6">
+                                            <label class="warning">@lang('sArticles::global.field_type')</label>
+                                        </div>
+                                        <div class="col">
+                                            <select id="rating" class="form-control" name="settings[type][]" onchange="documentDirty=true;">
+                                                @foreach(['Text', 'Textarea', 'RichText', 'File', 'Image'] as $value)
+                                                    <option value="{{$value}}" @if($setting['type'] == $value) selected @endif>{{$value}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
+                                    <input type="hidden" name="settings[key][]" value="{{$setting['key']}}" />
                                 </div>
-                                <div class="row form-row">
-                                    <div class="col-auto col-title-6">
-                                        <label class="warning">@lang('sArticles::global.field_type')</label>
-                                    </div>
-                                    <div class="col">
-                                        <select id="rating" class="form-control" name="settings[type][]" onchange="documentDirty=true;">
-                                            @foreach(['Text', 'Textarea', 'RichText', 'File', 'Image'] as $value)
-                                                <option value="{{$value}}" @if($setting['type'] == $value) selected @endif>{{$value}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <input type="hidden" name="settings[key][]" value="{{$setting['key']}}" />
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
         @endforeach
     </div>
     <div class="split my-3"></div>
@@ -47,7 +49,7 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
-                    <label for="parent" class="warning">@lang('sArticles::global.resource')</label>
+                    <label for="parent">@lang('sArticles::global.resource')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.resource_help')"></i>
                 </div>
                 <div class="col">
@@ -76,7 +78,7 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
-                    <label for="rating_on" class="warning">@lang('sArticles::global.rating')</label>
+                    <label for="rating_on">@lang('sArticles::global.rating')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.rating')"></i>
                 </div>
                 <div class="col">
@@ -90,7 +92,7 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
-                    <label for="comments_on" class="warning">@lang('sArticles::global.comments')</label>
+                    <label for="comments_on">@lang('sArticles::global.comments')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.comments_on_off_help')"></i>
                 </div>
                 <div class="col">
@@ -104,7 +106,7 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
-                    <label for="parent" class="warning">@lang('sArticles::global.polls')</label>
+                    <label for="polls_on">@lang('sArticles::global.polls')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.polls_on_off_help')"></i>
                 </div>
                 <div class="col">
@@ -124,6 +126,34 @@
                 <div class="col">
                     <input type="checkbox" id="features_oncheck" class="form-checkbox form-control" name="features_oncheck" value="" onchange="documentDirty=true;" onclick="changestate(document.form.features_on);" @if(evo()->getConfig('sart_features_on', 1) == 1) checked @endif>
                     <input type="hidden" id="features_on" name="features_on" value="{{evo()->getConfig('sart_features_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
+                    <label for="categories_on" class="warning">@lang('sArticles::global.categories')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.categories_on_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.categories_on);" @if(evo()->getConfig('sart_categories_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="categories_on" value="{{evo()->getConfig('sart_categories_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
+                    <label for="tag_texts_on">@lang('sArticles::global.tag_texts')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tag_texts_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" id="tag_texts_on_check" class="form-checkbox form-control" name="tag_texts_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.tag_texts_on);" @if(evo()->getConfig('sart_tag_texts_on', 1) == 1) checked @endif>
+                    <input type="hidden" id="tag_texts_on" name="tag_texts_on" value="{{evo()->getConfig('sart_tag_texts_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
@@ -166,47 +196,149 @@
     @endif
     <div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_fields_on')</h3>
-    <div class="row form-row">
-        <div class="row-col col-lg-3 col-md-3 col-12">
-            <div class="row form-row">
-                <div class="col-title-8">
-                    <label for="tag_texts_on" class="warning">@lang('sArticles::global.tag_texts')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tag_texts_on_off_help')"></i>
-                </div>
-                <div class="col">
-                    <input type="checkbox" id="tag_texts_on_check" class="form-checkbox form-control" name="tag_texts_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.tag_texts_on);" @if(evo()->getConfig('sart_tag_texts_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="tag_texts_on" name="tag_texts_on" value="{{evo()->getConfig('sart_tag_texts_on', 1)}}" onchange="documentDirty=true;">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row form-row">
-        <div class="row-col col-lg-3 col-md-3 col-12">
-            <div class="row form-row">
-                <div class="col-title-8">
-                    <label for="cover_title_on" class="warning">@lang('sArticles::global.cover_title')</label>
-                </div>
-                <div class="col">
-                    <input type="checkbox" id="cover_title_on_check" class="form-checkbox form-control" name="cover_title_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.cover_title_on);" @if(evo()->getConfig('sart_cover_title_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="cover_title_on" name="cover_title_on" value="{{evo()->getConfig('sart_cover_title_on', 1)}}" onchange="documentDirty=true;">
+    @php($types = array_keys(sArticles::config('types', [])))
+    @if(count($types) == 0)
+        @php($types = ['article'])
+    @endif
+    @foreach($types as $type)
+        <div class="row form-row">
+            <div class="row-col col-lg-4 col-md-4 col-12">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__name">@lang('global.resource_type')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.resource_type_help')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="types__{{$type}}__name" value="{{sArticles::config('types.'.$type.'.name', $type)}}" onchange="documentDirty=true;">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row form-row">
-        <div class="row-col col-lg-3 col-md-3 col-12">
-            <div class="row form-row">
-                <div class="col-title-8">
-                    <label for="long_title_on" class="warning">@lang('global.long_title')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.long_title_on_off_help')"></i>
-                </div>
-                <div class="col">
-                    <input type="checkbox" id="long_title_on_check" class="form-checkbox form-control" name="long_title_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.long_title_on);" @if(evo()->getConfig('sart_long_title_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="long_title_on" name="long_title_on" value="{{evo()->getConfig('sart_long_title_on', 1)}}" onchange="documentDirty=true;">
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__add_button_text">@lang('sArticles::global.add_button_text')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.add_button_text_help')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="types__{{$type}}__add_button_text" value="{{sArticles::config('types.'.$type.'.add_button_text', __('sArticles::global.add_article'))}}" onchange="documentDirty=true;">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__add_button_text">@lang('sArticles::global.to_button_text')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.add_button_text_help')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="types__{{$type}}__to_button_text" value="{{sArticles::config('types.'.$type.'.to_button_text', __('sArticles::global.add_article'))}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__publish_date_on">@lang('global.publish_date')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.show_field') @lang('global.publish_date')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.types__{{$type}}__publish_date_on);" @if(sArticles::config('types.'.$type.'.publish_date_on', 1) == 1) checked @endif>
+                        <input type="hidden" name="types__{{$type}}__publish_date_on" value="{{sArticles::config('types.'.$type.'.publish_date_on', 1)}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__long_title_on">@lang('global.long_title')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.show_field') @lang('global.long_title')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.types__{{$type}}__long_title_on);" @if(sArticles::config('types.'.$type.'.long_title_on', 1) == 1) checked @endif>
+                        <input type="hidden" name="types__{{$type}}__long_title_on" value="{{sArticles::config('types.'.$type.'.long_title_on', 1)}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__cover_title_on">@lang('sArticles::global.cover_title')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.show_field') @lang('sArticles::global.cover_title')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.types__{{$type}}__cover_title_on);" @if(sArticles::config('types.'.$type.'.cover_title_on', 1) == 1) checked @endif>
+                        <input type="hidden" name="types__{{$type}}__cover_title_on" value="{{sArticles::config('types.'.$type.'.cover_title_on', 1)}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__introtext_on">@lang('global.resource_summary')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.show_field') @lang('global.resource_summary')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.types__{{$type}}__introtext_on);" @if(sArticles::config('types.'.$type.'.introtext_on', 1) == 1) checked @endif>
+                        <input type="hidden" name="types__{{$type}}__introtext_on" value="{{sArticles::config('types.'.$type.'.introtext_on', 1)}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__visual_editor_introtext">@lang('sArticles::global.visual_editor_for') @lang('global.resource_summary')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.visual_editor_for') @lang('global.resource_summary')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.types__{{$type}}__visual_editor_introtext);" @if(sArticles::config('types.'.$type.'.visual_editor_introtext', 0) == 1) checked @endif>
+                        <input type="hidden" name="types__{{$type}}__visual_editor_introtext" value="{{sArticles::config('types.'.$type.'.visual_editor_introtext', 0)}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__description_on">@lang('global.description')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.show_field') @lang('global.description')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.types__{{$type}}__description_on);" @if(sArticles::config('types.'.$type.'.description_on', 1) == 1) checked @endif>
+                        <input type="hidden" name="types__{{$type}}__description_on" value="{{sArticles::config('types.'.$type.'.description_on', 1)}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__visual_editor_description">@lang('sArticles::global.visual_editor_for') @lang('global.description')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.visual_editor_for') @lang('global.description')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.types__{{$type}}__visual_editor_description);" @if(sArticles::config('types.'.$type.'.visual_editor_description', 0) == 1) checked @endif>
+                        <input type="hidden" name="types__{{$type}}__visual_editor_description" value="{{sArticles::config('types.'.$type.'.visual_editor_description', 0)}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
     <div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_fields_name')</h3>
     <div class="row form-row">

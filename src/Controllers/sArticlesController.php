@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Seiger\sArticles\Models\sArticlesAuthor;
+use Seiger\sArticles\Models\sArticlesCategory;
 use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticle;
@@ -33,6 +34,27 @@ class sArticlesController
     public function index(): View
     {
         return $this->view('index');
+    }
+
+    /**
+     * Update file configurations
+     *
+     * This method updates the file configurations based on the provided tabs array.
+     * It generates a PHP file with the updated settings and saves it in a specific location.
+     *
+     * @return bool
+     */
+    public function updateFileConfigs($settings): bool
+    {
+        // Preparation of deadlines with data
+        $string = '<?php return ' . $this->dataToString($settings) . ';';
+
+        // Save the config
+        $handle = fopen(EVO_CORE_PATH . 'custom/config/seiger/settings/sArticles.php', "w");
+        fwrite($handle, $string);
+        fclose($handle);
+
+        return true;
     }
 
     /**
@@ -133,6 +155,25 @@ class sArticlesController
                         evo()->getDatabase()->query($query);
                     }
                     break;
+                case 'categories': // Categories table
+                    $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_articles_categories'));
+                    if ($query) {
+                        $fields = evo()->getDatabase()->makeArray($query);
+                        foreach ($fields as $field) {
+                            $columns[$field['Field']] = $field;
+                        }
+                        foreach ($lang as $item) {
+                            if (!isset($columns[$item])) {
+                                $needs[] = "ADD `{$item}` varchar(255) COMMENT '" . strtoupper($item) . " Value version'";
+                            }
+                        }
+                    }
+                    if (count($needs)) {
+                        $need = implode(', ', $needs);
+                        $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_categories')."` {$need}";
+                        evo()->getDatabase()->query($query);
+                    }
+                    break;
             }
         }
     }
@@ -210,7 +251,7 @@ class sArticlesController
      * @param string $target
      * @return string
      */
-    protected function googleTranslate(string $text, string $source = 'ru', string $target = 'uk'): string
+    public function googleTranslate(string $text, string $source = 'ru', string $target = 'uk'): string
     {
         if ($source == $target) {
             return $text;
@@ -338,6 +379,9 @@ class sArticlesController
             case "tag" :
                 $aliases = sArticlesTag::where('s_articles_tags.tagid', '<>', $id)->get('alias')->pluck('alias')->toArray();
                 break;
+            case "category" :
+                $aliases = sArticlesCategory::where('s_articles_categories.catid', '<>', $id)->get('alias')->pluck('alias')->toArray();
+                break;
             case "author" :
                 $aliases = sArticlesAuthor::where('s_articles_authors.autid', '<>', $id)->get('alias')->pluck('alias')->toArray();
                 break;
@@ -378,5 +422,37 @@ class sArticlesController
     public function view(string $tpl, array $data = [])
     {
         return \View::make('sArticles::'.$tpl, $data);
+    }
+
+    /**
+     * Convert data to a string representation.
+     *
+     * @param mixed $data The data to convert.
+     * @return string The string representation of the data.
+     */
+    protected function dataToString(mixed $data): string
+    {
+        ob_start();
+        var_dump($data);
+        $data = ob_get_contents();
+        ob_end_clean();
+
+        $data = Str::of($data)->replaceMatches('/string\(\d+\) .*/', function ($match) {
+            return substr($match[0], (strpos($match[0], ') ') + 2)) . ',';
+        })->replaceMatches('/bool\(\w+\)/', function ($match) {
+            return str_replace(['bool(', ')'], ['', ','], $match[0]);
+        })->replaceMatches('/int\(\d+\)/', function ($match) {
+            return str_replace(['int(', ')'], ['', ','], $match[0]);
+        })->replaceMatches('/float\(\d+\)/', function ($match) {
+            return str_replace(['float(', ')'], ['', ','], $match[0]);
+        })->replaceMatches('/array\(\d+\) /', function ($match) {
+            return str_replace($match[0], '', $match[0]);
+        })->replaceMatches('/=>\n[ \t]{1,}/', function () {
+            return ' => ';
+        })->replaceMatches('/  /', function () {
+            return '    ';
+        })->remove('[')->remove(']')->replace('{', '[')->replace('}', '],')->rtrim(",\n");
+
+        return $data;
     }
 }

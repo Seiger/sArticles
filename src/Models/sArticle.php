@@ -91,6 +91,16 @@ class sArticle extends Model
     }
 
     /**
+     * Get the categories for the Book.
+     */
+    public function categories()
+    {
+        return $this
+            ->belongsToMany(sArticlesCategory::class, 's_article_categories', 'article', 'category')
+            ->orderBy('s_articles_categories.base');
+    }
+
+    /**
      * Only active articles
      *
      * @param Builder $builder

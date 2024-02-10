@@ -24,6 +24,7 @@ class CreateSArticlesTable extends Migration
             $table->integer('rating')->default(5);
             $table->string('alias', 255)->index();
             $table->string('cover', 255)->default('');
+            $table->string('type')->default('article');
             $table->jsonb('relevants')->default('(JSON_ARRAY())');
             $table->jsonb('tmplvars')->default('(JSON_ARRAY())');
             $table->jsonb('votes')->default('(JSON_ARRAY())');
@@ -38,6 +39,7 @@ class CreateSArticlesTable extends Migration
             $table->string('pagetitle', 100)->default('');
             $table->string('longtitle', 255)->default('');
             $table->mediumText('introtext')->default('');
+            $table->mediumText('description')->default('');
             $table->longText('content')->default('');
             $table->string('seotitle', 100)->default('');
             $table->string('seodescription', 255)->default('');
@@ -74,6 +76,21 @@ class CreateSArticlesTable extends Migration
         Schema::create('s_article_tags', function (Blueprint $table) {
             $table->integer('article')->index();
             $table->integer('tag')->index();
+        });
+
+        Schema::create('s_articles_categories', function (Blueprint $table) {
+            $table->id('catid');
+            $table->integer('position')->default(0);
+            $table->string('alias', 255)->index();
+            $table->string('cover', 255)->default('');
+            $table->string('base', 255)->default('');
+            $table->mediumText('base_content')->default('');
+            $table->timestamps();
+        });
+
+        Schema::create('s_article_categories', function (Blueprint $table) {
+            $table->integer('article')->index();
+            $table->integer('category')->index();
         });
 
         Schema::create('s_articles_authors', function (Blueprint $table) {

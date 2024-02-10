@@ -1,5 +1,8 @@
 <style>
+    #copyright{position:fixed;bottom:0;right:0;}
+    #copyright img{width:35px;}
     input[type=checkbox], input[type=radio] {padding:0.5em;}
+    input[name^=cover]:not([class*=mtv]) + input[type=button].form-control {margin-top: 0; width: 100px;}
     .form-row .row-col {display:flex; flex-wrap:wrap; flex-direction:row; align-content:start; padding-right:0.75rem;}
     .form-row .row-col > .row:not(.col):not(.col-sm):not(.col-md):not(.col-lg):not(.col-xl) {-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%;}
     .form-row-checkbox {align-items:center;}
@@ -7,13 +10,12 @@
     .form-row .col-title-7{width:7rem;}
     .form-row .col-title{width:8rem;}
     .form-row .col-title-9{width:9rem;}
-    .form-row .col-auto {padding-left:0;}
+    .form-row .col-auto{padding-left:0;}
     .warning + [data-tooltip].fa-question-circle {margin:0.3rem 0.5rem 0;}
     .form-row.form-row-date > div:last-child, .form-row.form-row-image > div:last-child, .form-row.form-row-file > div:last-child {display: flex; flex-wrap: wrap; flex-direction: row; align-items: flex-start;}
     .form-row.form-row-date .DatePicker, .form-row.form-row-image input.form-control[type="text"], .form-row.form-row-file input.form-control[type="text"] {flex-basis: 0; flex-grow: 1; max-width: 100%; width: 100% !important; min-width: auto !important;}
-    .image_for_field[data-image] {display:block; content:""; width:240px; height:120px; margin:.1rem .1rem 0 0; border: 1px #ccc solid; background: #fff 50% 50% no-repeat; background-size: contain; cursor: pointer}
-    .image_for_field[data-image=""] {display: none}
-    input[name^=cover]:not([class*=mtv]) + input[type=button].form-control {margin-top: 0; width: 100px;}
+    .image_for_field[data-image]{display:block; content:""; width:240px; height:120px; margin:.1rem .1rem 0 0; border: 1px #ccc solid; background: #fff 50% 50% no-repeat; background-size: contain; cursor: pointer}
+    .image_for_field.icon[data-image]{width:75px; height:75px;}
     .form-row.form-row-date input + a, .form-row.form-row-image input + input[type="button"], .form-row.form-row-file input + input[type="button"] {margin-left: -1px;}
     .notifier{position:fixed;display:none;top:0;left:0;width:100%;height:100vh;overflow-y:auto;z-index:9999;background:rgba(255,255,255,0.8);}
     .notifier-txt{position:absolute;width:100%;text-align:center;top:50%;left:50%;background:#fff;padding:30px;font-size:18px;-webkit-transform:translateY(-50%) translateX(-50%);-moz-transform:translateY(-50%) translateX(-50%);-ms-transform:translateY(-50%) translateX(-50%);-o-transform:translateY(-50%) translateX(-50%);transform:translateY(-50%) translateX(-50%);}
@@ -30,8 +32,6 @@
     table .post-thumbnail{width:70px;height:45px;}
     .badge.bg-seigerit{background-color:#0057b8 !important;color:#ffd700;font-size:85%;}
     .input-group .badge.bg-seigerit{font-size:150%;}
-    #copyright{position:fixed;bottom:0;right:0;background-color:#0057b8;padding:3px 7px;border-radius:5px;}
-    #copyright img{width:9em;}
     .input-group-text{padding:0.1rem 0.75rem;}
     #preview.form-control{max-width:100px;}
     .dark .sectionBody a small, .darkness .sectionBody a small{color:#b3b3b3;}
@@ -75,4 +75,5 @@
     .darkness .builder .b-resize{background-color:#ffd700}
     .darkness .builder .row-col-wrap:hover .b-resize{background-color:#65686d}
     .sbuttons-wraper{position:sticky;top:5px;text-align:center;}
+    #actions .dropdown:hover .dropdown-menu, #actions .dropdown.open .dropdown-menu{display: block;z-index: 3;width: min-content;border: 1px solid rgba(0,0,0,.15);}
 </style>

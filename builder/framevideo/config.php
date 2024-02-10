@@ -3,6 +3,6 @@
     'title' => 'YouTube',
     'type' => 'iframe',
     'id' => 'framevideo',
-    'order' => 3,
+    'order' => 5,
     'script' => '',
 ];

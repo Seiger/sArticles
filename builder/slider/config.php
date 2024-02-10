@@ -3,7 +3,7 @@
     'title' => 'Slider',
     'type' => 'gallery',
     'id' => 'slider',
-    'order' => 6,
+    'order' => 7,
     'script' => '<script>function onAddSlide(target) {
     let parent=target.closest(".slide");
     let attrId=parent.find(".image_for_field").attr("id").replace("image_for_","");

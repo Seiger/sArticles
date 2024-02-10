@@ -14,7 +14,6 @@ use Seiger\sArticles\Models\sArticlesPoll;
 class sArticles
 {
     public $url = '';
-    const  ALL_PAGES = -1;
 
     public function __construct()
     {
@@ -39,8 +38,8 @@ class sArticles
         if (!IN_MANAGER_MODE) {
             $query->active();
         }
-        if ($paginate == static::ALL_PAGES) {
-            return $query->get();
+        if (request()->has('type') && trim(request()->input('type', ''))) {
+            $query->whereType(request()->input('type', ''));
         }
         $articles = $query->paginate($paginate);
         return $articles;
@@ -246,5 +245,17 @@ class sArticles
     {
         $controller = new sArticlesController();
         return $controller->url;
+    }
+
+    /**
+     * Retrieves the value from the config file based on the given key.
+     *
+     * @param string $key The key to retrieve the value from the config file.
+     * @param mixed $default (optional) The default value to return if the key does not exist. Default is null.
+     * @return mixed The value retrieved from the config file or the default value if the key does not exist.
+     */
+    public function config(string $key, mixed $default = null): mixed
+    {
+        return config('seiger.settings.sArticles.' . $key, $default);
     }
 }

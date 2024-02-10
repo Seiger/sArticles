@@ -45,7 +45,7 @@ Event::listen('evolution.OnPageNotFound', function($params) {
     }
 });
 
-/*
+/**
  * Get document fields and add to array of resource fields
  */
 Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {

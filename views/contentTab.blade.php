@@ -1,5 +1,6 @@
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=contentSave" onsubmit="documentDirty=false;">
-    <input type="hidden" name="back" value="&get=content&lang={{request()->lang ?? 'base'}}&i={{request()->i ?? 0}}" />
+    <input type="hidden" name="back" value="&get=content&lang={{request()->lang ?? 'base'}}&type={{$checkType}}&i={{request()->i ?? 0}}" />
+    <input type="hidden" name="type" value="{{$checkType}}" />
     <input type="hidden" name="article" value="{{request()->i ?? 0}}" />
     <input type="hidden" name="lang" value="{{request()->lang ?? 'base'}}" />
     <div class="row form-row">
@@ -10,29 +11,10 @@
                     <i class="fa fa-question-circle" data-tooltip="@lang('global.resource_title_help')"></i>
                 </div>
                 <div class="col">
-                    {{--@if($lang == $sArticlesController->langDefault())--}}
                     <input type="text" id="pagetitle" class="form-control" name="pagetitle" maxlength="255" value="{{$content->pagetitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true"/>
-                    {{--@else
-                        <div class="input-group">
-                            <input type="text" id="pagetitle" class="form-control" name="pagetitle" maxlength="255" value="{{$content->pagetitle ?? ''}}" onchange="documentDirty=true;" spellcheck="true" style="width: calc(100% - 52px);"/>
-                            <button data-lang="{{$lang}}" class="btn btn-light js_translate" type="button" title="@lang('sArticles::global.auto_translate') {{strtoupper($sArticlesController->langDefault())}} => {{strtoupper($lang)}}" style="padding:0 5px;color:#0275d8;">
-                                <i class="fa fa-language" style="font-size:xx-large;"></i>
-                            </button>
-                        </div>
-                    @endif--}}
                 </div>
             </div>
-            @if(evo()->getConfig('sart_cover_title_on', 1) == 1)
-                <div class="row form-row">
-                    <div class="col-auto col-title-9">
-                        <label for="longtitle" class="warning">@lang('sArticles::global.cover_title')</label>
-                    </div>
-                    <div class="col">
-                        <input id="cover_title" name="constructor[cover_title]" value="{{$constructor['cover_title']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                    </div>
-                </div>
-            @endif
-            @if(evo()->getConfig('sart_long_title_on', 1) == 1)
+            @if(sArticles::config('types.'.$checkType.'.long_title_on', 1) == 1)
                 <div class="row form-row">
                     <div class="col-auto col-title-9">
                         <label for="longtitle" class="warning">@lang('global.long_title')</label>
@@ -42,14 +24,44 @@
                     </div>
                 </div>
             @endif
-            <div class="row form-row">
-                <div class="col-auto col-title-9">
-                    <label for="introtext" class="warning">@lang('global.resource_summary')</label>
+            @if(sArticles::config('types.'.$checkType.'.cover_title_on', 1) == 1)
+                <div class="row form-row">
+                    <div class="col-auto col-title-9">
+                        <label for="longtitle" class="warning">@lang('sArticles::global.cover_title')</label>
+                    </div>
+                    <div class="col">
+                        <input id="cover_title" name="constructor[cover_title]" value="{{$constructor['cover_title']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                    </div>
                 </div>
-                <div class="col">
-                    <textarea id="introtext" class="form-control" name="introtext" rows="3" wrap="soft" onchange="documentDirty=true;">{{$content->introtext ?? ''}}</textarea>
+            @endif
+            @if(sArticles::config('types.'.$checkType.'.introtext_on', 1) == 1)
+                <div class="row form-row">
+                    <div class="col-auto col-title-9">
+                        <label for="introtext" class="warning">@lang('global.resource_summary')</label>
+                    </div>
+                    <div class="col">
+                        <textarea id="introtext" class="form-control" name="introtext" rows="3" onchange="documentDirty=true;">{{$content->introtext ?? ''}}</textarea>
+                    </div>
                 </div>
-            </div>
+            @endif
+            @if(sArticles::config('types.'.$checkType.'.description_on', 1) == 1)
+                <div class="row form-row">
+                    <div class="col-auto col-title-9">
+                        <label for="description" class="warning">@lang('global.description')</label>
+                    </div>
+                    <div class="col">
+                        <textarea id="description" class="form-control" name="description" rows="3" onchange="documentDirty=true;">
+                            @if($content->description)
+                                {{$content->description ?? ''}}
+                            @else
+                                @if(is_array($defaultValue = evo()->invokeEvent('sArticlesManagerDefaultValueEvent', ['field' => 'description', 'type' => $checkType, 'lang' => $lang])))
+                                    {!!implode('', $defaultValue)!!}
+                                @endif
+                            @endif
+                        </textarea>
+                    </div>
+                </div>
+            @endif
             <div class="row form-row form-row-richtext">
                 <div class="col-auto col-title-9">
                     <div class="sbuttons-wraper">
@@ -178,9 +190,16 @@
 @push('scripts.bot')
     <div id="actions">
         <div class="btn-group">
-            <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
-                <i class="fa fa-times-circle"></i><span>@lang('sArticles::global.to_list_articles')</span>
-            </a>
+            <div class="dropdown">
+                <a href="{{$url}}&get=articles&type={{$checkType}}" class="btn btn-secondary">
+                    <i class="fa fa-times-circle"></i> <span>@lang('sArticles::global.to_list') {{sArticles::config('types.'.$checkType.'.to_button_text', __('sArticles::global.add_article'))}}</span>
+                </a>
+                <div class="dropdown-menu">
+                    <a href="{{$url}}&get=articles" class="btn btn-secondary dropdown-item">
+                        @lang('sArticles::global.to_list_publications')
+                    </a>
+                </div>
+            </div>
             <a id="Button1" class="btn btn-success" href="javascript:void(0);" onclick="saveForm('#form');">
                 <i class="fa fa-floppy-o"></i>
                 <span>@lang('global.save')</span>
@@ -235,23 +254,22 @@
             let enew=elem.replace('id="'+attr+'"','id="'+attr+cnts+'"')
                 .replace('id="image_for_'+attr+'"','id="image_for_'+attr+cnts+'"')
                 .replace('BrowseServer(\''+attr+'\')','BrowseServer(\''+attr+cnts+'\')')
-                .replace('BrowseServer(\''+attr+'\')','BrowseServer(\''+attr+cnts+'\')')
                 .replace('getElementById(\''+attr+'\')','getElementById(\''+attr+cnts+'\')')
                 .replace(/builder\[9999\]\[/g,'builder['+cnts+'][');
             $(".b-resize").before(enew);documentDirty=true;
-            if(type=='richtext'){tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
+            if(type=='richtext'){ {{evo()->getConfig('sart_tinymce5_theme')??'custom'}}.selector = selector_{{evo()->getConfig('sart_tinymce5_theme')??'custom'}} = selector_{{evo()->getConfig('sart_tinymce5_theme')??'custom'}} + ',#' + attr + cnts;tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
         });
         sortableTabs();
         function sortableTabs(){$('#builder').sortable({animation:150,onChange:function(){
-                tinymce.remove();
-                $('#builder').find('.b-draggable').each(function(index){
-                    let parent=$('#builder').find('.b-draggable').eq(index);
-                    let elemId=parent.find('[name^="builder\["]').first().attr('name').replace("builder[","").split("][")[0];
-                    parent.find('.b-item [name^="builder\['+elemId+'\]"]').each(function(position){
-                        this.name = this.name.replace("builder["+elemId+"]","builder["+index+"]");
-                    })
-                });
-                tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
+            tinymce.remove();
+            $('#builder').find('.b-draggable').each(function(index){
+                let parent=$('#builder').find('.b-draggable').eq(index);
+                let elemId=parent.find('[name^="builder\["]').first().attr('name').replace("builder[","").split("][")[0];
+                parent.find('.b-item [name^="builder\['+elemId+'\]"]').each(function(position){
+                    this.name = this.name.replace("builder["+elemId+"]","builder["+index+"]");
+                })
+            });
+            tinymce.init({{evo()->getConfig('sart_tinymce5_theme')??'custom'}})}
         })}
         function onDeleteField(target){let parent=target.closest('.b-draggable');alertify.confirm("@lang('sSettings::global.are_you_sure')","@lang('sSettings::global.deleted_irretrievably')",function(){alertify.error("@lang('sSettings::global.deleted')");parent.remove()},function(){alertify.success("@lang('sSettings::global.canceled')")}).set('labels',{ok:"@lang('global.delete')",cancel:"@lang('global.cancel')"}).set({transition:'zoom'});documentDirty=true}
     </script>
