@@ -31,12 +31,16 @@
                         <h2 class="tab">
                             <a onclick="javascript:tabSave('&get={{$tab}}{{${$tab.'_url'} ?? ''}}{{$linkType ?? ''}}');" href="{!!$url!!}&get={{$tab}}{{${$tab.'_url'} ?? ''}}{{$linkType ?? ''}}">
                                 <span><i class="@lang('sArticles::global.'.$tab.'_icon')" data-tooltip="@lang('sArticles::global.'.$tab.'_help')"></i>
-                                    @if($tab == 'articles' && sArticles::config('types.'.$checkType.'.list'))
-                                        {{sArticles::config('types.'.$checkType.'.list', '')}}
-                                    @elseif($tab == 'article' && sArticles::config('types.'.$checkType.'.name'))
-                                        {{sArticles::config('types.'.$checkType.'.name', '')}}
+                                    @if(is_array($value = evo()->invokeEvent('sArticlesManagerValueEvent', ['field' => 'tabname', 'item' => $tab, 'type' => $checkType, 'tab' => 'generaltabs'])))
+                                        {!!implode('', $value)!!}
                                     @else
-                                        @lang('sArticles::global.'.$tab)
+                                        @if($tab == 'articles' && sArticles::config('types.'.$checkType.'.list'))
+                                            {{sArticles::config('types.'.$checkType.'.list', '')}}
+                                        @elseif($tab == 'article' && sArticles::config('types.'.$checkType.'.name'))
+                                            {{sArticles::config('types.'.$checkType.'.name', '')}}
+                                        @else
+                                            @lang('sArticles::global.'.$tab)
+                                        @endif
                                     @endif
                                 </span>
                             </a>

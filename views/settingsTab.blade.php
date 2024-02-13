@@ -370,7 +370,7 @@
     <h3>@lang('sArticles::global.management_fields_name')</h3>
     <div class="row form-row">
         <div class="col-auto col-title-9">
-            <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
+            <label for="seotitle">@lang('sArticles::global.seotitle')</label>
             <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seotitle_help')"></i>
         </div>
         <div class="col">
@@ -381,7 +381,7 @@
     </div>
     <div class="row form-row">
         <div class="col-auto col-title-9">
-            <label for="seodescription" class="warning">@lang('sArticles::global.seodescription')</label>
+            <label for="seodescription">@lang('sArticles::global.seodescription')</label>
             <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seodescription_help')"></i>
         </div>
         <div class="col">

@@ -9,6 +9,13 @@ use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticlesAuthor;
 use Seiger\sArticles\Models\sArticlesFeature;
 
+/**
+ * Class sArticle
+ *
+ * Represents an article model.
+ *
+ * @property-read string $link The URL of the article.
+ */
 class sArticle extends Model
 {
     /**
