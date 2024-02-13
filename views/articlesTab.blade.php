@@ -8,7 +8,7 @@
 </div>
 @php($types = array_keys(sArticles::config('types', [])))
 @if(count($types) == 0) @php($types = ['article']) @endif
-@if(count($types) > 1)
+@if(sArticles::config('general.filter_types_on', 1) == 1 && count($types) > 1)
     <div class="btn-group mt-2">
         @if((request()->type ?? "") == '')
             <a href="{{$url}}&get=articles" class="btn btn-outline-primary"><span>@lang('sArticles::global.to_list_publications')</span></a>
@@ -31,7 +31,11 @@
         <tr>
             <th style="text-align:center;">@lang('global.name')</th>
             <th style="width:110px;text-align:center;">@lang('sArticles::global.section')</th>
-            <th style="width:105px;text-align:center;">@lang('sArticles::global.availability') <small>(<i class="fa fa-eye" data-tooltip="@lang('sArticles::global.article_views')"></i>)</small></th>
+            <th style="width:30px;text-align:center;">@lang('sArticles::global.views')</th>
+            @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'views_head', 'item' => $article, 'type' => $checkType, 'tab' => 'articles'])))
+                {!!implode('', $html)!!}
+            @endif
+            <th style="width:105px;text-align:center;">@lang('sArticles::global.availability')</th>
             <th id="action-btns">@lang('global.onlineusers_action')</th>
         </tr>
         </thead>
@@ -52,10 +56,16 @@
                     @endif
                 </td>
                 <td>
+                    <span class="badge badge-dark">{{$article->views}}</span>
+                </td>
+                @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'views', 'item' => $article, 'type' => $checkType, 'tab' => 'articles'])))
+                    {!!implode('', $html)!!}
+                @endif
+                <td>
                     @if($article->published)
-                        <span class="badge badge-success">@lang('global.page_data_published') <small>({{$article->views}})</small></span>
+                        <span class="badge badge-success">@lang('global.page_data_published')</span>
                     @else
-                        <span class="badge badge-dark">@lang('global.page_data_unpublished') <small>({{$article->views}})</small></span>
+                        <span class="badge badge-dark">@lang('global.page_data_unpublished')</span>
                     @endif
                 </td>
                 <td style="text-align:center;">
@@ -83,7 +93,7 @@
                 <a href="{!!$url!!}&get=article&type={{$checkType}}&i=0" class="btn btn-primary" title="@lang('sArticles::global.add_help') {{sArticles::config('types.'.$checkType.'.add_button_text', __('sArticles::global.add_article'))}}">
                     <i class="fa fa-plus"></i> <span>@lang('global.add') {{sArticles::config('types.'.$checkType.'.add_button_text', __('sArticles::global.add_article'))}}</span>
                 </a>
-                @if(count($types) > 1)
+                @if(sArticles::config('general.filter_types_on', 1) == 1 && count($types) > 1)
                     <div class="dropdown-menu">
                         @foreach($types as $type)
                             @if($type != $checkType)

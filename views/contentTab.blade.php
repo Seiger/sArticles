@@ -51,12 +51,10 @@
                     </div>
                     <div class="col">
                         <textarea id="description" class="form-control" name="description" rows="3" onchange="documentDirty=true;">
-                            @if($content->description)
-                                {{$content->description ?? ''}}
+                            @if(is_array($value = evo()->invokeEvent('sArticlesManagerValueEvent', ['field' => 'description', 'item' => $content, 'type' => $checkType, 'tab' => $lang])))
+                                {!!implode('', $value)!!}
                             @else
-                                @if(is_array($defaultValue = evo()->invokeEvent('sArticlesManagerDefaultValueEvent', ['field' => 'description', 'type' => $checkType, 'lang' => $lang])))
-                                    {!!implode('', $defaultValue)!!}
-                                @endif
+                                {!!$content->description ?? ''!!}
                             @endif
                         </textarea>
                     </div>
@@ -194,11 +192,13 @@
                 <a href="{{$url}}&get=articles&type={{$checkType}}" class="btn btn-secondary">
                     <i class="fa fa-times-circle"></i> <span>@lang('sArticles::global.to_list') {{sArticles::config('types.'.$checkType.'.to_button_text', __('sArticles::global.add_article'))}}</span>
                 </a>
-                <div class="dropdown-menu">
-                    <a href="{{$url}}&get=articles" class="btn btn-secondary dropdown-item">
-                        @lang('sArticles::global.to_list_publications')
-                    </a>
-                </div>
+                @if(sArticles::config('general.filter_types_on', 1) == 1)
+                    <div class="dropdown-menu">
+                        <a href="{{$url}}&get=articles" class="btn btn-secondary dropdown-item">
+                            @lang('sArticles::global.to_list_publications')
+                        </a>
+                    </div>
+                @endif
             </div>
             <a id="Button1" class="btn btn-success" href="javascript:void(0);" onclick="saveForm('#form');">
                 <i class="fa fa-floppy-o"></i>

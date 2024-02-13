@@ -46,11 +46,26 @@ php artisan migrate
 /*
  * Set default value for sArticles field
  */
-Event::listen('evolution.sArticlesManagerDefaultValueEvent', function($params) {
+Event::listen('evolution.sArticlesManagerValueEvent', function($params) {
     $result = '';
     if ($params['type'] == 'article') {
         if ($params['field'] == 'description') {
             $result = '<p></p>';
+        }
+    }
+    return $result;
+});
+```
+
+```php
+/*
+ * Add some html after the field
+ */
+Event::listen('evolution.sArticlesManagerAddAfterEvent', function($params) {
+    $result = '';
+    if ($params['type'] == 'idea') {
+        if ($params['field'] == 'published_at') {
+            $result = '';
         }
     }
     return $result;

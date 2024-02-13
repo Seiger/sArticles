@@ -4,7 +4,7 @@
     <div class="row form-row widgets sortable">
         @php($settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php')
         @foreach($settings as $key => $setting)
-            @if(!in_array($key, ['types']))
+            @if(!in_array($key, ['general', 'types']))
                 <div class="col-sm-12">
                     <div class="card">
                         <div class="card-header">
@@ -194,6 +194,20 @@
         @php($files = array_diff(scandir(MODX_BASE_PATH.'assets/plugins/tinymce5/configs'), array('.', '..', 'custom.js')))
         @include('tinymce5settings::tinymce5settings', ['themes'=>$files])
     @endif
+    <div class="row form-row">
+        <div class="row-col col-lg-3 col-md-3 col-12">
+            <div class="row form-row">
+                <div class="col-title">
+                    <label for="general__filter_types_on">@lang('sArticles::global.show_filter_types')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.show_filter_types')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__filter_types_on);" @if(sArticles::config('general.filter_types_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="general__filter_types_on" value="{{sArticles::config('general.filter_types_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_fields_on')</h3>
     @php($types = array_keys(sArticles::config('types', [])))
@@ -210,6 +224,19 @@
                     </div>
                     <div class="col">
                         <input type="text" class="form-control" name="types__{{$type}}__name" value="{{sArticles::config('types.'.$type.'.name', $type)}}" onchange="documentDirty=true;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-row">
+            <div class="row-col col-lg-3 col-md-3 col-12 offset-1">
+                <div class="row form-row">
+                    <div class="col-title-8">
+                        <label for="types__{{$type}}__list">@lang('sArticles::global.list_resources')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.list_resources_help')"></i>
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="types__{{$type}}__list" value="{{sArticles::config('types.'.$type.'.list', __('sArticles::global.articles'))}}" onchange="documentDirty=true;">
                     </div>
                 </div>
             </div>

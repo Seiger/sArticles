@@ -21,12 +21,15 @@ use Seiger\sArticles\Models\sArticleTranslate;
 if (!defined('IN_MANAGER_MODE') || IN_MANAGER_MODE != 'true') die("No access");
 
 $sArticlesController = new sArticlesController();
+$linkType = request()->has('type') ? '&type=' . request()->type : '';
 $data['editor'] = '';
 $data['tabs'] = [];
 $data['get'] = request()->get ?? "articles";
 $data['sArticlesController'] = $sArticlesController;
 $data['lang_default'] = $defaultLng = $sArticlesController->langDefault();
 $data['url'] = $sArticlesController->url;
+$data['linkType'] = $linkType;
+$data['checkType'] = request()->type ?? "article";
 
 switch ($data['get']) {
     default:
@@ -102,8 +105,8 @@ switch ($data['get']) {
     case 'commentDelete':
         sArticleComment::where('comid', (int)request()->i)->delete();
         $get = '&get='.( request()->get('article') ? 'article_comments&i='.request()->get('article') : 'comments' );
-        $page = ( request()->get('page') ?'&page='.request()->get('page') : '' );
-        return header('Location: ' . $sArticlesController->url . $get . $page);
+        $page = request()->get('page') ?'&page='.request()->get('page') : '';
+        return header('Location: ' . $sArticlesController->url . $get . $page . $linkType);
         break;
     case "article":
         $checkType = request()->type ?? "article";
@@ -123,7 +126,6 @@ switch ($data['get']) {
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
-        $data['generalTabName'] = sArticles::config('types.'.$checkType.'.name', __('sArticles::global.article'));
         $data['checkType'] = $checkType;
         break;
     case "articleSave":
@@ -176,7 +178,7 @@ switch ($data['get']) {
         DB::table('s_article_translates')->whereArticle((int)request()->i)->delete();
         $sArticlesController->setArticlesListing();
         $back = '&get=articles';
-        return header('Location: ' . $sArticlesController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "content":
         $checkType = request()->type ?? "article";
         $data['tabs'] = ['article', 'content'];
@@ -338,7 +340,7 @@ switch ($data['get']) {
         $content->save();
         $sArticlesController->setArticlesListing();
         $back = str_replace('&i=0', '&i=' . $content->article, (request()->back ?? '&get=articles'));
-        return header('Location: ' . $sArticlesController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "authors":
         $sArticlesController->setModifyTables('authors');
         $data['tabs'] = ['articles',  'authors', 'tags'];
@@ -431,7 +433,7 @@ switch ($data['get']) {
         die($result);
     case "authorDelete":
         sArticlesAuthor::find(request()->input('i', 0))->delete();
-        $back = '&get=authors';
+        $back = '&get=authors' . $linkType;
         return header('Location: ' . $sArticlesController->url . $back);
     case "poll":
         $data['tabs'] = ['poll'];
@@ -485,7 +487,7 @@ switch ($data['get']) {
         }
         Cache::forget('sArticles-polls-list');
         $back = '&get=polls';
-        return header('Location: ' . $sArticlesController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "tvs":
         $data['tabs'] = ['article', 'content'];
         if (evo()->getConfig('sart_comments_on', 1) == 1)
@@ -639,7 +641,7 @@ switch ($data['get']) {
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
-            return header('Location: ' . $sArticlesController->url . $back);
+            return header('Location: ' . $sArticlesController->url . $back . $linkType);
         }
         $data['features'] = sArticlesFeature::orderBy('position')->get();
         break;
@@ -692,7 +694,7 @@ switch ($data['get']) {
             }
         }
         $back = request()->back ?? '&get=features';
-        return header('Location: ' . $sArticlesController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "settings":
         $data['tabs'] = ['articles',  'authors', 'tags'];
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
@@ -711,7 +713,7 @@ switch ($data['get']) {
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
-            return header('Location: ' . $sArticlesController->url . $back);
+            return header('Location: ' . $sArticlesController->url . $back . $linkType);
         }
         break;
     case "settingsSave":
@@ -786,7 +788,7 @@ switch ($data['get']) {
             }
         }
 
-        $filters = ['types'];
+        $filters = ['general', 'types'];
         $all = request()->all();
         ksort($all);
 
@@ -799,7 +801,11 @@ switch ($data['get']) {
                     if (ctype_digit(strval($value))) {
                         $value = intval($value);
                     }
-                    $settings[$filter][$key[0]][$key[1]] = $value;
+                    if (isset($key[1])) {
+                        $settings[$filter][$key[0]][$key[1]] = $value;
+                    } else {
+                        $settings[$filter][$key[0]] = $value;
+                    }
                 }
             }
         }
@@ -807,7 +813,7 @@ switch ($data['get']) {
         evo()->clearCache('full');
         sleep(5);
         $back = request()->back ?? '&get=settings';
-        return header('Location: ' . $sArticlesController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "tags":
         $sArticlesController->setModifyTables('tags');
         $data['tabs'] = ['articles',  'authors', 'tags'];
@@ -877,7 +883,7 @@ switch ($data['get']) {
     case "tagDelete":
         DB::table('s_articles_tags')->where('tagid', (int)request()->i)->delete();
         $back = '&get=tags';
-        return header('Location: ' . $sArticlesController->url . $back);
+        return header('Location: ' . $sArticlesController->url . $back . $linkType);
 }
 
 echo $sArticlesController->view('index', $data);

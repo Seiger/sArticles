@@ -29,8 +29,16 @@
                 @else
                     <div class="tab-page {{$tab}}Tab" id="{{$tab}}Tab">
                         <h2 class="tab">
-                            <a onclick="javascript:tabSave('&get={{$tab}}{{${$tab.'_url'} ?? ''}}');" href="{!!$url!!}&get={{$tab}}{{${$tab.'_url'} ?? ''}}">
-                                <span><i class="@lang('sArticles::global.'.$tab.'_icon')" data-tooltip="@lang('sArticles::global.'.$tab.'_help')"></i> {{$generalTabName ?? __('sArticles::global.'.$tab)}}</span>
+                            <a onclick="javascript:tabSave('&get={{$tab}}{{${$tab.'_url'} ?? ''}}{{$linkType ?? ''}}');" href="{!!$url!!}&get={{$tab}}{{${$tab.'_url'} ?? ''}}{{$linkType ?? ''}}">
+                                <span><i class="@lang('sArticles::global.'.$tab.'_icon')" data-tooltip="@lang('sArticles::global.'.$tab.'_help')"></i>
+                                    @if($tab == 'articles' && sArticles::config('types.'.$checkType.'.list'))
+                                        {{sArticles::config('types.'.$checkType.'.list', '')}}
+                                    @elseif($tab == 'article' && sArticles::config('types.'.$checkType.'.name'))
+                                        {{sArticles::config('types.'.$checkType.'.name', '')}}
+                                    @else
+                                        @lang('sArticles::global.'.$tab)
+                                    @endif
+                                </span>
                             </a>
                         </h2>
                         <script>tpResources.addTabPage(document.getElementById('{{$tab}}Tab'));</script>

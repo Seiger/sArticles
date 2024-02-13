@@ -47,7 +47,7 @@
                 </div>
             </div>
         </div>
-        @if(sArticles::config('types.'.$checkType.'.cover_title_on', 1) == 1)
+        @if(sArticles::config('types.'.$checkType.'.publish_date_on', 1) == 1)
             <div class="row-col col-lg-3 col-md-6 col-12">
                 <div class="row form-row form-row-date">
                     <div class="col-auto col-title-9">
@@ -65,6 +65,9 @@
                 </div>
             </div>
         @endif
+        @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'published_at', 'item' => $article, 'type' => $checkType, 'tab' => 'article'])))
+            {!!implode('', $html)!!}
+        @endif
         <div class="row-col col-lg-3 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-6">
@@ -80,6 +83,30 @@
                 </div>
             </div>
         </div>
+        @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'author', 'item' => $article, 'type' => $checkType, 'tab' => 'article'])))
+            {!!implode('', $html)!!}
+        @endif
+        @if(evo()->getConfig('sart_features_on', 1) == 1)
+            <div class="row-col col-lg-6 col-md-6 col-12">
+                <div class="row form-row">
+                    <div class="col-auto col-title">
+                        <label for="features" class="warning">@lang('sArticles::global.features')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_article_help')"></i>
+                    </div>
+                    <div class="col">
+                        @php($article->feature = $article->features->pluck('fid')->toArray())
+                        @if(is_array($value = evo()->invokeEvent('sArticlesManagerValueEvent', ['field' => 'features', 'item' => $features, 'type' => $checkType, 'tab' => 'article'])))
+                            @php($features = $value[0])
+                        @endif
+                        <select id="features" class="form-control select2" name="features[]" multiple onchange="documentDirty=true;">
+                            @foreach($features as $feature)
+                                <option value="{{$feature->fid}}" @if(in_array($feature->fid, $article->feature)) selected @endif>{{$feature->base}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title">
@@ -95,24 +122,6 @@
                 </div>
             </div>
         </div>
-        @if(evo()->getConfig('sart_features_on', 1) == 1)
-            <div class="row-col col-lg-6 col-md-6 col-12">
-                <div class="row form-row">
-                    <div class="col-auto col-title">
-                        <label for="features" class="warning">@lang('sArticles::global.features')</label>
-                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_article_help')"></i>
-                    </div>
-                    <div class="col">
-                        @php($article->feature = $article->features->pluck('fid')->toArray())
-                        <select id="features" class="form-control select2" name="features[]" multiple onchange="documentDirty=true;">
-                            @foreach($features as $feature)
-                                <option value="{{$feature->fid}}" @if(in_array($feature->fid, $article->feature)) selected @endif>{{$feature->base}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div>
-        @endif
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title">
@@ -201,11 +210,13 @@
                 <a href="{{$url}}&get=articles&type={{$checkType}}" class="btn btn-secondary">
                     <i class="fa fa-times-circle"></i> <span>@lang('sArticles::global.to_list') {{sArticles::config('types.'.$checkType.'.to_button_text', __('sArticles::global.add_article'))}}</span>
                 </a>
-                <div class="dropdown-menu">
-                    <a href="{{$url}}&get=articles" class="btn btn-secondary dropdown-item">
-                        @lang('sArticles::global.to_list_publications')
-                    </a>
-                </div>
+                @if(sArticles::config('general.filter_types_on', 1) == 1)
+                    <div class="dropdown-menu">
+                        <a href="{{$url}}&get=articles" class="btn btn-secondary dropdown-item">
+                            @lang('sArticles::global.to_list_publications')
+                        </a>
+                    </div>
+                @endif
             </div>
             <a id="Button1" class="btn btn-success" href="javascript:void(0);" onclick="saveForm('#form');">
                 <i class="fa fa-floppy-o"></i>
