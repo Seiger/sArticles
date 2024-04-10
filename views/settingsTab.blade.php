@@ -92,6 +92,20 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
+                    <label for="general__authors_on">@lang('sArticles::global.authors')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.authors_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__authors_on);" @if(sArticles::config('general.authors_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="general__authors_on" value="{{sArticles::config('general.authors_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
                     <label for="comments_on">@lang('sArticles::global.comments')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.comments_on_off_help')"></i>
                 </div>
@@ -197,7 +211,7 @@
     <div class="row form-row">
         <div class="row-col col-lg-3 col-md-3 col-12">
             <div class="row form-row">
-                <div class="col-title">
+                <div class="col-auto">
                     <label for="general__filter_types_on">@lang('sArticles::global.show_filter_types')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.show_filter_types')"></i>
                 </div>

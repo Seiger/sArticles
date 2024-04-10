@@ -68,21 +68,23 @@
         @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'published_at', 'item' => $article, 'type' => $checkType, 'tab' => 'article'])))
             {!!implode('', $html)!!}
         @endif
-        <div class="row-col col-lg-3 col-md-6 col-12">
-            <div class="row form-row">
-                <div class="col-auto col-title-6">
-                    <label for="author_id" class="warning">@lang('sArticles::global.author')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.author_help')"></i>
-                </div>
-                <div class="col">
-                    <select id="author_id" class="form-control select2" name="author_id" onchange="documentDirty=true;">
-                        @foreach(\Seiger\sArticles\Models\sArticlesAuthor::orderBy('base_name')->get() as $user)
-                            <option value="{{$user->autid}}" @if($article->author_id == $user->autid) selected @endif>{{$user->base_name}} {{$user->base_lastname}}</option>
-                        @endforeach
-                    </select>
+        @if(sArticles::config('general.authors_on', 1) == 1)
+            <div class="row-col col-lg-3 col-md-6 col-12">
+                <div class="row form-row">
+                    <div class="col-auto col-title-6">
+                        <label for="author_id" class="warning">@lang('sArticles::global.author')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.author_help')"></i>
+                    </div>
+                    <div class="col">
+                        <select id="author_id" class="form-control select2" name="author_id" onchange="documentDirty=true;">
+                            @foreach(\Seiger\sArticles\Models\sArticlesAuthor::orderBy('base_name')->get() as $user)
+                                <option value="{{$user->autid}}" @if($article->author_id == $user->autid) selected @endif>{{$user->base_name}} {{$user->base_lastname}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
         @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'author', 'item' => $article, 'type' => $checkType, 'tab' => 'article'])))
             {!!implode('', $html)!!}
         @endif

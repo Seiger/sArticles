@@ -9,6 +9,7 @@ use EvolutionCMS\Models\SiteTmplvarTemplate;
 use EvolutionCMS\Models\UserAttribute;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
+use Seiger\sArticles\Facades\sArticles;
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleComment;
 use Seiger\sArticles\Models\sArticlesAuthor;
@@ -34,7 +35,10 @@ $data['checkType'] = request()->type ?? "article";
 switch ($data['get']) {
     default:
         $checkType = request()->type ?? "article";
-        $data['tabs'] = ['articles', 'authors', 'tags'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (sArticles::config('general.authors_on', 1) == 1) {
+            $data['tabs'][] = 'authors';
+        }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
@@ -53,7 +57,10 @@ switch ($data['get']) {
         $data['checkType'] = $checkType;
         break;
     case 'comments':
-        $data['tabs'] = ['articles', 'authors', 'tags'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (sArticles::config('general.authors_on', 1) == 1) {
+            $data['tabs'][] = 'authors';
+        }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
@@ -343,7 +350,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "authors":
         $sArticlesController->setModifyTables('authors');
-        $data['tabs'] = ['articles',  'authors', 'tags'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (sArticles::config('general.authors_on', 1) == 1) {
+            $data['tabs'][] = 'authors';
+        }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
@@ -541,7 +551,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "categories":
         $sArticlesController->setModifyTables('categories');
-        $data['tabs'] = ['articles',  'authors', 'tags'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (sArticles::config('general.authors_on', 1) == 1) {
+            $data['tabs'][] = 'authors';
+        }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
@@ -626,7 +639,10 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables('features');
-        $data['tabs'] = ['articles',  'authors', 'tags'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (sArticles::config('general.authors_on', 1) == 1) {
+            $data['tabs'][] = 'authors';
+        }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
@@ -696,7 +712,10 @@ switch ($data['get']) {
         $back = request()->back ?? '&get=features';
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "settings":
-        $data['tabs'] = ['articles',  'authors', 'tags'];
+        $data['tabs'] = ['articles', 'tags'];
+        if (sArticles::config('general.authors_on', 1) == 1) {
+            $data['tabs'][] = 'authors';
+        }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }

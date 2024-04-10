@@ -39,7 +39,7 @@
     <div id="actions">
         <div class="btn-group">
             <a id="Button5" class="btn btn-secondary" href="{!!$url!!}">
-                <i class="fa fa-times-circle"></i><span>@lang('sArticles::global.to_list_articles')</span>
+                <i class="fa fa-times-circle"></i><span>@lang('sArticles::global.to_list_publications')</span>
             </a>
             <a id="Button1" class="btn btn-success" href="javascript:void(0);" onclick="saveForm('#form');">
                 <i class="fa fa-floppy-o"></i>

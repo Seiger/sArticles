@@ -123,7 +123,7 @@
     'tags' => 'Tags',
     'to_button_text_help' => 'Text for the To List button. For example: To the list of <b>articles</b>',
     'to_button_text' => 'To the list of ...',
-    'to_list_articles' => 'To the list of',
+    'to_list' => 'To the list of',
     'to_list_polls' => 'To the list of polls',
     'to_list_publications' => 'To the list of all publications',
     'total_votes' => 'Total number of votes',
