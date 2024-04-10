@@ -25,9 +25,9 @@ class CreateSArticlesTable extends Migration
             $table->string('alias', 255)->index();
             $table->string('cover', 255)->default('');
             $table->string('type')->default('article');
-            $table->jsonb('relevants')->default('(JSON_ARRAY())');
-            $table->jsonb('tmplvars')->default('(JSON_ARRAY())');
-            $table->jsonb('votes')->default('(JSON_ARRAY())');
+            $table->jsonb('relevants')->default(new Expression('(JSON_ARRAY())'));
+            $table->jsonb('tmplvars')->default(new Expression('(JSON_ARRAY())'));
+            $table->jsonb('votes')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });
@@ -44,8 +44,8 @@ class CreateSArticlesTable extends Migration
             $table->string('seotitle', 100)->default('');
             $table->string('seodescription', 255)->default('');
             $table->enum('seorobots', ['index,follow', 'noindex,nofollow'])->default('index,follow');
-            $table->jsonb('builder')->default('(JSON_ARRAY())');
-            $table->jsonb('constructor')->default('(JSON_ARRAY())');
+            $table->jsonb('builder')->default(new Expression('(JSON_ARRAY())'));
+            $table->jsonb('constructor')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamps();
         });
 
@@ -116,9 +116,9 @@ class CreateSArticlesTable extends Migration
 
         Schema::create('s_articles_polls', function (Blueprint $table) {
             $table->id('pollid');
-            $table->jsonb('question')->default('(JSON_ARRAY())');
-            $table->jsonb('answers')->default('(JSON_ARRAY())');
-            $table->jsonb('votes')->default('(JSON_ARRAY())');
+            $table->jsonb('question')->default(new Expression('(JSON_ARRAY())'));
+            $table->jsonb('answers')->default(new Expression('(JSON_ARRAY())'));
+            $table->jsonb('votes')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamps();
         });
     }
