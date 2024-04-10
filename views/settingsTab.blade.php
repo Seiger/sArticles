@@ -162,6 +162,20 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
+                    <label for="general__tags_on">@lang('sArticles::global.tags')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__tags_on);" @if(sArticles::config('general.tags_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="general__tags_on" value="{{sArticles::config('general.tags_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
                     <label for="tag_texts_on">@lang('sArticles::global.tag_texts')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tag_texts_on_off_help')"></i>
                 </div>

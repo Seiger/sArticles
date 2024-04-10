@@ -35,9 +35,12 @@ $data['checkType'] = request()->type ?? "article";
 switch ($data['get']) {
     default:
         $checkType = request()->type ?? "article";
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles'];
         if (sArticles::config('general.authors_on', 1) == 1) {
             $data['tabs'][] = 'authors';
+        }
+        if (sArticles::config('general.tags_on', 1) == 1) {
+            $data['tabs'][] = 'tags';
         }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
@@ -57,9 +60,12 @@ switch ($data['get']) {
         $data['checkType'] = $checkType;
         break;
     case 'comments':
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles'];
         if (sArticles::config('general.authors_on', 1) == 1) {
             $data['tabs'][] = 'authors';
+        }
+        if (sArticles::config('general.tags_on', 1) == 1) {
+            $data['tabs'][] = 'tags';
         }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
@@ -350,9 +356,12 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "authors":
         $sArticlesController->setModifyTables('authors');
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles'];
         if (sArticles::config('general.authors_on', 1) == 1) {
             $data['tabs'][] = 'authors';
+        }
+        if (sArticles::config('general.tags_on', 1) == 1) {
+            $data['tabs'][] = 'tags';
         }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
@@ -551,9 +560,12 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "categories":
         $sArticlesController->setModifyTables('categories');
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles'];
         if (sArticles::config('general.authors_on', 1) == 1) {
             $data['tabs'][] = 'authors';
+        }
+        if (sArticles::config('general.tags_on', 1) == 1) {
+            $data['tabs'][] = 'tags';
         }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
@@ -639,9 +651,12 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
         $sArticlesController->setModifyTables('features');
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles'];
         if (sArticles::config('general.authors_on', 1) == 1) {
             $data['tabs'][] = 'authors';
+        }
+        if (sArticles::config('general.tags_on', 1) == 1) {
+            $data['tabs'][] = 'tags';
         }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
@@ -712,9 +727,12 @@ switch ($data['get']) {
         $back = request()->back ?? '&get=features';
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "settings":
-        $data['tabs'] = ['articles', 'tags'];
+        $data['tabs'] = ['articles'];
         if (sArticles::config('general.authors_on', 1) == 1) {
             $data['tabs'][] = 'authors';
+        }
+        if (sArticles::config('general.tags_on', 1) == 1) {
+            $data['tabs'][] = 'tags';
         }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
@@ -835,7 +853,13 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "tags":
         $sArticlesController->setModifyTables('tags');
-        $data['tabs'] = ['articles',  'authors', 'tags'];
+        $data['tabs'] = ['articles'];
+        if (sArticles::config('general.authors_on', 1) == 1) {
+            $data['tabs'][] = 'authors';
+        }
+        if (sArticles::config('general.tags_on', 1) == 1) {
+            $data['tabs'][] = 'tags';
+        }
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }

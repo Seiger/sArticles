@@ -124,38 +124,40 @@
                 </div>
             </div>
         </div>
-        <div class="row-col col-lg-6 col-md-6 col-12">
-            <div class="row form-row">
-                <div class="col-auto col-title">
-                    <label for="tags" class="warning">@lang('sArticles::global.main_tag_article')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
-                </div>
-                <div class="col">
-                    @php($article->tag = $article->tags()->pluck('tagid')->toArray())
-                    <select id="type" class="form-control select2" name="tags[]" onchange="documentDirty=true;">
-                        <option></option>
-                        @foreach($tags as $tag)
-                            <option value="{{$tag->tagid}}" @if($tag->tagid == $article->tag[0]) selected @endif>{{$tag->base}}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="row-col col-lg-6 col-md-6 col-12">
-            <div class="row form-row">
-                <div class="col-auto col-title">
-                    <label for="tags" class="warning">@lang('sArticles::global.tags_article')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
-                </div>
-                <div class="col">
-                    <select id="type" class="form-control select2" name="tags[]" multiple onchange="documentDirty=true;">
-                        @foreach($tags as $tag)
-                            <option value="{{$tag->tagid}}" @if(in_array($tag->tagid, $article->tag)) selected @endif>{{$tag->base}}</option>
-                        @endforeach
-                    </select>
+        @if(sArticles::config('general.tags_on', 1) == 1)
+            <div class="row-col col-lg-6 col-md-6 col-12">
+                <div class="row form-row">
+                    <div class="col-auto col-title">
+                        <label for="tags" class="warning">@lang('sArticles::global.main_tag_article')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
+                    </div>
+                    <div class="col">
+                        @php($article->tag = $article->tags()->pluck('tagid')->toArray())
+                        <select id="type" class="form-control select2" name="tags[]" onchange="documentDirty=true;">
+                            <option></option>
+                            @foreach($tags as $tag)
+                                <option value="{{$tag->tagid}}" @if($tag->tagid == $article->tag[0]) selected @endif>{{$tag->base}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="row-col col-lg-6 col-md-6 col-12">
+                <div class="row form-row">
+                    <div class="col-auto col-title">
+                        <label for="tags" class="warning">@lang('sArticles::global.tags_article')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
+                    </div>
+                    <div class="col">
+                        <select id="type" class="form-control select2" name="tags[]" multiple onchange="documentDirty=true;">
+                            @foreach($tags as $tag)
+                                <option value="{{$tag->tagid}}" @if(in_array($tag->tagid, $article->tag)) selected @endif>{{$tag->base}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="row-col col-lg-6 col-md-6 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title">
