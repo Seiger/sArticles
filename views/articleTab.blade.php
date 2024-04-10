@@ -88,7 +88,7 @@
         @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'author', 'item' => $article, 'type' => $checkType, 'tab' => 'article'])))
             {!!implode('', $html)!!}
         @endif
-        @if(evo()->getConfig('sart_features_on', 1) == 1)
+        @if(sArticles::config('general.features_on', 1) == 1)
             <div class="row-col col-lg-6 col-md-6 col-12">
                 <div class="row form-row">
                     <div class="col-auto col-title">

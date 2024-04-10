@@ -1,6 +1,7 @@
 <?php return [
     "general" => [
         "authors_on" => 1,
+        "features_on" => 1,
         "filter_types_on" => 1,
         "tags_on" => 1,
     ],

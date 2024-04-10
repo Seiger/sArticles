@@ -134,12 +134,12 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
-                    <label for="features_on" class="warning">@lang('sArticles::global.features')</label>
+                    <label for="general__features_on">@lang('sArticles::global.features')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_on_off_help')"></i>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="features_oncheck" class="form-checkbox form-control" name="features_oncheck" value="" onchange="documentDirty=true;" onclick="changestate(document.form.features_on);" @if(evo()->getConfig('sart_features_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="features_on" name="features_on" value="{{evo()->getConfig('sart_features_on', 1)}}" onchange="documentDirty=true;">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__features_on);" @if(sArticles::config('general.features_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="general__features_on" value="{{sArticles::config('general.features_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>

@@ -52,7 +52,7 @@ switch ($data['get']) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
-            if (evo()->getConfig('sart_features_on', 1) == 1) {
+            if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
             $data['tabs'][] = 'settings';
@@ -77,7 +77,7 @@ switch ($data['get']) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
-            if (evo()->getConfig('sart_features_on', 1) == 1) {
+            if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
             $data['tabs'][] = 'settings';
@@ -373,7 +373,7 @@ switch ($data['get']) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
-            if (evo()->getConfig('sart_features_on', 1) == 1) {
+            if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
             $data['tabs'][] = 'settings';
@@ -577,7 +577,9 @@ switch ($data['get']) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
-            $data['tabs'][] = 'features';
+            if (sArticles::config('general.features_on', 1) == 1) {
+                $data['tabs'][] = 'features';
+            }
             $data['tabs'][] = 'settings';
         }
         $data['categories'] = sArticlesCategory::orderBy('position')->get();
@@ -668,7 +670,9 @@ switch ($data['get']) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
-            $data['tabs'][] = 'features';
+            if (sArticles::config('general.features_on', 1) == 1) {
+                $data['tabs'][] = 'features';
+            }
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
@@ -744,7 +748,7 @@ switch ($data['get']) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
-            if (evo()->getConfig('sart_features_on', 1) == 1) {
+            if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
             $data['tabs'][] = 'settings';
@@ -870,7 +874,7 @@ switch ($data['get']) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
-            if (evo()->getConfig('sart_features_on', 1) == 1) {
+            if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
             $data['tabs'][] = 'settings';
