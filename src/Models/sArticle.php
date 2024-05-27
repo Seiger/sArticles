@@ -1,5 +1,6 @@
 <?php namespace Seiger\sArticles\Models;
 
+use Carbon\Carbon;
 use EvolutionCMS\Facades\UrlProcessor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +24,7 @@ class sArticle extends Model
      *
      * @var array
      */
-    protected $appends = ['coverSrc', 'link'];
+    protected $appends = ['coverSrc', 'link', 'dateObj'];
 
     /**
      * The "booted" method of the model.
@@ -152,5 +153,15 @@ class sArticle extends Model
             $base_url = rtrim($base_url, evo()->getConfig('friendly_url_suffix', '')) . '/';
         }
         return $base_url.$this->alias.evo()->getConfig('friendly_url_suffix', '');
+    }
+
+    /**
+     * Get the article link
+     *
+     * @return string link
+     */
+    public function getDateObjAttribute()
+    {
+        return Carbon::parse($this->published_at);
     }
 }
