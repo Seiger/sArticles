@@ -134,4 +134,5 @@
     'votes' => 'Голосов',
     'with_id' => 'с ID',
     'you_sure' => 'Вы уверены, что хотите удалить запись',
+    'not_writable' => 'Файл ../core/custom/config/seiger/settings/sArticles.php не доступен для записи.',
 ];

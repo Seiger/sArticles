@@ -31,7 +31,7 @@ class sArticlesServiceProvider extends ServiceProvider
                 dirname(__DIR__) . '/config/sArticlesAlias.php' => config_path('app/aliases/sArticles.php', true),
                 dirname(__DIR__) . '/config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php', true),
                 dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png'),
-                dirname(__DIR__) . '/images/seigerit-yellow.svg' => public_path('assets/site/seigerit-yellow.svg'),
+                dirname(__DIR__) . '/images/seigerit-blue.svg' => public_path('assets/site/seigerit-blue.svg'),
                 dirname(__DIR__) . '/builder/accordion/config.php' => public_path('assets/modules/sarticles/builder/accordion/config.php'),
                 dirname(__DIR__) . '/builder/accordion/render.blade.php' => public_path('assets/modules/sarticles/builder/accordion/render.blade.php'),
                 dirname(__DIR__) . '/builder/accordion/template.blade.php' => public_path('assets/modules/sarticles/builder/accordion/template.blade.php'),

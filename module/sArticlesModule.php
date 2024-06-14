@@ -120,7 +120,6 @@ switch ($data['get']) {
         $get = '&get='.( request()->get('article') ? 'article_comments&i='.request()->get('article') : 'comments' );
         $page = request()->get('page') ?'&page='.request()->get('page') : '';
         return header('Location: ' . $sArticlesController->url . $get . $page . $linkType);
-        break;
     case "article":
         $checkType = request()->type ?? "article";
         $data['tabs'] = ['article', 'content'];

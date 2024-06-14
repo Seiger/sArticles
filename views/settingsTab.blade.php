@@ -1,3 +1,4 @@
+@if(!is_writable(EVO_CORE_PATH . 'custom/config/seiger/settings/sArticles.php'))<div class="alert alert-danger" role="alert">@lang('sArticles::global.not_writable')</div>@endif
 <form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=settingsSave" onsubmit="documentDirty=false;">
     <input type="hidden" name="back" value="&get=settings" />
     <h3>@lang('sArticles::global.management_additional_fields')</h3>

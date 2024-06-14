@@ -32,7 +32,7 @@
             <th style="text-align:center;">@lang('global.name')</th>
             <th style="width:110px;text-align:center;">@lang('sArticles::global.section')</th>
             <th style="width:30px;text-align:center;">@lang('sArticles::global.views')</th>
-            @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'views_head', 'item' => $article, 'type' => $checkType, 'tab' => 'articles'])))
+            @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'views_head', 'item' => null, 'type' => $checkType, 'tab' => 'articles'])))
                 {!!implode('', $html)!!}
             @endif
             <th style="width:105px;text-align:center;">@lang('sArticles::global.availability')</th>
