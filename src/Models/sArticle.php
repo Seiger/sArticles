@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Seiger\sArticles\Controllers\sArticlesController;
-use Seiger\sArticles\Models\sArticlesAuthor;
-use Seiger\sArticles\Models\sArticlesFeature;
 
 /**
  * Class sArticle
