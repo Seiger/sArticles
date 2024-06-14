@@ -9,7 +9,6 @@ use EvolutionCMS\Models\SiteTmplvarTemplate;
 use EvolutionCMS\Models\UserAttribute;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
-use Seiger\sArticles\Facades\sArticles;
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleComment;
 use Seiger\sArticles\Models\sArticlesAuthor;
@@ -48,7 +47,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
-        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+        if (sArticles::config('general.categories_on', 1) == 1) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
@@ -73,7 +72,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
-        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+        if (sArticles::config('general.categories_on', 1) == 1) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
@@ -120,6 +119,7 @@ switch ($data['get']) {
         $get = '&get='.( request()->get('article') ? 'article_comments&i='.request()->get('article') : 'comments' );
         $page = request()->get('page') ?'&page='.request()->get('page') : '';
         return header('Location: ' . $sArticlesController->url . $get . $page . $linkType);
+        break;
     case "article":
         $checkType = request()->type ?? "article";
         $data['tabs'] = ['article', 'content'];
@@ -368,7 +368,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
-        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+        if (sArticles::config('general.categories_on', 1) == 1) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
@@ -572,7 +572,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
-        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+        if (sArticles::config('general.categories_on', 1) == 1) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
@@ -665,13 +665,11 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
-        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+        if (sArticles::config('general.categories_on', 1) == 1) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
-            if (sArticles::config('general.features_on', 1) == 1) {
-                $data['tabs'][] = 'features';
-            }
+            $data['tabs'][] = 'features';
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
@@ -743,7 +741,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
-        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+        if (sArticles::config('general.categories_on', 1) == 1) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {
@@ -777,11 +775,6 @@ switch ($data['get']) {
             $polls_on = request()->polls_on;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_polls_on', '{$polls_on}')");
             evo()->setConfig('sart_polls_on', $polls_on);
-        }
-        if (request()->has('categories_on') && request()->categories_on != evo()->getConfig('sart_categories_on')) {
-            $categories_on = request()->categories_on;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_categories_on', '{$categories_on}')");
-            evo()->setConfig('sart_categories_on', $categories_on);
         }
         if (request()->has('in_main_menu') && request()->in_main_menu != evo()->getConfig('sart_in_main_menu')) {
             $in_main_menu = request()->in_main_menu;
@@ -869,7 +862,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_polls_on', 0) == 1) {
             $data['tabs'][] = 'polls';
         }
-        if (evo()->getConfig('sart_categories_on', 1) == 1) {
+        if (sArticles::config('general.categories_on', 1) == 1) {
             $data['tabs'][] = 'categories';
         }
         if (evo()->hasPermission('settings')) {

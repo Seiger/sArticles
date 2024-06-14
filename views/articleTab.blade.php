@@ -16,7 +16,7 @@
                     <input type="checkbox" id="publishedcheck" class="form-checkbox form-control" name="publishedcheck" value="" onchange="documentDirty=true;" onclick="changestate(document.form.published);" @if(isset($article->published) && $article->published) checked @endif>
                     <input type="hidden" id="published" name="published" value="{{$article->published ?? 0}}" onchange="documentDirty=true;">
                     &emsp;<i class="fa fa-eye" data-tooltip="@lang('sArticles::global.article_views')"> <b>{{$article->views ?? 0}}</b></i>
-                    @if(evo()->getConfig('sart_rating_on', 1) == 1)&emsp;<i class="fa fa-star" data-tooltip="@lang('sArticles::global.rating')"> <b>{{$article->rating ?? 0}}</b></i>@endif
+                    @if(sArticles::config('general.rating_on', 1) == 1)&emsp;<i class="fa fa-star" data-tooltip="@lang('sArticles::global.rating')"> <b>{{$article->rating ?? 0}}</b></i>@endif
                 </div>
             </div>
         </div>
@@ -88,6 +88,23 @@
         @if(is_array($html = evo()->invokeEvent('sArticlesManagerAddAfterEvent', ['field' => 'author', 'item' => $article, 'type' => $checkType, 'tab' => 'article'])))
             {!!implode('', $html)!!}
         @endif
+        @if(sArticles::config('general.categories_on', 1) == 1)
+            <div class="row-col col-lg-6 col-md-6 col-12">
+                <div class="row form-row">
+                    <div class="col-auto col-title">
+                        <label for="categories">@lang('sArticles::global.categories')</label>
+                    </div>
+                    <div class="col">
+                        @php($article->category = $article->categories->pluck('catid')->toArray())
+                        <select id="categories" class="form-control select2" name="categories[]" multiple onchange="documentDirty=true;">
+                            @foreach($categories as $category)
+                                <option value="{{$category->catid}}" @if(in_array($category->catid, $article->category)) selected @endif>{{$category->base}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        @endif
         @if(sArticles::config('general.features_on', 1) == 1)
             <div class="row-col col-lg-6 col-md-6 col-12">
                 <div class="row form-row">
@@ -109,26 +126,11 @@
                 </div>
             </div>
         @endif
-        <div class="row-col col-lg-6 col-md-6 col-12">
-            <div class="row form-row">
-                <div class="col-auto col-title">
-                    <label for="categories">@lang('sArticles::global.categories')</label>
-                </div>
-                <div class="col">
-                    @php($article->category = $article->categories->pluck('catid')->toArray())
-                    <select id="categories" class="form-control select2" name="categories[]" multiple onchange="documentDirty=true;">
-                        @foreach($categories as $category)
-                            <option value="{{$category->catid}}" @if(in_array($category->catid, $article->category)) selected @endif>{{$category->base}}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-        </div>
         @if(sArticles::config('general.tags_on', 1) == 1)
             <div class="row-col col-lg-6 col-md-6 col-12">
                 <div class="row form-row">
                     <div class="col-auto col-title">
-                        <label for="tags" class="warning">@lang('sArticles::global.main_tag_article')</label>
+                        <label for="tags">@lang('sArticles::global.main_tag_article')</label>
                         <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
                     </div>
                     <div class="col">
@@ -145,7 +147,7 @@
             <div class="row-col col-lg-6 col-md-6 col-12">
                 <div class="row form-row">
                     <div class="col-auto col-title">
-                        <label for="tags" class="warning">@lang('sArticles::global.tags_article')</label>
+                        <label for="tags">@lang('sArticles::global.tags_article')</label>
                         <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
                     </div>
                     <div class="col">

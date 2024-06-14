@@ -79,12 +79,12 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
-                    <label for="rating_on">@lang('sArticles::global.rating')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.rating')"></i>
+                    <label for="general__rating_on">@lang('sArticles::global.rating')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.rating_on_off_help')"></i>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="rating_on_check" class="form-checkbox form-control" name="rating_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.rating_on);" @if(evo()->getConfig('sart_rating_on', 1) == 1) checked @endif>
-                    <input type="hidden" id="rating_on" name="rating_on" value="{{evo()->getConfig('sart_rating_on', 1)}}" onchange="documentDirty=true;">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__rating_on);" @if(sArticles::config('general.rating_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="general__rating_on" value="{{sArticles::config('general.rating_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
@@ -99,6 +99,20 @@
                 <div class="col">
                     <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__authors_on);" @if(sArticles::config('general.authors_on', 1) == 1) checked @endif>
                     <input type="hidden" name="general__authors_on" value="{{sArticles::config('general.authors_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
+                    <label for="general__tags_on">@lang('sArticles::global.tags')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__tags_on);" @if(sArticles::config('general.tags_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="general__tags_on" value="{{sArticles::config('general.tags_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
@@ -135,40 +149,26 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
+                    <label for="general__categories_on">@lang('sArticles::global.categories')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.categories_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__categories_on);" @if(sArticles::config('general.categories_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="general__categories_on" value="{{sArticles::config('general.categories_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
                     <label for="general__features_on">@lang('sArticles::global.features')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_on_off_help')"></i>
                 </div>
                 <div class="col">
                     <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__features_on);" @if(sArticles::config('general.features_on', 1) == 1) checked @endif>
                     <input type="hidden" name="general__features_on" value="{{sArticles::config('general.features_on', 1)}}" onchange="documentDirty=true;">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row form-row">
-        <div class="row-col col-12">
-            <div class="row form-row">
-                <div class="col-auto">
-                    <label for="categories_on" class="warning">@lang('sArticles::global.categories')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.categories_on_help')"></i>
-                </div>
-                <div class="col">
-                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.categories_on);" @if(evo()->getConfig('sart_categories_on', 1) == 1) checked @endif>
-                    <input type="hidden" name="categories_on" value="{{evo()->getConfig('sart_categories_on', 1)}}" onchange="documentDirty=true;">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row form-row">
-        <div class="row-col col-12">
-            <div class="row form-row">
-                <div class="col-auto">
-                    <label for="general__tags_on">@lang('sArticles::global.tags')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_on_off_help')"></i>
-                </div>
-                <div class="col">
-                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__tags_on);" @if(sArticles::config('general.tags_on', 1) == 1) checked @endif>
-                    <input type="hidden" name="general__tags_on" value="{{sArticles::config('general.tags_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
