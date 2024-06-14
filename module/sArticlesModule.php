@@ -276,10 +276,12 @@ switch ($data['get']) {
         $data['constructor'] = $constructor;
         $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
         if (is_array($settings)) {
-            foreach ($settings as $setting) {
-                $data['constructor'][$setting['key']] = array_merge($setting, ['value' => ($constructor[$setting['key']] ?? '')]);
-                if (strtolower($setting['type']) == 'richtext') {
-                    $editor[] = $setting['key'];
+            foreach ($settings as $key => $setting) {
+                if (!in_array($key, ['general', 'types'])) {
+                    $data['constructor'][$setting['key']] = array_merge($setting, ['value' => ($constructor[$setting['key']] ?? '')]);
+                    if (strtolower($setting['type']) == 'richtext') {
+                        $editor[] = $setting['key'];
+                    }
                 }
             }
         }

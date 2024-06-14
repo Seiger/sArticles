@@ -96,44 +96,46 @@
                     <i class="b-resize b-resize-r"></i>
                 </div>
             </div>
-            @foreach($constructor as $item)
-                @if(trim($item['type']??''))
-                    <div class="row form-row">
-                        <div class="col-auto col-title">
-                            <label for="{{$item['key']}}" class="warning">{{$item['name']}}</label>
-                        </div>
-                        <div class="col">
-                            @switch($item['type'])
-                                @case('Text')
-                                    <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                    @break
-                                @case('File')
-                                    <div class="input-group mb-3">
+            @if($constructor)
+                @foreach($constructor as $item)
+                    @if(trim($item['type']??''))
+                        <div class="row form-row">
+                            <div class="col-auto col-title">
+                                <label for="{{$item['key']}}" class="warning">{{$item['name']}}</label>
+                            </div>
+                            <div class="col">
+                                @switch($item['type'])
+                                    @case('Text')
                                         <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                        <div class="input-group-append">
-                                            <button onclick="BrowseFileServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                        @break
+                                    @case('File')
+                                        <div class="input-group mb-3">
+                                            <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                            <div class="input-group-append">
+                                                <button onclick="BrowseFileServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    @break
-                                @case('Image')
-                                    <div class="input-group mb-3">
-                                        <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                        <div class="input-group-append">
-                                            <button onclick="BrowseServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                        @break
+                                    @case('Image')
+                                        <div class="input-group mb-3">
+                                            <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                            <div class="input-group-append">
+                                                <button onclick="BrowseServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div id="image_for_{{$item['key']}}" data-image="{{$item['value']}}" onclick="BrowseServer('{{$item['key']}}')" class="image_for_field" style="background-image: url('{{MODX_SITE_URL . $item['value']}}');"></div>
-                                        <script>document.getElementById('{{$item['key']}}').addEventListener('change', evoRenderImageCheck, false);</script>
-                                    </div>
-                                    @break
-                                @default
-                                    <textarea id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" rows="3" wrap="soft" onchange="documentDirty=true;">{{$item['value']}}</textarea>
-                            @endswitch
+                                        <div class="col-12">
+                                            <div id="image_for_{{$item['key']}}" data-image="{{$item['value']}}" onclick="BrowseServer('{{$item['key']}}')" class="image_for_field" style="background-image: url('{{MODX_SITE_URL . $item['value']}}');"></div>
+                                            <script>document.getElementById('{{$item['key']}}').addEventListener('change', evoRenderImageCheck, false);</script>
+                                        </div>
+                                        @break
+                                    @default
+                                        <textarea id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" rows="3" wrap="soft" onchange="documentDirty=true;">{{$item['value']}}</textarea>
+                                @endswitch
+                            </div>
                         </div>
-                    </div>
-                @endif
-            @endforeach
+                    @endif
+                @endforeach
+            @endif
         </div>
         <div class="split my-2"></div>
         <div class="row-col col-lg-12 col-12">
