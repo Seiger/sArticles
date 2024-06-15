@@ -191,6 +191,20 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
+                    <label for="general__relevants_on">@lang('sArticles::global.relevant_articles')</label>
+                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.relevants_on_off_help')"></i>
+                </div>
+                <div class="col">
+                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__relevants_on);" @if(sArticles::config('general.relevants_on', 1) == 1) checked @endif>
+                    <input type="hidden" name="general__relevants_on" value="{{sArticles::config('general.relevants_on', 1)}}" onchange="documentDirty=true;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-row">
+        <div class="row-col col-12">
+            <div class="row form-row">
+                <div class="col-auto">
                     <label for="in_main_menu" class="warning">@lang('sArticles::global.in_main_menu')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.in_main_menu_help')"></i>
                 </div>
