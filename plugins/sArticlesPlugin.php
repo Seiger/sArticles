@@ -73,6 +73,12 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
                 }
             }
         }
+        if (sArticles::config('general.views_on', 1) == 1) {
+            if (!in_array($article->id, $_SESSION['s_articles_article_views'] ?? [])) {
+                $article->increment('views');
+                $_SESSION['s_articles_article_views'][] = $article->id;
+            }
+        }
         unset($article->tmplvars);
         return array_merge($params['documentObject'], Arr::dot($article->toArray()));
     }
