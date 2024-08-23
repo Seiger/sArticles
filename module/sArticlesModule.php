@@ -57,6 +57,8 @@ switch ($data['get']) {
             $data['tabs'][] = 'settings';
         }
         $data['checkType'] = $checkType;
+        $_SESSION['itemaction'] = 'Viewing a list of articles';
+        $_SESSION['itemname'] = __('sArticles::global.articles');
         break;
     case 'comments':
         $data['tabs'] = ['articles'];
@@ -121,24 +123,32 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $get . $page . $linkType);
         break;
     case "article":
+        $requestId = (int)request()->input('i', 0);
         $checkType = request()->type ?? "article";
         $data['tabs'] = ['article', 'content'];
-        $data['article'] = sArticles::getArticle(request()->i);
-        $data['article_url'] = '&type='.$checkType.'&i='.request()->i;
-        $data['content_url'] = '&type='.$checkType.'&i='.request()->i;
-        $data['tvs_url'] = '&type='.$checkType.'&i='.request()->i;
+        $data['article'] = sArticles::getArticle($requestId);
+        $data['article_url'] = '&type='.$checkType.'&i=' . $requestId;
+        $data['content_url'] = '&type='.$checkType.'&i=' . $requestId;
+        $data['tvs_url'] = '&type='.$checkType.'&i=' . $requestId;
         $data['features'] = sArticlesFeature::orderBy('base')->get();
         $data['categories'] = sArticlesCategory::orderBy('base')->get();
         $data['tags'] = sArticlesTag::orderBy('base')->get();
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'article_comments';
-            $data['article_comments_url'] = '&i=' . request()->i;
+            $data['article_comments_url'] = '&i=' . $requestId;
         }
         $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? null;
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
         $data['checkType'] = $checkType;
+        if ($requestId > 0) {
+            $_SESSION['itemaction'] = 'Editing Article';
+            $_SESSION['itemname'] = $data['article']->title;
+        } else {
+            $_SESSION['itemaction'] = 'Creating a Article';
+            $_SESSION['itemname'] = __('sArticles::global.articles');
+        }
         break;
     case "articleSave":
         $requestId = (int)request()->article;
@@ -183,11 +193,17 @@ switch ($data['get']) {
         $article->tags()->sync([]);
         $article->tags()->sync(array_unique(request()->input('tags', [])));
         $sArticlesController->setArticlesListing();
+        $_SESSION['itemaction'] = 'Saving Article';
+        $_SESSION['itemname'] = $article->title;
         $back = str_replace(['&i=0', '&type=article'], ['&i=' . $article->id, '&type=' . $article->type], (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "articleDelete":
-        DB::table('s_articles')->whereId((int)request()->i)->delete();
-        DB::table('s_article_translates')->whereArticle((int)request()->i)->delete();
+        $requestId = (int)request()->input('i', 0);
+        $article = sArticle::find($requestId);
+        $_SESSION['itemaction'] = 'Deleting Article';
+        $_SESSION['itemname'] = $article->title;
+        DB::table('s_articles')->whereId($requestId)->delete();
+        DB::table('s_article_translates')->whereArticle($requestId)->delete();
         $sArticlesController->setArticlesListing();
         $back = '&get=articles';
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
