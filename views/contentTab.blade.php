@@ -30,7 +30,7 @@
                         <label for="longtitle" class="warning">@lang('sArticles::global.cover_title')</label>
                     </div>
                     <div class="col">
-                        <input id="cover_title" name="constructor[cover_title]" value="{{$constructor['cover_title']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                        <input id="cover_title" name="constructor[cover_title]" value="{{$constructor['cover_title'] ?? ''}}" class="form-control" type="text" onchange="documentDirty=true;">
                     </div>
                 </div>
             @endif
