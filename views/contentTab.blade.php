@@ -108,13 +108,9 @@
                                     @case('Text')
                                         <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
                                         @break
-                                    @case('File')
-                                        <div class="input-group mb-3">
-                                            <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
-                                            <div class="input-group-append">
-                                                <button onclick="BrowseFileServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
-                                            </div>
-                                        </div>
+                                    @case('Check Box')
+                                        <input name="constructor[{{$item['key']}}]" value="0" type="hidden">
+                                        <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="1" class="form-checkbox form-control" type="checkbox" @if($item['value'] == 1) checked @endif onchange="documentDirty=true;">
                                         @break
                                     @case('Image')
                                         <div class="input-group mb-3">
@@ -128,6 +124,14 @@
                                             <script>document.getElementById('{{$item['key']}}').addEventListener('change', evoRenderImageCheck, false);</script>
                                         </div>
                                         @break
+                                    @case('File')
+                                        <div class="input-group mb-3">
+                                            <input id="{{$item['key']}}" name="constructor[{{$item['key']}}]" value="{{$item['value']}}" class="form-control" type="text" onchange="documentDirty=true;">
+                                            <div class="input-group-append">
+                                                <button onclick="BrowseFileServer('{{$item['key']}}')" class="btn btn-outline-secondary" type="button">@lang('global.insert')</button>
+                                            </div>
+                                        </div>
+                                        @break
                                     @default
                                         <textarea id="{{$item['key']}}" class="form-control" name="constructor[{{$item['key']}}]" rows="3" wrap="soft" onchange="documentDirty=true;">{{$item['value']}}</textarea>
                                 @endswitch
@@ -137,7 +141,7 @@
                 @endforeach
             @endif
         </div>
-        <div class="split my-2"></div>
+        <div class="split my-3"></div>
         <div class="row-col col-lg-12 col-12">
             <div class="row form-row">
                 <div class="col-auto col-title-9">

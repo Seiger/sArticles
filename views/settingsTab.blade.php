@@ -29,7 +29,7 @@
                                         </div>
                                         <div class="col">
                                             <select id="rating" class="form-control" name="settings[type][]" onchange="documentDirty=true;">
-                                                @foreach(['Text', 'Textarea', 'RichText', 'File', 'Image'] as $value)
+                                                @foreach(['Text', 'Textarea', 'RichText', 'Check Box', 'Image', 'File'] as $value)
                                                     <option value="{{$value}}" @if($setting['type'] == $value) selected @endif>{{$value}}</option>
                                                 @endforeach
                                             </select>

@@ -225,7 +225,7 @@ switch ($data['get']) {
         $data['article_url'] = '&type='.$checkType.'&i='.request()->i;
         $data['content_url'] = '&type='.$checkType.'&i='.request()->i;
         $data['tvs_url'] = '&type='.$checkType.'&i='.request()->i;
-        $data['constructor'] = [];
+        $data['constructor'] = data_is_json($content->constructor ?? '', true) ?? [];
         $editor = [];
         $buttons = [];
         $elements = [];
