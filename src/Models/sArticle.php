@@ -30,15 +30,27 @@ class sArticle extends Model
      */
     protected static function booted()
     {
-        static::addGlobalScope('translates', function (Builder $builder) {
-            $builder->leftJoin('s_article_translates', function ($leftJoin) {
-                $leftJoin->on('s_articles.id', '=', 's_article_translates.article')
-                    ->where('lang', function ($leftJoin) {
+        static::addGlobalScope('translate', function (Builder $builder) {
+            if (!isset($builder->getQuery()->columns)) {
+                $builder->select('*');
+            }
+
+            $locale = app()->getLocale();
+            foreach ($builder->getQuery()->columns as $key => $column) {
+                if (is_string($column) && str_starts_with($column, 'locale.')) {
+                    $locale = explode('.', $column)[1];
+                    unset($builder->getQuery()->columns[$key]);
+                }
+            }
+
+            $builder->leftJoin('s_article_translates as sat', function ($leftJoin) use ($builder, $locale) {
+                $leftJoin->on('s_articles.id', '=', 'sat.article')
+                    ->where('sat.lang', function ($leftJoin) use ($builder, $locale) {
                         $leftJoin->select('lang')
-                            ->from('s_article_translates')
-                            ->whereRaw(DB::getTablePrefix().'s_article_translates.article = '.DB::getTablePrefix().'s_articles.id')
-                            ->whereIn('lang', [evo()->getLocale(), 'base'])
-                            ->orderByRaw('FIELD(lang, "'.evo()->getLocale().'", "base")')
+                            ->from('s_article_translates as t')
+                            ->whereRaw('`' . DB::getTablePrefix() . 't`.`article` = `' . DB::getTablePrefix() . 's_articles`.`id`')
+                            ->whereIn('lang', [$locale, 'base'])
+                            ->orderByRaw('FIELD(`lang`, "' . $locale . '", "base")')
                             ->limit(1);
                     });
             });

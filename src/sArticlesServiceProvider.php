@@ -26,6 +26,9 @@ class sArticlesServiceProvider extends ServiceProvider
             // MultiLang
             $this->loadTranslationsFrom(dirname(__DIR__) . '/lang', 'sArticles');
 
+            // Check sArticles configuration
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/sArticlesCheck.php', 'cms.settings');
+
             // For use config
             $this->publishes([
                 dirname(__DIR__) . '/config/sArticlesAlias.php' => config_path('app/aliases/sArticles.php', true),

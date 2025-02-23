@@ -25,9 +25,9 @@ class CreateSArticlesTable extends Migration
             $table->string('alias', 255)->index();
             $table->string('cover', 255)->default('');
             $table->string('type')->default('article');
-            $table->jsonb('relevants');
-            $table->jsonb('tmplvars');
-            $table->jsonb('votes');
+            $table->jsonb('relevants')->nullable();
+            $table->jsonb('tmplvars')->nullable();
+            $table->jsonb('votes')->nullable();
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });

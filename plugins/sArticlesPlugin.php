@@ -64,8 +64,8 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
     }
     if ($document) {
         $article = sArticle::find($document);
-        $article->constructor = data_is_json($article->constructor, true);
-        $article->tmplvars = data_is_json($article->tmplvars, true);
+        $article->constructor = data_is_json($article->constructor ?? '', true);
+        $article->tmplvars = data_is_json($article->tmplvars ?? '', true);
         if ($article->tmplvars && count($article->tmplvars)) {
             foreach ($article->tmplvars as $name => $value) {
                 if (isset($params['documentObject'][$name]) && is_array($params['documentObject'][$name])) {
