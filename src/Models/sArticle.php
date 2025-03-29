@@ -58,26 +58,41 @@ class sArticle extends Model
     }
 
     /**
-     * Filter search
+     * Apply search filters to the query
      *
-     * @return mixed
+     * @param \Illuminate\Database\Eloquent\Builder $builder The query builder object
+     *
+     * @return \Illuminate\Database\Eloquent\Builder The modified query builder object
      */
-    public function scopeSearch()
+    public function scopeSearch($builder)
     {
         if (request()->has('search')) {
-            $fields = collect(['pagetitle', 'longtitle', 'introtext', 'content']);
+            if (!isset($builder->getQuery()->columns)) {
+                $builder->select('*');
+            }
+
+            $fields = collect([
+                'sat.pagetitle',
+                'sat.longtitle',
+                'sat.introtext',
+                'sat.content',
+            ]);
 
             $search = Str::of(request('search'))
                 ->stripTags()
                 ->replaceMatches('/[^\p{L}\p{N}\@\.!#$%&\'*+-\/=?^_`{|}~]/iu', ' ') // allowed symbol in email
                 ->replaceMatches('/(\s){2,}/', '$1') // removing extra spaces
                 ->trim()->explode(' ')
-                ->filter(fn($word) => mb_strlen($word) > 2);
+                ->filter(fn($word) => mb_strlen($word) > 0);
+
             $select = collect([0]);
-            $search->map(fn($word) => $fields->map(fn($field) => $select->push("(CASE WHEN `".DB::getTablePrefix()."s_article_translates`.`{$field}` LIKE '%{$word}%' THEN 1 ELSE 0 END)"))); // Generate points source
-            return $this->addSelect('*', DB::Raw('(' . $select->implode(' + ') . ') as points'))
-                ->when($search->count(), fn($query) => $query->where(fn($query) => $search->map(fn($word) => $fields->map(fn($field) => $query->orWhere($field, 'like', "%{$word}%")))))
-                ->orderByDesc('points');
+
+            $fields->map(fn($field) => $select->push("(CASE WHEN ".$builder->getGrammar()->wrap($field)." LIKE '%{$search->implode(' ')}%' THEN 10 ELSE 0 END)")); // Generate Exact match points source
+            $search->map(fn($word) => $fields->map(fn($field) => $select->push("(CASE WHEN ".$builder->getGrammar()->wrap($field)." LIKE '%{$word}%' THEN 1 ELSE 0 END)"))); // Generate Partial match points source
+
+            $s = $builder->addSelect(DB::Raw('(' . $select->implode(' + ') . ') as points'));
+            $s->when($search->count(), fn($query) => $query->where(fn($query) => $search->map(fn($word) => $fields->map(fn($field) => $query->orWhere($field, 'like', "%{$word}%")))));
+            return $s->orderByDesc('points');
         }
     }
 
