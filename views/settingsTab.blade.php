@@ -29,7 +29,7 @@
                                         </div>
                                         <div class="col">
                                             <select id="rating" class="form-control" name="settings[type][]" onchange="documentDirty=true;">
-                                                @foreach(['Text', 'Textarea', 'RichText', 'Check Box', 'Image', 'File'] as $value)
+                                                @foreach(['Text', 'Textarea', 'RichText', 'File', 'Image'] as $value)
                                                     <option value="{{$value}}" @if($setting['type'] == $value) selected @endif>{{$value}}</option>
                                                 @endforeach
                                             </select>
@@ -62,9 +62,9 @@
                             @php($parentlookup = evo()->getConfig('sart_blank', 1))
                         @endif
                         @if($parentlookup !== false && is_numeric($parentlookup))
-                            @php($parentname = \EvolutionCMS\Models\SiteContent::withTrashed()->select('pagetitle')->find($parentlookup)->pagetitle)
+                            @php($parentname = \EvolutionCMS\Models\SiteContent::withTrashed()->select('pagetitle')->find($parentlookup)?->pagetitle ?? '')
                             @if(!$parentname)
-                                @php(evo()->webAlertAndQuit($_lang["error_no_parent"]))
+                                <script>alert("@lang('global.error_no_parent')")</script>
                             @endif
                         @endif
                         <i id="plock" class="fa fa-folder" onclick="enableParentSelection(!allowParentSelection);"></i>
@@ -183,20 +183,6 @@
                 <div class="col">
                     <input type="checkbox" id="tag_texts_on_check" class="form-checkbox form-control" name="tag_texts_on_check" value="" onchange="documentDirty=true;" onclick="changestate(document.form.tag_texts_on);" @if(evo()->getConfig('sart_tag_texts_on', 1) == 1) checked @endif>
                     <input type="hidden" id="tag_texts_on" name="tag_texts_on" value="{{evo()->getConfig('sart_tag_texts_on', 1)}}" onchange="documentDirty=true;">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row form-row">
-        <div class="row-col col-12">
-            <div class="row form-row">
-                <div class="col-auto">
-                    <label for="general__relevants_on">@lang('sArticles::global.relevant_articles')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.relevants_on_off_help')"></i>
-                </div>
-                <div class="col">
-                    <input type="checkbox" class="form-checkbox form-control" onchange="documentDirty=true;" onclick="changestate(document.form.general__relevants_on);" @if(sArticles::config('general.relevants_on', 1) == 1) checked @endif>
-                    <input type="hidden" name="general__relevants_on" value="{{sArticles::config('general.relevants_on', 1)}}" onchange="documentDirty=true;">
                 </div>
             </div>
         </div>
@@ -409,7 +395,7 @@
             </div>
         </div>
     @endforeach
-    <div class="split my-3"></div>
+    {{--<div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_fields_name')</h3>
     <div class="row form-row">
         <div class="col-auto col-title-9">
@@ -432,7 +418,7 @@
                 <input type="text" id="seodescription" class="form-control" name="seodescription" value="{{evo()->getConfig('sart_name_seodescription', '')}}" onchange="documentDirty=true;">
             </div>
         </div>
-    </div>
+    </div>--}}
     <div class="split my-3"></div>
 </form>
 
