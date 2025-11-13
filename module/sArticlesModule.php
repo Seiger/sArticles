@@ -358,8 +358,8 @@ switch ($data['get']) {
         $content->seotitle = request()->seotitle;
         $content->seodescription = request()->seodescription;
         $content->seorobots = request()->seorobots;
-        $content->builder = json_encode(array_values(request()->builder ?? []));
-        $content->constructor = json_encode(request()->constructor);
+        $content->builder = json_encode(array_values(request()->builder ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $content->constructor = json_encode(request()->constructor, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($content->article == 0) {
             $article = new sArticle();
             $article->alias = $sArticlesController->validateAlias(request()->pagetitle);
