@@ -1,4 +1,4 @@
-# sArticles for Evolution CMS 3
+# sArticles for Evolution CMS
 [![Latest Stable Version](https://img.shields.io/packagist/v/seiger/sarticles?label=version)](https://packagist.org/packages/seiger/sarticles)
 [![CMS Evolution](https://img.shields.io/badge/CMS-Evolution-brightgreen.svg)](https://github.com/evolution-cms/evolution)
 ![PHP version](https://img.shields.io/packagist/php-v/seiger/sarticles)
@@ -6,15 +6,6 @@
 [![Issues](https://img.shields.io/github/issues/Seiger/sarticles)](https://github.com/Seiger/sarticles/issues)
 [![Stars](https://img.shields.io/packagist/stars/Seiger/sarticles)](https://packagist.org/packages/seiger/sarticles)
 [![Total Downloads](https://img.shields.io/packagist/dt/seiger/sarticles)](https://packagist.org/packages/seiger/sarticles)
-
-> [!WARNING]  
-> Pay attention when updating from version 1.0.x to 1.1.x.
-> 
-> Content builder templates have been converted to Blade format.
-> 
-> The table of articles and translations of articles have been edited.
-> 
-> Added comment and category tables.
 
 **sArticles** Blog News and Articles Management Module for Evolution CMS admin panel.
 

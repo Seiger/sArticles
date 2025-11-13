@@ -142,53 +142,59 @@
             @endif
         </div>
         <div class="split my-3"></div>
-        <div class="row-col col-lg-12 col-12">
-            <div class="row form-row">
-                <div class="col-auto col-title-9">
-                    @if(trim(evo()->getConfig('sart_name_seotitle', '')))
-                        <label for="seotitle" class="warning">{{evo()->getConfig('sart_name_seotitle', '')}}</label>
-                    @else
-                        <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
-                    @endif
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seotitle_help')"></i>
-                </div>
-                <div class="col">
-                    <div class="input-group">
-                        <input type="text" id="seotitle" class="form-control" name="seotitle" value="{{$content->seotitle ?? ''}}" onchange="documentDirty=true;">
+        @if(!evo()->getConfig('check_sSeo', false))
+            <div class="row-col col-lg-12 col-12">
+                <div class="row form-row">
+                    <div class="col-auto col-title-9">
+                        @if(trim(evo()->getConfig('sart_name_seotitle', '')))
+                            <label for="seotitle" class="warning">{{evo()->getConfig('sart_name_seotitle', '')}}</label>
+                        @else
+                            <label for="seotitle" class="warning">@lang('sArticles::global.seotitle')</label>
+                        @endif
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seotitle_help')"></i>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <input type="text" id="seotitle" class="form-control" name="seotitle" value="{{$content->seotitle ?? ''}}" onchange="documentDirty=true;">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row form-row">
-                <div class="col-auto col-title-9">
-                    @if(trim(evo()->getConfig('sart_name_seodescription', '')))
-                        <label for="seotitle" class="warning">{{evo()->getConfig('sart_name_seodescription', '')}}</label>
-                    @else
-                        <label for="seotitle" class="warning">@lang('sArticles::global.seodescription')</label>
-                    @endif
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seodescription_help')"></i>
-                </div>
-                <div class="col">
-                    <div class="input-group">
-                        <textarea id="seodescription" class="form-control" name="seodescription" rows="3" wrap="soft" onchange="documentDirty=true;">{{$content->seodescription ?? ''}}</textarea>
+                <div class="row form-row">
+                    <div class="col-auto col-title-9">
+                        @if(trim(evo()->getConfig('sart_name_seodescription', '')))
+                            <label for="seotitle" class="warning">{{evo()->getConfig('sart_name_seodescription', '')}}</label>
+                        @else
+                            <label for="seotitle" class="warning">@lang('sArticles::global.seodescription')</label>
+                        @endif
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seodescription_help')"></i>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <textarea id="seodescription" class="form-control" name="seodescription" rows="3" wrap="soft" onchange="documentDirty=true;">{{$content->seodescription ?? ''}}</textarea>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row form-row">
-                <div class="col-auto col-title-9">
-                    <label for="seorobots" class="warning">@lang('sArticles::global.seorobots')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seorobots_help')"></i>
+                <div class="row form-row">
+                    <div class="col-auto col-title-9">
+                        <label for="seorobots" class="warning">@lang('sArticles::global.seorobots')</label>
+                        <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.seorobots_help')"></i>
+                    </div>
+                    <div class="col">
+                        <select id="seorobots" class="form-control" name="seorobots" onchange="documentDirty=true;">
+                            @foreach(['index,follow', 'noindex,nofollow'] as $value)
+                                <option value="{{$value}}" @if(($content->seorobots ?? 'index,follow') == $value) selected @endif>{{$value}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-                <div class="col">
-                    <select id="seorobots" class="form-control" name="seorobots" onchange="documentDirty=true;">
-                        @foreach(['index,follow', 'noindex,nofollow'] as $value)
-                            <option value="{{$value}}" @if(($content->seorobots ?? 'index,follow') == $value) selected @endif>{{$value}}</option>
-                        @endforeach
-                    </select>
-                </div>
+                <div class="split my-2"></div>
             </div>
-            <div class="split my-2"></div>
-        </div>
+        @endif
     </div>
+    @if (evo()->getConfig('check_sLang', false))
+        @php($seoFields = evo()->invokeEvent('OnRenderSeoFields', ['type' => $checkType, 'lang' => request()->input('lang', 'base'), 'id' => request()->integer('i')]))
+        @if(is_array($seoFields))<div class="split my-3"></div>{!!implode('', $seoFields)!!}@endif
+    @endif
 </form>
 
 @push('scripts.bot')

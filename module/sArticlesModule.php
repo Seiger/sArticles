@@ -307,6 +307,7 @@ switch ($data['get']) {
         if (sArticles::config('types.'.$checkType.'.visual_editor_description', 0) == 1) {
             $editor[] = 'description';
         }
+
         $data['content'] = $content;
         $data['editor'] = $sArticlesController->textEditor(implode(',', $editor));
         $data['buttons'] = $buttons;
@@ -314,6 +315,12 @@ switch ($data['get']) {
         $data['chunks'] = $chunks;
         $data['generalTabName'] = sArticles::config('types.'.$checkType.'.name', __('sArticles::global.article'));
         $data['checkType'] = $checkType;
+
+        evo()->documentObject = array_merge(
+            $content?->toArray() ?? [],
+            $content->article()->first()?->toArray() ?? [],
+            ['type' => $checkType]
+        );
         break;
     case "contentSave":
         $contentField = '';
@@ -368,6 +375,9 @@ switch ($data['get']) {
             $content->article = $article->id;
         }
         $content->save();
+
+        $article = $content->article()->first();
+        evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content'));
         $sArticlesController->setArticlesListing();
         $back = str_replace('&i=0', '&i=' . $content->article, (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
