@@ -318,7 +318,7 @@ switch ($data['get']) {
 
         evo()->documentObject = array_merge(
             $content?->toArray() ?? [],
-            $content->article()->first()?->toArray() ?? [],
+            $content?->article()?->first()?->toArray() ?? [],
             ['type' => $checkType]
         );
         break;
