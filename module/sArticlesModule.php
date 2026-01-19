@@ -222,6 +222,11 @@ switch ($data['get']) {
         if (!$content && request()->lang == $sArticlesController->langDefault()) {
             $content = sArticleTranslate::whereArticle((int)request()->i)->whereLang('base')->first();
         }
+        if (!$content) {
+            $content = new sArticleTranslate();
+            $content->article = (int)request()->i;
+            $content->lang = request()->lang;
+        }
         $data['article_url'] = '&type='.$checkType.'&i='.request()->i;
         $data['content_url'] = '&type='.$checkType.'&i='.request()->i;
         $data['tvs_url'] = '&type='.$checkType.'&i='.request()->i;
