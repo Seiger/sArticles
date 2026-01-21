@@ -189,7 +189,7 @@ class sArticlesController
         $articles = sArticle::select('id', 'alias', 'parent')->wherePublished(1)->get();
         if ($articles) {
             foreach ($articles as $article) {
-                $link = str_replace(MODX_SITE_URL, '', $article->link);
+                $link = str_replace(EVO_SITE_URL, '', $article->link);
                 $articlesListing[trim($link, '/')] = $article->id;
             }
         }

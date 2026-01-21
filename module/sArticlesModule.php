@@ -367,9 +367,9 @@ switch ($data['get']) {
         $content->introtext = request()->input('introtext', '');
         $content->description = request()->input('description', '');
         $content->content = $contentField;
-        $content->seotitle = request()->seotitle;
-        $content->seodescription = request()->seodescription;
-        $content->seorobots = request()->seorobots;
+        $content->seotitle = request()->input('seotitle', '');
+        $content->seodescription = request()->input('seodescription', '');
+        $content->seorobots = request()->input('seorobots', '');
         $content->builder = json_encode(array_values(request()->builder ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $content->constructor = json_encode(request()->constructor, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($content->article == 0) {
