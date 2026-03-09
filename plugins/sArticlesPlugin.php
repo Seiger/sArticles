@@ -63,6 +63,7 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
         }
     }
     if ($document) {
+        evo()->setPlaceholder('article', (int)$document);
         $article = sArticle::find($document);
         $article->constructor = data_is_json($article->constructor ?? '', true);
         $article->tmplvars = data_is_json($article->tmplvars ?? '', true);
