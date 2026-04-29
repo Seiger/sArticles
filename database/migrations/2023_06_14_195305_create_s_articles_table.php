@@ -1,5 +1,6 @@
 <?php
 
+use EvolutionCMS\Models\SiteTemplate;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -121,6 +122,16 @@ class CreateSArticlesTable extends Migration
             $table->jsonb('votes');
             $table->timestamps();
         });
+
+        $templateArticle = SiteTemplate::whereTemplatealias('s_articles_article')->first();
+        if (!$templateArticle) {
+            $templateArticle = new SiteTemplate();
+            $templateArticle->templatealias = 's_articles_article';
+            $templateArticle->templatename = 'sArticles Article';
+            $templateArticle->description = 'Template for sArticles Article';
+            $templateArticle->icon = 'fa fa-newspaper';
+            $templateArticle->save();
+        }
     }
 
     /**
@@ -130,6 +141,7 @@ class CreateSArticlesTable extends Migration
      */
     public function down()
     {
+        SiteTemplate::whereTemplatealias('s_articles_article')->delete();
         Schema::dropIfExists('s_articles_polls');
         Schema::dropIfExists('s_article_comments');
         Schema::dropIfExists('s_articles_authors');

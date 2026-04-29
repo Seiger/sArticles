@@ -50,35 +50,6 @@
         <div class="row-col col-12">
             <div class="row form-row">
                 <div class="col-auto">
-                    <label for="parent">@lang('sArticles::global.resource')</label>
-                    <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.resource_help')"></i>
-                </div>
-                <div class="col">
-                    <div>
-                        @php($parentlookup = false)
-                        @if(evo()->getConfig('sart_blank', 1) == 0)
-                            @php($parentname = evo()->getConfig('site_name'))
-                        @else
-                            @php($parentlookup = evo()->getConfig('sart_blank', 1))
-                        @endif
-                        @if($parentlookup !== false && is_numeric($parentlookup))
-                            @php($parentname = \EvolutionCMS\Models\SiteContent::withTrashed()->select('pagetitle')->find($parentlookup)?->pagetitle ?? '')
-                            @if(!$parentname)
-                                <script>alert("@lang('global.error_no_parent')")</script>
-                            @endif
-                        @endif
-                        <i id="plock" class="fa fa-folder" onclick="enableParentSelection(!allowParentSelection);"></i>
-                        <b id="parentName">{{evo()->getConfig('sart_blank', 1)}} ({{entities($parentname)}})</b>
-                        <input type="hidden" name="parent" value="{{evo()->getConfig('sart_blank', 1)}}" onchange="documentDirty=true;" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row form-row">
-        <div class="row-col col-12">
-            <div class="row form-row">
-                <div class="col-auto">
                     <label for="general__rating_on">@lang('sArticles::global.rating')</label>
                     <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.rating_on_off_help')"></i>
                 </div>

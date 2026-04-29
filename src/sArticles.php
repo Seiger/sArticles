@@ -1,5 +1,6 @@
 <?php namespace Seiger\sArticles;
 
+use Illuminate\Support\Arr;
 use EvolutionCMS\Models\UserAttribute;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
@@ -82,6 +83,75 @@ class sArticles
     public function getArticleByAlias(string $articleAlias): object
     {
         return sArticle::where('s_articles.alias', $articleAlias)->first() ?? new sArticle();
+    }
+
+    /**
+     * Determine whether the package should use legacy blank resource mode.
+     *
+     * @return bool
+     */
+    public function isLegacyMode(): bool
+    {
+        return (int)evo()->getConfig('sart_blank', 1) > 1;
+    }
+
+    /**
+     * Resolve article by request URI segments.
+     *
+     * @param array $segments
+     * @return sArticle|null
+     */
+    public function resolveArticleByUri(array $segments): ?sArticle
+    {
+        if (isset($segments[0]) && $segments[0] === evo()->getConfig('lang', 'uk')) {
+            unset($segments[0]);
+        }
+
+        $segments = array_values($segments);
+        $alias = implode('/', $segments);
+        $articleId = sArticles::documentListing()[$alias] ?? 0;
+
+        if ($articleId > 0) {
+            $article = sArticles::getArticle((int)$articleId);
+            if ($article->id ?? 0) {
+                return $article;
+            }
+        }
+
+        $articleAlias = Arr::last($segments);
+        if (!$articleAlias) {
+            return null;
+        }
+
+        $article = sArticles::getArticleByAlias($articleAlias);
+        if (!($article->id ?? 0)) {
+            return null;
+        }
+
+        if (
+            trim($article->link, '/') === trim($alias, '/') ||
+            trim($article->link, '/') === trim('/' . evo()->getConfig('lang', 'uk') . '/' . $alias, '/')
+        ) {
+            return $article;
+        }
+
+        return null;
+    }
+
+    /**
+     * Increment article views once per session.
+     *
+     * @param sArticle $article
+     * @return void
+     */
+    public function trackView(sArticle $article): void
+    {
+        if (sArticles::config('general.views_on', 1) == 1) {
+            if (!in_array($article->id, $_SESSION['s_articles_article_views'] ?? [])) {
+                $article->increment('views');
+                $_SESSION['s_articles_article_views'][] = $article->id;
+            }
+        }
     }
 
     /**

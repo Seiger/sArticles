@@ -789,11 +789,6 @@ switch ($data['get']) {
         break;
     case "settingsSave":
         $tbl = evo()->getDatabase()->getFullTableName('system_settings');
-        if (request()->has('parent') && request()->parent != evo()->getConfig('sart_blank')) {
-            $resource = request()->parent;
-            evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_blank', '{$resource}')");
-            evo()->setConfig('sart_blank', $resource);
-        }
         if (request()->has('comments_on') && request()->comments_on != evo()->getConfig('sart_comments_on')) {
             $comments_on = request()->comments_on;
             evo()->getDatabase()->query("REPLACE INTO {$tbl} (`setting_name`, `setting_value`) VALUES ('sart_comments_on', '{$comments_on}')");
