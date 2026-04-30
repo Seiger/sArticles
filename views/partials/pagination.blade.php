@@ -4,18 +4,26 @@
         switch (request()->get('get'))
        {
            case 'article_comments':
-               $fullUrl = sArticles::moduleUrl() . '&get='.request()->get('get').'&i='.request()->get('i');
+               $fullUrl = sArticles::moduleUrl() . '&get='.request()->get('get').'&i='.request()->get('i') . (request()->has('search') ? '&search=' . request()->search : '');
                break;
            case 'comments':
-               $fullUrl = sArticles::moduleUrl() . '&get='.request()->get('get');
+               $fullUrl = sArticles::moduleUrl() . '&get='.request()->get('get') . (request()->has('search') ? '&search=' . request()->search : '');
                break;
            default:
-                $fullUrl = sArticles::moduleUrl() . (request()->has('search') ? '&search=' . request()->search : '') . (request()->has('type') ? '&type=' . request()->type : '');
+                $availability = in_array(request()->get('availability'), ['published', 'unpublished'], true) ? request()->get('availability') : '';
+                $fullUrl = sArticles::moduleUrl()
+                    . '&get=' . request()->get('get', 'articles')
+                    . (request()->has('search') ? '&search=' . request()->search : '')
+                    . (request()->has('type') ? '&type=' . request()->type : '')
+                    . (trim(request()->input('section', '')) !== '' ? '&section=' . request()->input('section') : '')
+                    . (trim(request()->input('category', '')) !== '' ? '&category=' . request()->input('category') : '')
+                    . ($availability ? '&availability=' . $availability : '')
+                    . (trim(request()->input('tag', '')) !== '' ? '&tag=' . request()->input('tag') : '')
+                    . (trim(request()->input('feature', '')) !== '' ? '&feature=' . request()->input('feature') : '');
         }
         $paginator->withPath($fullUrl);
     @endphp
-    <style>.dark #translatePagination a {color: #444}</style>
-    <nav role="navigation" aria-label="{{__('Pagination Navigation')}}" id="translatePagination">
+    <nav role="navigation" aria-label="{{__('Pagination Navigation')}}" id="translatePagination" class="sarticles-pagination">
         <ul class="pagination justify-content-center">
             {{-- Previous Page Link --}}
             @if (!$paginator->onFirstPage())
@@ -34,14 +42,14 @@
             @foreach ($elements as $element)
                 {{-- "Three Dots" Separator --}}
                 @if (is_string($element))
-                    <li class="page-item"><a class="page-link">{{$element}}</a></li>
+                    <li class="page-item disabled" aria-disabled="true"><span class="page-link">{{$element}}</span></li>
                 @endif
 
                 {{-- Array Of Links --}}
                 @if (is_array($element))
                     @foreach ($element as $page => $url)
                         @if ($page == $paginator->currentPage())
-                            <li class="page-item"><a class="page-link active dark">{{$page}}</a></li>
+                            <li class="page-item active" aria-current="page"><span class="page-link">{{$page}}</span></li>
                         @else
                             <li class="page-item"><a class="page-link" href="{{$paginator->url($page)}}">{{$page}}</a></li>
                         @endif

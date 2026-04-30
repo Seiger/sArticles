@@ -12,11 +12,11 @@ class sArticlesServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Add custom routes for package
+        include(__DIR__ . '/Http/routes.php');
+
         // Only Manager
         if (IN_MANAGER_MODE) {
-            // Add custom routes for package
-            include(__DIR__ . '/Http/routes.php');
-
             // Migration for create tables
             $this->loadMigrationsFrom(dirname(__DIR__) . '/database/migrations');
 
@@ -35,6 +35,9 @@ class sArticlesServiceProvider extends ServiceProvider
                 dirname(__DIR__) . '/config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php', true),
                 dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png'),
                 dirname(__DIR__) . '/images/seigerit-blue.svg' => public_path('assets/site/seigerit-blue.svg'),
+                dirname(__DIR__) . '/assets/css/themes.css' => public_path('assets/modules/sarticles/css/themes.css'),
+                dirname(__DIR__) . '/assets/css/admin.css' => public_path('assets/modules/sarticles/css/admin.css'),
+                dirname(__DIR__) . '/assets/js/admin.js' => public_path('assets/modules/sarticles/js/admin.js'),
                 dirname(__DIR__) . '/views/s_articles_article.blade.php' => public_path('views/s_articles_article.blade.php'),
                 dirname(__DIR__) . '/builder/accordion/config.php' => public_path('assets/modules/sarticles/builder/accordion/config.php'),
                 dirname(__DIR__) . '/builder/accordion/render.blade.php' => public_path('assets/modules/sarticles/builder/accordion/render.blade.php'),

@@ -28,16 +28,16 @@
                 </div>
                 <div class="col">
                     <div>
-                        @php($parentlookup = false)
+                        @php $parentlookup = false; @endphp
                         @if(($article->parent ?? 0) == 0)
-                            @php($parentname = evo()->getConfig('site_name'))
+                            @php $parentname = evo()->getConfig('site_name'); @endphp
                         @else
-                            @php($parentlookup = ($article->parent ?? 0))
+                            @php $parentlookup = ($article->parent ?? 0); @endphp
                         @endif
                         @if($parentlookup !== false && is_numeric($parentlookup))
-                            @php($parentname = \EvolutionCMS\Models\SiteContent::withTrashed()->select('pagetitle')->find($parentlookup)->pagetitle)
+                            @php $parentname = \EvolutionCMS\Models\SiteContent::withTrashed()->select('pagetitle')->find($parentlookup)->pagetitle; @endphp
                             @if(!$parentname)
-                                @php(evo()->webAlertAndQuit($_lang["error_no_parent"]))
+                                @php evo()->webAlertAndQuit($_lang["error_no_parent"]); @endphp
                             @endif
                         @endif
                         <i id="plock" class="fa fa-folder" onclick="enableParentSelection(!allowParentSelection);"></i>
@@ -95,7 +95,7 @@
                         <label for="categories">@lang('sArticles::global.categories')</label>
                     </div>
                     <div class="col">
-                        @php($article->category = $article->categories->pluck('catid')->toArray())
+                        @php $article->category = $article->categories->pluck('catid')->toArray(); @endphp
                         <select id="categories" class="form-control select2" name="categories[]" multiple onchange="documentDirty=true;">
                             @foreach($categories as $category)
                                 <option value="{{$category->catid}}" @if(in_array($category->catid, $article->category)) selected @endif>{{$category->base}}</option>
@@ -113,9 +113,9 @@
                         <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.features_article_help')"></i>
                     </div>
                     <div class="col">
-                        @php($article->feature = $article->features->pluck('fid')->toArray())
+                        @php $article->feature = $article->features->pluck('fid')->toArray(); @endphp
                         @if(is_array($value = evo()->invokeEvent('sArticlesManagerValueEvent', ['field' => 'features', 'item' => $features, 'type' => $checkType, 'tab' => 'article'])))
-                            @php($features = $value[0])
+                            @php $features = $value[0]; @endphp
                         @endif
                         <select id="features" class="form-control select2" name="features[]" multiple onchange="documentDirty=true;">
                             @foreach($features as $feature)
@@ -134,7 +134,7 @@
                         <i class="fa fa-question-circle" data-tooltip="@lang('sArticles::global.tags_article_help')"></i>
                     </div>
                     <div class="col">
-                        @php($article->tag = $article->tags()->pluck('tagid')->toArray())
+                        @php $article->tag = $article->tags()->pluck('tagid')->toArray(); @endphp
                         <select id="type" class="form-control select2" name="tags[]" onchange="documentDirty=true;">
                             <option></option>
                             @foreach($tags as $tag)
@@ -167,7 +167,7 @@
                         <label for="relevants" class="warning">@lang('sArticles::global.relevant_articles')</label>
                     </div>
                     <div class="col">
-                        @php($articleRelevants = data_is_json($article->relevants ?? '', true) ?: [])
+                        @php $articleRelevants = data_is_json($article->relevants ?? '', true) ?: []; @endphp
                         <select id="relevants" class="form-control select2" name="relevants[]" multiple onchange="documentDirty=true;">
                             @foreach(sArticles::all() as $item)
                                 @if(($article->id ?? 0) != $item->id)

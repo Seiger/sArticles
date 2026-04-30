@@ -192,7 +192,7 @@
         @endif
     </div>
     @if (evo()->getConfig('check_sLang', false))
-        @php($seoFields = evo()->invokeEvent('OnRenderSeoFields', ['type' => $checkType, 'lang' => request()->input('lang', 'base'), 'id' => request()->integer('i')]))
+        @php $seoFields = evo()->invokeEvent('OnRenderSeoFields', ['type' => $checkType, 'lang' => request()->input('lang', 'base'), 'id' => request()->integer('i')]); @endphp
         @if(is_array($seoFields))<div class="split my-3"></div>{!!implode('', $seoFields)!!}@endif
     @endif
 </form>

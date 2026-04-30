@@ -50,7 +50,10 @@ class sArticle extends Model
                             ->from('s_article_translates as t')
                             ->whereRaw('`' . DB::getTablePrefix() . 't`.`article` = `' . DB::getTablePrefix() . 's_articles`.`id`')
                             ->whereIn('lang', [$locale, 'base'])
-                            ->orderByRaw('FIELD(`lang`, "' . $locale . '", "base")')
+                            ->orderByRaw(
+                                'CASE WHEN `lang` = ? THEN 0 WHEN `lang` = ? THEN 1 ELSE 2 END',
+                                [$locale, 'base']
+                            )
                             ->limit(1);
                     });
             });
@@ -83,15 +86,40 @@ class sArticle extends Model
                 ->replaceMatches('/[^\p{L}\p{N}\@\.!#$%&\'*+-\/=?^_`{|}~]/iu', ' ') // allowed symbol in email
                 ->replaceMatches('/(\s){2,}/', '$1') // removing extra spaces
                 ->trim()->explode(' ')
+                ->map(fn($word) => mb_strtolower($word))
                 ->filter(fn($word) => mb_strlen($word) > 0);
 
+            if (!$search->count()) {
+                return $builder;
+            }
+
             $select = collect([0]);
+            $bindings = [];
+            $exact = '%' . addcslashes(mb_strtolower($search->implode(' ')), '\\%_') . '%';
 
-            $fields->map(fn($field) => $select->push("(CASE WHEN ".$builder->getGrammar()->wrap($field)." LIKE '%{$search->implode(' ')}%' THEN 10 ELSE 0 END)")); // Generate Exact match points source
-            $search->map(fn($word) => $fields->map(fn($field) => $select->push("(CASE WHEN ".$builder->getGrammar()->wrap($field)." LIKE '%{$word}%' THEN 1 ELSE 0 END)"))); // Generate Partial match points source
+            $fields->each(function ($field) use ($builder, $select, $exact, &$bindings) {
+                $select->push("(CASE WHEN LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\' THEN 10 ELSE 0 END)");
+                $bindings[] = $exact;
+            }); // Generate Exact match points source
+            $search->each(function ($word) use ($fields, $builder, $select, &$bindings) {
+                $like = '%' . addcslashes($word, '\\%_') . '%';
+                $fields->each(function ($field) use ($builder, $select, $like, &$bindings) {
+                    $select->push("(CASE WHEN LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\' THEN 1 ELSE 0 END)");
+                    $bindings[] = $like;
+                });
+            }); // Generate Partial match points source
 
-            $s = $builder->addSelect(DB::Raw('(' . $select->implode(' + ') . ') as points'));
-            $s->when($search->count(), fn($query) => $query->where(fn($query) => $search->map(fn($word) => $fields->map(fn($field) => $query->orWhere($field, 'like', "%{$word}%")))));
+            $s = $builder->selectRaw('(' . $select->implode(' + ') . ') as points', $bindings);
+            $s->when($search->count(), function ($query) use ($search, $fields, $builder) {
+                $query->where(function ($query) use ($search, $fields, $builder) {
+                    $search->each(function ($word) use ($fields, $query, $builder) {
+                        $like = '%' . addcslashes($word, '\\%_') . '%';
+                        $fields->each(function ($field) use ($query, $builder, $like) {
+                            $query->orWhereRaw("LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\'", [$like]);
+                        });
+                    });
+                });
+            });
             return $s->orderByDesc('points');
         }
     }

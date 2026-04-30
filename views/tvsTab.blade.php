@@ -5,7 +5,7 @@
     <input type="hidden" name="back" value="&get=tvs&i={{request()->i ?? 0}}" />
     <input type="hidden" name="article" value="{{request()->i ?? 0}}" />
     @foreach($tvs as $tv)
-        @php($tv->value = $tvValues[$tv->name] ?? '')
+        @php $tv->value = $tvValues[$tv->name] ?? ''; @endphp
         <div class="row form-row">
             <div class="row-col col-lg-12 col-12">
                 <div class="row form-row">

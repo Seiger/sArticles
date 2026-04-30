@@ -6,18 +6,13 @@
             @foreach($sArticlesController->langList() as $lang)
                 <td style="text-align:center !important;"><b>{{strtoupper($lang)}}</b></td>
             @endforeach
+            <td id="action-btns" class="sarticles-th-actions">@lang('global.onlineusers_action')</td>
         </tr>
         </thead>
         <tbody>
         @foreach($tags as $tag)
             <tr>
                 <td data-id="{{$tag['tagid']}}">
-                    <a style="padding: 3px 5px;" href="#" data-href="{!! $url !!}&get=tagDelete&i={{$tag['tagid']}}" data-delete="{{$tag['tagid']}}" data-name="{{$tag[$sArticlesController->langDefault()]}}" class="btn btn-outline-danger">
-                        <i class="fa fa-trash" style="font-size: x-large;" title="@lang('global.remove')"></i>
-                    </a>
-                    <a style="padding: 3px 5px;color:#0057b8;" class="btn btn-light" type="button" href="#" data-toggle="modal" data-target="#editTagAlias" title="@lang('sArticles::global.edit_alias')">
-                        <i class="fa fa-pencil-alt" style="font-size: x-large;"></i>
-                    </a>&emsp;
                     {{$tag['alias']}}
                 </td>
                 @foreach($sArticlesController->langList() as $lang)
@@ -52,6 +47,28 @@
                         @endif
                     </td>
                 @endforeach
+                <td data-id="{{$tag['tagid']}}" style="text-align:center;">
+                    <div class="btn-group">
+                        <a class="btn btn-primary btn-icon"
+                           type="button"
+                           href="#"
+                           data-toggle="modal"
+                           data-target="#editTagAlias"
+                           title="@lang('sArticles::global.edit_alias')"
+                           aria-label="@lang('sArticles::global.edit_alias')">
+                            {!! svg('tabler-edit', 'sarticles-icon')->toHtml() !!}
+                        </a>
+                        <a href="#"
+                           data-href="{!! $url !!}&get=tagDelete&i={{$tag['tagid']}}"
+                           data-delete="{{$tag['tagid']}}"
+                           data-name="{{$tag[$sArticlesController->langDefault()]}}"
+                           class="btn btn-outline-danger btn-icon"
+                           title="@lang('global.remove')"
+                           aria-label="@lang('global.remove')">
+                            {!! svg('tabler-trash', 'sarticles-icon')->toHtml() !!}
+                        </a>
+                    </div>
+                </td>
             </tr>
         @endforeach
         </tbody>

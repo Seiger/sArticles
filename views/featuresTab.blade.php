@@ -11,22 +11,6 @@
                     <div class="card-block">
                         <div class="userstable">
                             <div class="card-body">
-                                <div class="row form-row">
-                                    <div class="col-auto col-title-6">
-                                        <label class="warning">@lang('sArticles::global.badge')</label>
-                                    </div>
-                                    <div class="col">
-                                        <input type="text" class="form-control" name="features[badge][]" maxlength="255" value="{{$feature->badge ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
-                                    </div>
-                                </div>
-                                <div class="row form-row">
-                                    <div class="col-auto col-title-6">
-                                        <label class="warning">@lang('sArticles::global.color')</label>
-                                    </div>
-                                    <div class="col">
-                                        <input type="text" class="form-control" name="features[color][]" maxlength="255" value="{{$feature->color ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
-                                    </div>
-                                </div>
                                 @foreach($sArticlesController->langList() as $idx => $lang)
                                     <div class="row form-row">
                                         <div class="col-auto col-title-6">
@@ -43,6 +27,22 @@
                                     </div>
                                     <div class="col">
                                         <input type="text" class="form-control" name="features[alias][]" maxlength="255" value="{{$feature->alias ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
+                                    </div>
+                                </div>
+                                <div class="row form-row">
+                                    <div class="col-auto col-title-6">
+                                        <label class="warning">@lang('sArticles::global.color')</label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="text" class="form-control" name="features[color][]" maxlength="255" value="{{$feature->color ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
+                                    </div>
+                                </div>
+                                <div class="row form-row">
+                                    <div class="col-auto col-title-6">
+                                        <label class="warning">@lang('sArticles::global.badge')</label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="text" class="form-control" name="features[badge][]" maxlength="255" value="{{$feature->badge ?? ''}}" onchange="documentDirty=true;" spellcheck="true">
                                     </div>
                                 </div>
                                 <input type="hidden" name="features[fid][]" value="{{$feature->fid}}">
@@ -86,22 +86,6 @@
                 <div class="card-block">
                     <div class="userstable">
                         <div class="card-body">
-                            <div class="row form-row">
-                                <div class="col-auto col-title-6">
-                                    <label class="warning">@lang('sArticles::global.badge')</label>
-                                </div>
-                                <div class="col">
-                                    <input type="text" class="form-control" name="features[badge][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
-                                </div>
-                            </div>
-                            <div class="row form-row">
-                                <div class="col-auto col-title-6">
-                                    <label class="warning">@lang('sArticles::global.color')</label>
-                                </div>
-                                <div class="col">
-                                    <input type="text" class="form-control" name="features[color][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
-                                </div>
-                            </div>
                             @foreach($sArticlesController->langList() as $idx => $lang)
                                 <div class="row form-row">
                                     <div class="col-auto col-title-6">
@@ -118,6 +102,22 @@
                                 </div>
                                 <div class="col">
                                     <input type="text" class="form-control" name="features[alias][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
+                                </div>
+                            </div>
+                            <div class="row form-row">
+                                <div class="col-auto col-title-6">
+                                    <label class="warning">@lang('sArticles::global.color')</label>
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" name="features[color][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
+                                </div>
+                            </div>
+                            <div class="row form-row">
+                                <div class="col-auto col-title-6">
+                                    <label class="warning">@lang('sArticles::global.badge')</label>
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" name="features[badge][]" maxlength="255" value="" onchange="documentDirty=true;" spellcheck="true">
                                 </div>
                             </div>
                             <input type="hidden" name="features[fid][]" value="">

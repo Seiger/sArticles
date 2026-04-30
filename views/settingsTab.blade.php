@@ -1,9 +1,9 @@
 @if(!is_writable(EVO_CORE_PATH . 'custom/config/seiger/settings/sArticles.php'))<div class="alert alert-danger" role="alert">@lang('sArticles::global.not_writable')</div>@endif
-<form id="form" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=settingsSave" onsubmit="documentDirty=false;">
+<form id="form" class="sarticles-settings" name="form" method="post" enctype="multipart/form-data" action="{!!$url!!}&get=settingsSave" onsubmit="documentDirty=false;">
     <input type="hidden" name="back" value="&get=settings" />
     <h3>@lang('sArticles::global.management_additional_fields')</h3>
     <div class="row form-row widgets sortable">
-        @php($settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php')
+        @php $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php'; @endphp
         @foreach($settings as $key => $setting)
             @if(!in_array($key, ['general', 'types']))
                 <div class="col-sm-12">
@@ -190,8 +190,8 @@
         </div>
     </div>
     @if(evo()->getConfig('which_editor', 'TinyMCE5') == 'TinyMCE5')
-        @php(evo()->setConfig('tinymce5_theme', evo()->getConfig('sart_tinymce5_theme', 'custom')))
-        @php($files = array_diff(scandir(MODX_BASE_PATH.'assets/plugins/tinymce5/configs'), array('.', '..', 'custom.js')))
+        @php evo()->setConfig('tinymce5_theme', evo()->getConfig('sart_tinymce5_theme', 'custom')); @endphp
+        @php $files = array_diff(scandir(MODX_BASE_PATH.'assets/plugins/tinymce5/configs'), array('.', '..', 'custom.js')); @endphp
         @include('tinymce5settings::tinymce5settings', ['themes'=>$files])
     @endif
     <div class="row form-row">
@@ -210,9 +210,9 @@
     </div>
     <div class="split my-3"></div>
     <h3>@lang('sArticles::global.management_fields_on')</h3>
-    @php($types = array_keys(sArticles::config('types', [])))
+    @php $types = array_keys(sArticles::config('types', [])); @endphp
     @if(count($types) == 0)
-        @php($types = ['article'])
+        @php $types = ['article']; @endphp
     @endif
     @foreach($types as $type)
         <div class="row form-row">

@@ -35,15 +35,67 @@ class sArticles
     {
         $order = 's_articles.published_at';
         $direc = 'desc';
-        $query = sArticle::search()->orderBy($order, $direc);
+        $query = sArticle::search()
+            ->with(['categories', 'tags', 'features'])
+            ->orderBy($order, $direc);
         if (!IN_MANAGER_MODE) {
             $query->active();
+        } else {
+            $availability = request()->input('availability', '');
+
+            if ($availability === 'published') {
+                $query->where('s_articles.published', 1);
+            } elseif ($availability === 'unpublished') {
+                $query->where('s_articles.published', 0);
+            }
         }
         if (request()->has('type') && trim(request()->input('type', ''))) {
             $query->whereType(request()->input('type', ''));
         }
+        $sections = $this->filterIds('section');
+        $categories = $this->filterIds('category');
+        $tags = $this->filterIds('tag');
+        $features = $this->filterIds('feature');
+
+        if (IN_MANAGER_MODE && count($sections)) {
+            $query->where(function ($sectionsQuery) use ($sections) {
+                if (in_array(1, $sections, true)) {
+                    $sectionsQuery->orWhere('s_articles.parent', '<=', 1);
+                }
+
+                $parentIds = array_values(array_filter($sections, fn($id) => $id > 1));
+                if (count($parentIds)) {
+                    $sectionsQuery->orWhereIn('s_articles.parent', $parentIds);
+                }
+            });
+        }
+        if (IN_MANAGER_MODE && count($categories)) {
+            $query->whereHas('categories', fn($categoriesQuery) => $categoriesQuery->whereIn('s_articles_categories.catid', $categories));
+        }
+        if (IN_MANAGER_MODE && count($tags)) {
+            $query->whereHas('tags', fn($tagsQuery) => $tagsQuery->whereIn('s_articles_tags.tagid', $tags));
+        }
+        if (IN_MANAGER_MODE && count($features)) {
+            $query->whereHas('features', fn($featuresQuery) => $featuresQuery->whereIn('s_articles_features.fid', $features));
+        }
         $articles = $query->paginate($paginate);
         return $articles;
+    }
+
+    /**
+     * Read comma separated manager filter ids from request.
+     */
+    protected function filterIds(string $key): array
+    {
+        $value = request()->input($key, '');
+        $values = is_array($value) ? $value : explode(',', (string) $value);
+
+        return collect($values)
+            ->map(fn($id) => (int) $id)
+            ->filter(fn($id) => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
@@ -59,6 +111,10 @@ class sArticles
         if ($artids)
         {
             $query->whereIn('article_id', $artids);
+        }
+        if (request()->has('search') && trim(request()->input('search', '')) !== '') {
+            $search = '%' . addcslashes(mb_strtolower(trim(strip_tags(request()->input('search', '')))), '\\%_') . '%';
+            $query->whereRaw("LOWER(`comment`) LIKE ? ESCAPE '\\\\'", [$search]);
         }
         return $query->paginate($paginate);
     }
@@ -289,21 +345,50 @@ class sArticles
      */
     public function approveComment()
     {
-        $result = [];
-        $message = request()->get('comment', '');
-        $approved = request()->get('approved');
+        if (!isset($_SESSION['mgrValidated'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $comid = request()->get('comid', 0);
         $comment = sArticleComment::find($comid);
-        if ($comment && $message)
-        {
+        $result = [];
+
+        if ($comment) {
+            $message = request()->get('comment', $comment->comment);
+            $approved = (int) request()->get('approved', 0);
+
             sArticleComment::where('comid', $comid)
                 ->update([
-                    'comment' => trim($message),
-                    'approved' => (int)$approved,
+                    'comment' => trim((string) $message),
+                    'approved' => $approved,
                 ]);
-            $result['comment'] =  sArticleComment::where('comid', $comid)->first();
+            $result['comment'] = sArticleComment::where('comid', $comid)->first();
         }
-        return json_encode($result);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Publish or unpublish an article from the manager list.
+     */
+    public function publishArticle()
+    {
+        if (!isset($_SESSION['mgrValidated'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $articleId = (int) request()->get('article_id', 0);
+        $published = (int) request()->get('published', 0);
+        $article = sArticle::find($articleId);
+
+        if (!$article) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        $article->published = $published ? 1 : 0;
+        $article->save();
+
+        return response()->json(['article' => $article->fresh()]);
     }
 
     /**

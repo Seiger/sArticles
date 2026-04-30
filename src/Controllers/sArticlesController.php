@@ -314,13 +314,19 @@ class sArticlesController
             }
         }
 
-        return implode("", evo()->invokeEvent('OnRichTextEditorInit', [
+        $editorHtml = evo()->invokeEvent('OnRichTextEditorInit', [
             'editor' => $editor,
             'elements' => $elements,
             'height' => $height,
             'contentType' => 'htmlmixed',
             'options' => $options
-        ]));
+        ]);
+
+        if (!is_array($editorHtml)) {
+            return '';
+        }
+
+        return implode('', $editorHtml);
     }
 
     /**

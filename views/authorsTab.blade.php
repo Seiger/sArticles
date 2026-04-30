@@ -136,7 +136,11 @@
                 url: '{!!$url!!}&get=addAuthor',
                 type: 'POST',
                 dataType: 'JSON',
-                data: 'name='+_name+'lastname='+_lastname+'&office='+_office,
+                data: {
+                    name: _name,
+                    lastname: _lastname,
+                    office: _office
+                },
                 success: function (ajax) {
                     if (ajax.status == 1) {
                         window.location.reload();

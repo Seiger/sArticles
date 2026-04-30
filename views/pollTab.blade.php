@@ -71,7 +71,7 @@
                                 <span class="badge bg-seigerit">{{$lang}}</span>
                             </div>
                         @endif
-                        <input name="answers[{{$lang}}][]" value="" type="text" class="form-control" maxlength="255" onchange="documentDirty=true;" spellcheck="true">
+                        <input name="answers[{{$lang}}][__INDEX__]" value="" type="text" class="form-control" maxlength="255" onchange="documentDirty=true;" spellcheck="true">
                     </div>
                 @endforeach
             </div>
@@ -82,7 +82,21 @@
         .draft-element{display:none;}
     </style>
     <script>
-        function addItem() {$("#form").append($('.draft-element').html());}
+        function nextAnswerIndex() {
+            var max = -1;
+            $('#form').find('input[name^="answers["]').each(function () {
+                var match = this.name.match(/\]\[(\d+)\]$/);
+                if (match) {
+                    max = Math.max(max, parseInt(match[1], 10));
+                }
+            });
+            return max + 1;
+        }
+        function addItem() {
+            var index = nextAnswerIndex();
+            $("#form").append($('.draft-element').html().replace(/__INDEX__/g, index));
+            documentDirty = true;
+        }
         function onDeleteField(target){let parent=target.closest('.answer');alertify.confirm("@lang('sSettings::global.are_you_sure')","@lang('sSettings::global.deleted_irretrievably')",function(){alertify.error("@lang('sSettings::global.deleted')");parent.remove()},function(){alertify.success("@lang('sSettings::global.canceled')")}).set('labels',{ok:"@lang('global.delete')",cancel:"@lang('global.cancel')"}).set({transition:'zoom'});documentDirty=true}
     </script>
 @endpush

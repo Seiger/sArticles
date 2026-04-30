@@ -1,0 +1,2554 @@
+html.sarticles-page,
+html.sarticles-page body {
+  background: var(--color-base-100) !important;
+  color-scheme: light;
+}
+
+html.sarticles-page body {
+  color: var(--color-base-content) !important;
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-anchor: none;
+}
+
+html.sarticles-page[data-theme-mode="dark"],
+html.sarticles-page[data-theme="evodark"],
+html.sarticles-page[data-theme="evodarkness"],
+html.sarticles-page[data-theme-mode="dark"] body,
+html.sarticles-page[data-theme="evodark"] body,
+html.sarticles-page[data-theme="evodarkness"] body {
+  color-scheme: dark;
+}
+
+html.sarticles-page {
+  --sa-scrollbar-track: var(--color-base-100);
+  --sa-scrollbar-thumb: color-mix(in oklab, var(--color-base-content) 24%, transparent);
+  --sa-scrollbar-thumb-hover: color-mix(in oklab, var(--color-base-content) 38%, transparent);
+  --sa-surface: var(--color-base-100);
+  --sa-surface-muted: var(--color-base-200);
+  --sa-surface-strong: var(--color-base-300);
+  --sa-tabs-bg: color-mix(in oklab, var(--color-base-content) 3%, transparent);
+  --sa-border: color-mix(in oklab, var(--color-base-content) 16%, transparent);
+  --sa-border-soft: color-mix(in oklab, var(--color-base-content) 9%, transparent);
+  --sa-muted: color-mix(in oklab, var(--color-base-content) 68%, transparent);
+  --sa-hover: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  --sa-tab-hover: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  --sa-tab-active: var(--color-primary);
+  overflow-y: auto;
+  overflow-anchor: none;
+}
+
+html.sarticles-page.sarticles-custom-scrollbars,
+html.sarticles-page.sarticles-custom-scrollbars body {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+html.sarticles-page[data-theme-mode="dark"],
+html.sarticles-page[data-theme="evodark"],
+html.sarticles-page[data-theme="evodarkness"] {
+  --sa-scrollbar-thumb: color-mix(in oklab, var(--color-base-content) 24%, transparent);
+  --sa-scrollbar-thumb-hover: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+  --sa-tabs-bg: color-mix(in oklab, black 18%, var(--color-base-100));
+  --sa-dark-control: color-mix(in oklab, var(--color-base-content) 4%, var(--sa-surface));
+  --sa-dark-control-active: color-mix(in oklab, var(--color-primary) 18%, var(--sa-surface));
+  --sa-dark-panel: color-mix(in oklab, var(--color-base-content) 5%, var(--sa-surface));
+  --sa-dark-field: color-mix(in oklab, black 10%, var(--sa-surface));
+}
+
+html.sarticles-page.sarticles-custom-scrollbars,
+html.sarticles-page.sarticles-custom-scrollbars * {
+  scrollbar-color: var(--sa-scrollbar-thumb) var(--sa-scrollbar-track);
+  scrollbar-width: auto;
+}
+
+html.sarticles-page.sarticles-custom-scrollbars::-webkit-scrollbar,
+html.sarticles-page.sarticles-custom-scrollbars *::-webkit-scrollbar {
+  width: 0.9rem !important;
+  height: 0.9rem !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--sa-scrollbar-track) !important;
+  background-color: var(--sa-scrollbar-track) !important;
+}
+
+html.sarticles-page.sarticles-custom-scrollbars::-webkit-scrollbar-thumb,
+html.sarticles-page.sarticles-custom-scrollbars *::-webkit-scrollbar-thumb,
+html.sarticles-page.sarticles-custom-scrollbars:hover::-webkit-scrollbar-thumb,
+html.sarticles-page.sarticles-custom-scrollbars *:hover::-webkit-scrollbar-thumb {
+  border: 0.24rem solid transparent !important;
+  border-radius: 999px !important;
+  background: var(--sa-scrollbar-thumb) !important;
+  background-clip: content-box !important;
+  box-shadow: none !important;
+}
+
+html.sarticles-page.sarticles-custom-scrollbars::-webkit-scrollbar-thumb:hover,
+html.sarticles-page.sarticles-custom-scrollbars *::-webkit-scrollbar-thumb:hover {
+  background: var(--sa-scrollbar-thumb-hover) !important;
+  background-clip: content-box !important;
+  box-shadow: none !important;
+}
+
+html.sarticles-page.sarticles-custom-scrollbars::-webkit-scrollbar-track,
+html.sarticles-page.sarticles-custom-scrollbars *::-webkit-scrollbar-track,
+html.sarticles-page.sarticles-custom-scrollbars::-webkit-scrollbar-corner,
+html.sarticles-page.sarticles-custom-scrollbars *::-webkit-scrollbar-corner {
+  border: 0 !important;
+  background: var(--sa-scrollbar-track) !important;
+  background-color: var(--sa-scrollbar-track) !important;
+}
+
+.sarticles-admin {
+  padding: 0.55rem 0.75rem 0;
+  color: var(--color-base-content);
+  font-size: 0.8125rem;
+  min-height: 100vh;
+  overflow-anchor: none;
+}
+
+.sarticles-admin,
+.sarticles-admin *,
+.sarticles-admin *::before,
+.sarticles-admin *::after {
+  box-sizing: border-box;
+}
+
+.sarticles-admin a {
+  color: var(--color-primary);
+}
+
+.sarticles-admin a:hover,
+.sarticles-admin a:focus {
+  color: color-mix(in oklab, var(--color-primary) 74%, var(--color-base-content));
+}
+
+.sarticles-admin__header {
+  display: flex;
+  align-items: center;
+  min-height: 1.8rem;
+  margin: 0 0 0.45rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.sarticles-admin__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--color-base-content);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0;
+  box-shadow: none !important;
+}
+
+.sarticles-admin .sarticles-admin__title-link,
+.sarticles-admin .sarticles-admin__title-link:hover,
+.sarticles-admin .sarticles-admin__title-link:focus,
+.sarticles-admin .sarticles-admin__title-link:visited {
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+  color: inherit !important;
+  text-decoration: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.sarticles-admin__title i {
+  margin: 0 !important;
+  color: var(--color-primary) !important;
+  font-size: 0.95rem;
+  opacity: 1 !important;
+}
+
+.sarticles-admin__title span {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.sarticles-admin .sarticles-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1em;
+  height: 1em;
+  color: currentColor;
+  stroke-width: 2;
+  vertical-align: -0.12em;
+}
+
+.sarticles-admin__title-icon {
+  color: var(--color-primary);
+}
+
+.sarticles-panel.sectionBody {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.sarticles-admin .sarticles-tabs {
+  display: block;
+  min-height: calc(100vh - 4.85rem);
+}
+
+.sarticles-admin .sarticles-tabbar {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 1.65rem minmax(0, 1fr) 1.65rem;
+  align-items: center;
+  column-gap: 0.35rem;
+  height: 2.65rem;
+  min-height: 2.65rem;
+  max-height: 2.65rem;
+  padding: 0 0.55rem;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: var(--sa-tabs-bg) !important;
+  background-color: var(--sa-tabs-bg) !important;
+  white-space: nowrap;
+}
+
+.sarticles-admin .sarticles-tabbar__scroller {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 2.65rem;
+  min-height: 2.65rem;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: transparent !important;
+  background-color: transparent !important;
+  contain: layout paint;
+}
+
+.sarticles-admin .sarticles-tabbar__scroller {
+  scrollbar-width: none;
+}
+
+.sarticles-admin .sarticles-tabbar__scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.sarticles-admin .sarticles-tabbar__tab {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  height: 2.65rem;
+  min-height: 2.65rem;
+  max-height: 2.65rem;
+  margin: 0;
+  padding: 0;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--sa-muted) !important;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-transform: none;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.sarticles-admin .sarticles-tabbar__tab a {
+  display: inline-flex;
+  align-items: center;
+  height: 2.65rem;
+  min-height: 2.65rem;
+  max-height: 2.65rem;
+  padding: 0 0.62rem;
+  color: inherit;
+  font: inherit;
+  text-decoration: none !important;
+}
+
+.sarticles-admin .sarticles-tabbar__tab a > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.sarticles-admin .sarticles-tabbar__tab:hover {
+  background: var(--sa-tab-hover) !important;
+  background-color: var(--sa-tab-hover) !important;
+  color: var(--color-base-content) !important;
+}
+
+.sarticles-admin .sarticles-tabbar__tab.selected {
+  border-bottom-color: var(--sa-tab-active) !important;
+  color: var(--sa-tab-active) !important;
+}
+
+.sarticles-admin .sarticles-tabbar__tab .sarticles-tab__icon,
+.sarticles-admin .sarticles-tabbar__tab i {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.sarticles-admin .sarticles-tabbar__tab.selected .sarticles-tab__icon,
+.sarticles-admin .sarticles-tabbar__tab.selected i {
+  color: var(--sa-tab-active);
+}
+
+.sarticles-admin .tab-row-container {
+  height: auto;
+  min-height: 2.1rem;
+  margin-bottom: 0;
+  padding: 0.35rem 0.55rem 0.1rem;
+  border-bottom: 0;
+  background: var(--sa-tabs-bg) !important;
+  white-space: nowrap;
+}
+
+.sarticles-admin .tab-row {
+  height: auto;
+  min-height: 2.1rem;
+  margin-bottom: 0;
+  padding: 0.35rem 0.55rem 0.1rem;
+  border-bottom: 0;
+  background: var(--sa-tabs-bg) !important;
+  white-space: nowrap;
+}
+
+.sarticles-admin .tab-row-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.65rem minmax(0, 1fr) 1.65rem;
+  align-items: center;
+  column-gap: 0.35rem;
+  overflow: hidden;
+}
+
+.sarticles-admin .tab-row {
+  position: relative;
+  display: flex;
+  gap: 0;
+  padding-right: 1.9rem;
+  padding-left: 1.9rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  contain: layout paint;
+}
+
+.sarticles-admin .tab-row-container .tab-row {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  margin-bottom: 0;
+  padding: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.sarticles-admin .tab-row-container > i.prev,
+.sarticles-admin .tab-row-container > i.next,
+.sarticles-admin .tab-row > i.prev,
+.sarticles-admin .tab-row > i.next,
+.sarticles-admin .sarticles-tab-arrow {
+  position: static !important;
+  z-index: 4;
+  display: inline-flex !important;
+  visibility: visible !important;
+  align-items: center;
+  justify-content: center;
+  width: 1.65rem;
+  min-width: 1.65rem;
+  height: 2.1rem;
+  padding: 0;
+  margin: 0;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--color-primary);
+  font-family: Arial, sans-serif !important;
+  font-size: 0 !important;
+  font-style: normal !important;
+  text-indent: 0;
+  line-height: 1;
+  opacity: 1;
+  cursor: pointer;
+  overflow: hidden;
+  appearance: none;
+}
+
+.sarticles-admin .sarticles-tab-arrow:hover,
+.sarticles-admin .sarticles-tab-arrow:focus,
+.sarticles-admin .sarticles-tab-arrow:active,
+.sarticles-admin .sarticles-tab-arrow:disabled {
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.sarticles-admin .tab-row-container > i.prev,
+.sarticles-admin .tab-row-container > .sarticles-tab-arrow--prev {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.sarticles-admin .tab-row-container > i.next,
+.sarticles-admin .tab-row-container > .sarticles-tab-arrow--next {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.sarticles-admin .tab-row > i.prev,
+.sarticles-admin .tab-row > i.next,
+.sarticles-admin .tab-row > .sarticles-tab-arrow {
+  position: absolute !important;
+  top: 0;
+  bottom: 0;
+  height: auto;
+}
+
+.sarticles-admin .tab-row > i.prev,
+.sarticles-admin .tab-row > .sarticles-tab-arrow--prev {
+  left: 0;
+}
+
+.sarticles-admin .tab-row > i.next,
+.sarticles-admin .tab-row > .sarticles-tab-arrow--next {
+  right: 0;
+}
+
+.sarticles-admin .tab-row-container > i.prev::before,
+.sarticles-admin .tab-row-container > i.next::before,
+.sarticles-admin .tab-row > i.prev::before,
+.sarticles-admin .tab-row > i.next::before {
+  content: "" !important;
+  display: none !important;
+}
+
+.sarticles-admin .tab-row-container > i.prev::after,
+.sarticles-admin .tab-row-container > i.next::after,
+.sarticles-admin .tab-row > i.prev::after,
+.sarticles-admin .tab-row > i.next::after {
+  content: "" !important;
+  display: none !important;
+}
+
+.sarticles-admin .tab-row-container > i.disable,
+.sarticles-admin .tab-row-container > i.disabled,
+.sarticles-admin .tab-row-container > i.is-disabled,
+.sarticles-admin .tab-row > i.disable,
+.sarticles-admin .tab-row > i.disabled,
+.sarticles-admin .tab-row > i.is-disabled,
+.sarticles-admin .sarticles-tab-arrow.is-disabled {
+  color: var(--sa-muted);
+  opacity: 0.45;
+  cursor: default;
+}
+
+.sarticles-admin .sarticles-tab-arrow__icon {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+  pointer-events: none;
+}
+
+.sarticles-admin .tab-row::-webkit-scrollbar {
+  display: none;
+}
+
+.sarticles-admin .tab-row-container::after {
+  display: none;
+}
+
+.sarticles-admin .tab-pane > .tab-row::before,
+.sarticles-admin .tab-pane > .tab-row::after {
+  content: "" !important;
+  display: none !important;
+}
+
+.sarticles-admin .tab-pane > .tab-row::before {
+  left: 0;
+}
+
+.sarticles-admin .tab-pane > .tab-row::after {
+  right: 0;
+}
+
+.sarticles-admin .tab-pane > .tab-row:has(> i.prev)::before,
+.sarticles-admin .tab-pane > .tab-row:has(> i.next)::after {
+  display: none !important;
+}
+
+.sarticles-admin .tab-row .tab,
+.sarticles-admin .tab-pane > .tab-page > .tab {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  height: auto;
+  min-height: 2rem;
+  margin: 0;
+  padding: 0;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--sa-muted) !important;
+  line-height: 1.25;
+  text-transform: none;
+  box-shadow: none !important;
+}
+
+.sarticles-admin .tab-row .tab a,
+.sarticles-admin .tab-pane > .tab-page > .tab a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.34rem 0.62rem;
+  color: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sarticles-admin .tab-row .tab > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: inherit;
+  padding: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: inherit;
+  font: inherit;
+}
+
+.sarticles-admin .tab-row .tab a > span,
+.sarticles-admin .tab-pane > .tab-page > .tab a > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.sarticles-admin .tab-row .tab i,
+.sarticles-admin .tab-pane > .tab-page > .tab i,
+.sarticles-admin .tab-row .tab .sarticles-tab__icon,
+.sarticles-admin .tab-pane > .tab-page > .tab .sarticles-tab__icon {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.sarticles-admin .tab-row .tab:hover {
+  background: var(--sa-tab-hover) !important;
+  background-color: var(--sa-tab-hover) !important;
+  color: var(--color-base-content) !important;
+}
+
+.sarticles-admin .tab-row .tab.selected,
+.sarticles-admin .tab-row .tab.tab-selected {
+  border-bottom-color: var(--sa-tab-active) !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--sa-tab-active) !important;
+  box-shadow: none !important;
+}
+
+.sarticles-admin .tab-row .tab.selected i,
+.sarticles-admin .tab-row .tab.tab-selected i,
+.sarticles-admin .tab-row .tab.selected .sarticles-tab__icon,
+.sarticles-admin .tab-row .tab.tab-selected .sarticles-tab__icon {
+  color: var(--sa-tab-active);
+}
+
+.sarticles-admin .tab-page {
+  clear: both;
+  width: 100%;
+  min-height: calc(100vh - 7.3rem);
+  padding: 0.84rem 0 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--color-base-content);
+  box-shadow: none !important;
+}
+
+.sarticles-admin .split {
+  height: 1px;
+  margin: 0.65rem 0;
+  border: 0;
+  background: var(--sa-border-soft);
+}
+
+.sarticles-toolbar {
+  display: flex;
+  align-items: stretch;
+  max-width: 42rem;
+  margin-bottom: 0.65rem;
+}
+
+.sarticles-listbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.25rem 0 0.25rem;
+}
+
+.sarticles-listbar.is-loading,
+.sarticles-list-table.is-loading {
+  opacity: 0.62;
+  pointer-events: none;
+  transition: opacity 0.14s ease;
+}
+
+.sarticles-filter-strip {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.22rem;
+  min-width: 0;
+  min-height: 2.38rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.sarticles-create-shortcut {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 42%, transparent);
+  border-radius: 7px;
+  background: color-mix(in oklab, var(--color-primary) 14%, var(--sa-surface));
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.sarticles-create-shortcut:hover,
+.sarticles-create-shortcut:focus {
+  background: var(--color-primary);
+  color: var(--color-primary-content);
+  text-decoration: none;
+}
+
+.sarticles-create-shortcut .sarticles-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  stroke-width: 2.5;
+}
+
+.sarticles-segmented {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.18rem;
+  min-height: 2.15rem;
+  padding: 0.16rem;
+  border: 1px solid var(--sa-border);
+  border-radius: 7px;
+  background: var(--sa-surface);
+}
+
+.sarticles-segmented__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.82rem;
+  height: 1.72rem;
+  border-radius: 5px;
+  color: var(--sa-muted);
+  text-decoration: none;
+}
+
+.sarticles-segmented__item:hover {
+  background: var(--sa-hover);
+  color: var(--color-base-content);
+}
+
+.sarticles-segmented__item.is-active {
+  background: var(--color-primary);
+  color: var(--color-primary-content);
+}
+
+.sarticles-segmented__item--published {
+  color: var(--color-success);
+}
+
+.sarticles-segmented__item--unpublished {
+  color: var(--color-error);
+}
+
+.sarticles-segmented__item--published:hover,
+.sarticles-segmented__item--published.is-active {
+  background: color-mix(in oklab, var(--color-success) 16%, transparent);
+  color: var(--color-success);
+}
+
+.sarticles-segmented__item--unpublished:hover,
+.sarticles-segmented__item--unpublished.is-active {
+  background: color-mix(in oklab, var(--color-error) 16%, transparent);
+  color: var(--color-error);
+}
+
+.sarticles-segmented__item .sarticles-icon {
+  display: block !important;
+  width: 0.95rem;
+  height: 0.95rem;
+  margin: 0 !important;
+  vertical-align: 0 !important;
+}
+
+.sarticles-filter-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.sarticles-filter-menu__toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--sa-border) !important;
+  border-radius: 7px;
+  background: var(--sa-surface) !important;
+  background-color: var(--sa-surface) !important;
+  background-image: none !important;
+  color: var(--color-primary) !important;
+  line-height: 1;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.sarticles-filter-menu__toggle:hover,
+.sarticles-filter-menu__toggle:focus,
+.sarticles-filter-menu__toggle.is-active,
+.sarticles-filter-menu.is-open .sarticles-filter-menu__toggle {
+  border-color: color-mix(in oklab, var(--color-primary) 42%, var(--sa-border));
+  background: color-mix(in oklab, var(--color-primary) 14%, var(--sa-surface));
+  color: var(--color-primary);
+  outline: 0;
+}
+
+.sarticles-filter-menu__toggle .sarticles-icon {
+  display: block !important;
+  width: 1rem;
+  height: 1rem;
+  margin: 0 !important;
+  vertical-align: 0 !important;
+}
+
+.sarticles-filter-menu__count {
+  position: absolute;
+  right: -0.24rem;
+  top: -0.24rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0.95rem;
+  height: 0.95rem;
+  padding: 0 0.2rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-primary-content);
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sarticles-filter-menu__panel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.55rem);
+  left: 50%;
+  display: none;
+  width: min(18rem, calc(100vw - 2rem));
+  padding: 0.48rem;
+  border: 1px solid var(--sa-border);
+  border-radius: 8px;
+  background: var(--sa-surface) !important;
+  color: var(--color-base-content) !important;
+  box-shadow: 0 0.65rem 1.4rem color-mix(in oklab, black 16%, transparent);
+  transform: translateX(-50%);
+}
+
+.sarticles-filter-menu.is-open .sarticles-filter-menu__panel {
+  display: block;
+}
+
+.sarticles-filter-menu__panel::before {
+  content: "";
+  position: absolute;
+  top: -0.36rem;
+  left: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-left: 1px solid var(--sa-border);
+  border-top: 1px solid var(--sa-border);
+  background: var(--sa-surface) !important;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.sarticles-filter-menu__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  height: 1.95rem;
+  margin: 0 0 0.42rem;
+  padding: 0 0.55rem;
+  border: 1px solid var(--sa-border) !important;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--color-base-content) 2%, var(--sa-surface)) !important;
+  color: var(--sa-muted) !important;
+}
+
+.sarticles-filter-menu__search .sarticles-icon {
+  width: 0.92rem;
+  height: 0.92rem;
+}
+
+.sarticles-filter-menu__search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+  color: var(--color-base-content) !important;
+  box-shadow: none !important;
+}
+
+.sarticles-filter-menu__search:focus-within {
+  border-color: var(--color-primary) !important;
+  color: var(--color-base-content) !important;
+  box-shadow: 0 0 0 0.12rem color-mix(in oklab, var(--color-primary) 20%, transparent);
+}
+
+.sarticles-filter-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  max-height: 14rem;
+  overflow: auto;
+  padding: 0.12rem 0.12rem 0.12rem 0;
+}
+
+.sarticles-filter-menu__option {
+  display: flex;
+  align-items: center;
+  gap: 0.48rem;
+  min-height: 1.65rem;
+  margin: 0;
+  padding: 0.18rem 0.2rem;
+  border-radius: 5px;
+  color: var(--color-base-content);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.sarticles-filter-menu__option:hover {
+  background: var(--sa-hover);
+}
+
+.sarticles-filter-menu__option input[type="checkbox"] {
+  position: relative;
+  flex: 0 0 auto;
+  width: 0.96rem;
+  height: 0.96rem;
+  margin: 0;
+  border: 1px solid var(--sa-border) !important;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--color-base-content) 4%, var(--sa-surface)) !important;
+  background-color: color-mix(in oklab, var(--color-base-content) 4%, var(--sa-surface)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, black 4%, transparent);
+  accent-color: var(--color-primary);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.sarticles-filter-menu__option input[type="checkbox"]:checked {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary) !important;
+  background-color: var(--color-primary) !important;
+  box-shadow: none;
+}
+
+.sarticles-filter-menu__option input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 0.29rem;
+  top: 0.13rem;
+  width: 0.31rem;
+  height: 0.55rem;
+  border: solid var(--color-primary-content);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.sarticles-filter-menu__option input[type="checkbox"]:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.12rem color-mix(in oklab, var(--color-primary) 22%, transparent);
+}
+
+.sarticles-filter-menu__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.sarticles-filter-menu__action,
+.sarticles-filter-menu__apply {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.7rem;
+  border: 1px solid transparent !important;
+  border-radius: 5px;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  color: var(--color-primary) !important;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.sarticles-filter-menu__action {
+  padding: 0 0.38rem;
+  border-color: var(--sa-border) !important;
+  background: color-mix(in oklab, var(--color-primary) 7%, var(--sa-surface)) !important;
+}
+
+.sarticles-filter-menu__apply {
+  width: 1.85rem;
+  margin-left: auto;
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary) !important;
+  color: var(--color-primary-content) !important;
+}
+
+.sarticles-filter-menu__apply .sarticles-icon {
+  display: block !important;
+  width: 0.92rem;
+  height: 0.92rem;
+  margin: 0 !important;
+  vertical-align: 0 !important;
+}
+
+.sarticles-filter-menu__action:hover {
+  background: var(--sa-hover) !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme="evodark"] .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-filter-strip,
+html.sarticles-page[data-theme="evodark"] .sarticles-filter-strip,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-filter-strip,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-segmented,
+html.sarticles-page[data-theme="evodark"] .sarticles-segmented,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-segmented {
+  background: color-mix(in oklab, black 10%, var(--sa-surface)) !important;
+  background-color: color-mix(in oklab, black 10%, var(--sa-surface)) !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-filter-menu__panel,
+html.sarticles-page[data-theme="evodark"] .sarticles-filter-menu__panel,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-filter-menu__panel,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-filter-menu__panel::before,
+html.sarticles-page[data-theme="evodark"] .sarticles-filter-menu__panel::before,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-filter-menu__panel::before {
+  background: color-mix(in oklab, black 8%, var(--sa-surface)) !important;
+  background-color: color-mix(in oklab, black 8%, var(--sa-surface)) !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-filter-menu__action,
+html.sarticles-page[data-theme="evodark"] .sarticles-filter-menu__action,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-filter-menu__action {
+  background: color-mix(in oklab, var(--color-primary) 9%, var(--sa-surface)) !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-filter-menu__option input[type="checkbox"],
+html.sarticles-page[data-theme="evodark"] .sarticles-filter-menu__option input[type="checkbox"],
+html.sarticles-page[data-theme="evodarkness"] .sarticles-filter-menu__option input[type="checkbox"] {
+  border-color: color-mix(in oklab, white 20%, transparent) !important;
+  background: var(--sa-dark-field) !important;
+  background-color: var(--sa-dark-field) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, black 18%, transparent);
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-filter-menu__option input[type="checkbox"]:checked,
+html.sarticles-page[data-theme="evodark"] .sarticles-filter-menu__option input[type="checkbox"]:checked,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-filter-menu__option input[type="checkbox"]:checked {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary) !important;
+  background-color: var(--color-primary) !important;
+  box-shadow: none;
+}
+
+.sarticles-filter-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  width: 10.4rem;
+  min-width: 8rem;
+  min-height: 2.15rem;
+  margin: 0;
+  padding: 0 1.9rem 0 0.52rem;
+  border: 1px solid var(--sa-border);
+  border-radius: 7px;
+  background: var(--sa-surface);
+  color: var(--sa-muted);
+}
+
+.sarticles-filter-select--section {
+  width: 11.8rem;
+}
+
+.sarticles-filter-select--taxonomy {
+  width: 10.25rem;
+}
+
+.sarticles-filter-select::after {
+  content: "";
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  pointer-events: none;
+  transform: translateY(-65%) rotate(45deg);
+  opacity: 0.72;
+}
+
+.sarticles-filter-select:focus-within {
+  border-color: var(--color-primary);
+  color: var(--color-base-content);
+  box-shadow: 0 0 0 0.12rem color-mix(in oklab, var(--color-primary) 20%, transparent);
+}
+
+.sarticles-filter-select__icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--color-primary);
+}
+
+.sarticles-filter-select select {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  color: var(--color-base-content) !important;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+.sarticles-filter-select select::-ms-expand {
+  display: none;
+}
+
+html.sarticles-page .sarticles-admin .sarticles-filter-select select:not([size]):not([multiple]),
+html.sarticles-page .sarticles-admin .sarticles-filter-select select[size="1"],
+html.sarticles-page.dark .sarticles-admin .sarticles-filter-select select:not([size]):not([multiple]),
+html.sarticles-page.darkness .sarticles-admin .sarticles-filter-select select:not([size]):not([multiple]),
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-select select:not([size]):not([multiple]) {
+  padding: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  background-repeat: initial !important;
+  background-position: initial !important;
+  background-size: initial !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+.sarticles-search {
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  gap: 0.45rem;
+  width: 200px !important;
+  max-width: 200px !important;
+  flex: 0 0 200px !important;
+  min-height: 2.15rem;
+  margin: 0;
+  padding: 0 0.7rem;
+  border: 1px solid var(--sa-border);
+  border-radius: 7px;
+  background: var(--sa-surface);
+  color: var(--sa-muted);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.sarticles-search:focus-within {
+  border-color: var(--color-primary);
+  color: var(--color-base-content);
+  box-shadow: 0 0 0 0.12rem color-mix(in oklab, var(--color-primary) 20%, transparent);
+}
+
+.sarticles-search__icon {
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.72;
+  cursor: pointer;
+}
+
+.sarticles-search input[type="search"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+  color: var(--color-base-content) !important;
+  font-size: 0.82rem;
+  box-shadow: none !important;
+  appearance: none;
+}
+
+.sarticles-search input[type="search"]::placeholder {
+  color: transparent;
+  opacity: 0;
+}
+
+.sarticles-search input[type="search"]::-webkit-search-decoration,
+.sarticles-search input[type="search"]::-webkit-search-cancel-button,
+.sarticles-search input[type="search"]::-webkit-search-results-button,
+.sarticles-search input[type="search"]::-webkit-search-results-decoration {
+  display: none;
+}
+
+.sarticles-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.sarticles-admin .table-responsive {
+  overflow: auto;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.sarticles-admin .articlesTab > .split,
+.sarticles-admin .commentsTab > .split,
+.sarticles-admin .article_commentsTab > .split,
+.sarticles-admin .pollsTab > .split,
+.sarticles-admin .tagsTab > .split,
+.sarticles-admin .categoriesTab > .split,
+.sarticles-admin .authorsTab > .split {
+  display: none;
+}
+
+.sarticles-admin .articlesTab .sarticles-list-table {
+  margin-top: 0.35rem;
+}
+
+.sarticles-admin .sarticles-list-table {
+  overflow: hidden;
+  border: 1px solid var(--sa-border);
+  border-radius: 8px;
+  background: var(--color-base-100);
+}
+
+.sarticles-admin .table-responsive {
+  overflow: auto;
+  border: 1px solid var(--sa-border) !important;
+  border-radius: 8px !important;
+  background: var(--color-base-100) !important;
+  box-shadow: none !important;
+}
+
+.sarticles-admin table.table {
+  width: 100%;
+  margin: 0;
+  border: 0 !important;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  color: var(--color-base-content);
+  box-shadow: none !important;
+}
+
+.sarticles-admin .table th,
+.sarticles-admin .table td {
+  padding: 0.55rem 0.65rem;
+  border-color: var(--sa-border-soft);
+  vertical-align: middle;
+}
+
+.sarticles-admin .table thead th,
+.sarticles-admin .table thead td {
+  border: 0 !important;
+  background: var(--sa-surface-muted);
+  color: var(--color-base-content);
+  font-weight: 700;
+}
+
+.sarticles-admin .sarticles-list-table table.table {
+  border-collapse: collapse;
+}
+
+.sarticles-admin .table-responsive table.table {
+  border-collapse: collapse;
+}
+
+.sarticles-admin .sarticles-list-table .table th,
+.sarticles-admin .sarticles-list-table .table td {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+.sarticles-admin .table-responsive .table th,
+.sarticles-admin .table-responsive .table td {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+.sarticles-admin .sarticles-list-table .table thead th,
+.sarticles-admin .sarticles-list-table .table thead td {
+  border-top: 0 !important;
+  border-bottom: 1px solid var(--sa-border) !important;
+  background: color-mix(in oklab, var(--color-base-content) 5%, var(--color-base-100));
+  color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sarticles-admin .table-responsive .table thead th,
+.sarticles-admin .table-responsive .table thead td {
+  border-top: 0 !important;
+  border-bottom: 1px solid var(--sa-border) !important;
+  background: color-mix(in oklab, var(--color-base-content) 5%, var(--color-base-100));
+  color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.sarticles-admin .sarticles-list-table .table thead .sarticles-th-name {
+  text-align: left !important;
+}
+
+.sarticles-admin .sarticles-list-table .table thead .sarticles-th-cover {
+  width: 4.7rem;
+  padding-right: 0.35rem;
+  padding-left: 0.65rem;
+  text-align: center !important;
+}
+
+.sarticles-admin .sarticles-list-table .table thead .sarticles-th-section,
+.sarticles-admin .sarticles-list-table .table thead .sarticles-th-meta {
+  text-align: left !important;
+}
+
+.sarticles-admin .sarticles-list-table .sarticles-th-section {
+  width: 9.5rem;
+}
+
+.sarticles-admin .sarticles-list-table .sarticles-th-meta {
+  width: 8.5rem;
+}
+
+.sarticles-admin .sarticles-list-table .sarticles-th-views,
+.sarticles-admin .sarticles-list-table .sarticles-status-cell {
+  width: 4.6rem;
+  text-align: center;
+}
+
+.sarticles-admin .sarticles-list-table .table .sarticles-th-actions,
+.sarticles-admin .sarticles-list-table .table td:last-child {
+  width: 7.9rem !important;
+  max-width: 7.9rem;
+  padding-right: 0.8rem;
+  padding-left: 0.8rem;
+  text-align: center;
+}
+
+html.sarticles-page .sarticles-admin .sarticles-list-table #action-btns {
+  width: 7.9rem !important;
+}
+
+.sarticles-admin .sarticles-list-table .table tbody td:first-child {
+  text-align: center;
+}
+
+.sarticles-admin .sarticles-list-table .sarticles-cover-cell {
+  width: 4.7rem;
+  padding-right: 0.35rem;
+  text-align: center;
+}
+
+.sarticles-admin .sarticles-list-table .sarticles-cover-cell .post-thumbnail {
+  display: block;
+  width: 3.25rem;
+  height: 2.65rem;
+  margin: 0 auto;
+  object-fit: cover;
+}
+
+.sarticles-admin .sarticles-list-table .sarticles-title-cell {
+  min-width: 14rem;
+  text-align: left;
+}
+
+.sarticles-admin .sarticles-list-table .sarticles-section-cell,
+.sarticles-admin .sarticles-list-table .sarticles-meta-cell {
+  text-align: left;
+}
+
+.sarticles-admin .sarticles-meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.22rem;
+  align-items: center;
+}
+
+.sarticles-admin .sarticles-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 8.8rem;
+  min-height: 1.18rem;
+  padding: 0.08rem 0.36rem;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 18%, var(--sa-border));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-primary) 8%, transparent);
+  color: color-mix(in oklab, var(--color-base-content) 82%, var(--color-primary));
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sarticles-admin .sarticles-meta-empty {
+  color: var(--sa-muted);
+  font-size: 0.76rem;
+}
+
+.sarticles-admin .table tbody tr {
+  background: transparent;
+}
+
+.sarticles-admin .sarticles-list-table .table tbody tr + tr td {
+  border-top: 1px solid var(--sa-border-soft) !important;
+}
+
+.sarticles-admin .table-responsive .table tbody tr + tr td,
+.sarticles-admin .table-responsive .table tbody tr + tr th {
+  border-top: 1px solid var(--sa-border-soft) !important;
+}
+
+.sarticles-admin .table tbody tr:hover {
+  background: var(--sa-hover);
+}
+
+.sarticles-admin .sarticles-editable-row {
+  cursor: pointer;
+}
+
+.sarticles-admin .sarticles-comments-toolbar {
+  margin-top: 0.35rem;
+}
+
+.sarticles-admin .sarticles-comments-table tbody tr,
+.sarticles-admin .sarticles-comments-table tbody tr:nth-child(odd),
+.sarticles-admin .sarticles-comments-table tbody tr:nth-child(even) {
+  background: transparent;
+  color: var(--color-base-content);
+}
+
+.sarticles-admin .sarticles-comments-table tbody tr:hover,
+.sarticles-admin .sarticles-comments-table.table-hover tbody tr:hover,
+.sarticles-admin .sarticles-comments-table .table-hover tbody tr:hover {
+  background: color-mix(in oklab, var(--color-primary) 10%, var(--sa-surface)) !important;
+  color: var(--color-base-content) !important;
+}
+
+.sarticles-admin .sarticles-comments-table tbody tr:hover td,
+.sarticles-admin .sarticles-comments-table tbody tr:hover a,
+.sarticles-admin .sarticles-comments-table tbody tr:hover span,
+.sarticles-admin .sarticles-comments-table tbody tr:hover b {
+  color: var(--color-base-content) !important;
+}
+
+.sarticles-admin .table .post-thumbnail {
+  width: 4rem;
+  height: 2.65rem;
+  margin-right: 0.5rem;
+  object-fit: cover;
+}
+
+.sarticles-admin .tagsTable {
+  margin-top: 0.35rem;
+}
+
+.sarticles-admin .tagsTable td,
+.sarticles-admin .tagsTable th {
+  vertical-align: middle;
+}
+
+.sarticles-admin .tagsTable .image_for_field[data-image] {
+  width: 5.6rem !important;
+  height: 5.6rem !important;
+  margin: 0 auto;
+  border-radius: 7px;
+}
+
+.sarticles-admin .tagsTable .input-group.mb-3 {
+  margin-bottom: 0.45rem !important;
+}
+
+.sarticles-admin .tagsTable .btn i {
+  font-size: 0.82rem !important;
+}
+
+.sarticles-admin .form-control,
+.sarticles-admin .custom-select,
+.sarticles-admin select,
+.sarticles-admin textarea,
+.sarticles-admin input[type="text"],
+.sarticles-admin input[type="password"],
+.sarticles-admin input[type="number"],
+.sarticles-admin input[type="email"] {
+  min-height: 2.1rem;
+  border: 1px solid var(--sa-border);
+  border-radius: 6px;
+  background-color: var(--sa-surface) !important;
+  color: var(--color-base-content) !important;
+  box-shadow: none;
+}
+
+.sarticles-admin textarea.form-control,
+.sarticles-admin textarea {
+  min-height: 5rem;
+}
+
+.sarticles-admin .form-control:focus,
+.sarticles-admin .custom-select:focus,
+.sarticles-admin select:focus,
+.sarticles-admin textarea:focus,
+.sarticles-admin input:focus {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.12rem color-mix(in oklab, var(--color-primary) 20%, transparent);
+}
+
+.sarticles-admin .sarticles-search input[type="search"]:focus,
+.sarticles-admin .sarticles-filter-menu__search input:focus {
+  border-color: transparent !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.sarticles-admin .input-group,
+.sarticles-admin .input-group-prepend,
+.sarticles-admin .input-group-append {
+  display: flex;
+  align-items: stretch;
+}
+
+.sarticles-admin .input-group .form-control {
+  min-width: 0;
+}
+
+.sarticles-admin .input-group-text {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.1rem;
+  border-color: var(--sa-border);
+  background: var(--sa-surface-muted);
+  color: var(--sa-muted);
+}
+
+.sarticles-admin .form-row .row-col {
+  padding-right: 0.75rem;
+  color: var(--color-base-content);
+}
+
+.sarticles-settings {
+  max-width: 64rem;
+}
+
+.sarticles-settings > h3 {
+  margin: 0.75rem 0 0.5rem;
+  color: var(--sa-muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) {
+  display: block;
+  margin: 0;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) > .row-col {
+  display: block;
+  width: 100%;
+  max-width: 54rem;
+  padding-right: 0;
+  flex: none;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) > .row-col.offset-1 {
+  margin-left: 0;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) > .row-col > .row.form-row {
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) minmax(12rem, 1fr);
+  align-items: center;
+  column-gap: 0.75rem;
+  min-height: 2rem;
+  margin: 0 0 0.45rem;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) > .row-col > .row.form-row > .col-auto,
+.sarticles-settings > .row.form-row:not(.widgets) > .row-col > .row.form-row > [class*="col-title"] {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: auto;
+  min-width: 0;
+  padding: 0;
+  color: var(--sa-muted);
+  text-align: right;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) label,
+.sarticles-settings > .row.form-row:not(.widgets) .warning {
+  margin: 0;
+  line-height: 1.2;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) [data-tooltip].fa-question-circle {
+  flex: 0 0 auto;
+  margin: 0 0 0 0.4rem;
+  color: var(--sa-muted);
+  font-size: 0.82rem;
+  opacity: 0.72;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) > .row-col > .row.form-row > .col,
+.sarticles-settings > .row.form-row:not(.widgets) > .row-col > .row.form-row > .input-group.col {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 32rem;
+  padding: 0;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) .form-control:not(.form-checkbox) {
+  width: 100%;
+  min-height: 1.9rem;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) .input-group {
+  width: auto;
+  max-width: 13rem;
+  flex: 0 0 auto;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) .input-group.col:has(#main_menu_order) {
+  align-items: stretch;
+  width: auto;
+  max-width: 8.2rem;
+  height: 2rem;
+  border: 1px solid var(--sa-border);
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--sa-surface);
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) .input-group.col:has(#main_menu_order) .input-group-prepend {
+  flex: 0 0 auto;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) .input-group.col:has(#main_menu_order) .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  min-width: 2rem;
+  min-height: 0;
+  height: 100%;
+  padding: 0;
+  border: 0 !important;
+  border-right: 1px solid var(--sa-border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--color-base-content) !important;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) .input-group.col:has(#main_menu_order) .btn:hover {
+  background: var(--sa-hover) !important;
+}
+
+.sarticles-settings #main_menu_order {
+  width: 4rem !important;
+  max-width: 4rem;
+  min-height: 0 !important;
+  height: 100%;
+  margin: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  text-align: center;
+  flex: 0 0 4rem;
+  box-shadow: none !important;
+}
+
+.sarticles-settings input[type="checkbox"].form-checkbox,
+.sarticles-admin input[type="checkbox"].form-checkbox.form-control {
+  position: relative;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+  min-width: 1.05rem !important;
+  min-height: 1.05rem !important;
+  margin: 0;
+  padding: 0 !important;
+  border: 1px solid var(--sa-border);
+  border-radius: 4px;
+  background-color: var(--sa-surface) !important;
+  box-shadow: none;
+  accent-color: var(--color-warning);
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.sarticles-settings input[type="checkbox"].form-checkbox:checked,
+.sarticles-admin input[type="checkbox"].form-checkbox.form-control:checked {
+  border-color: transparent;
+  background-color: var(--color-warning) !important;
+}
+
+.sarticles-settings input[type="checkbox"].form-checkbox:checked::after,
+.sarticles-admin input[type="checkbox"].form-checkbox.form-control:checked::after {
+  content: "";
+  position: absolute;
+  left: 0.34rem;
+  top: 0.15rem;
+  width: 0.32rem;
+  height: 0.58rem;
+  border: solid var(--color-warning-content);
+  border-width: 0 0.12rem 0.12rem 0;
+  transform: rotate(45deg);
+}
+
+.sarticles-settings input[type="checkbox"].form-checkbox:focus,
+.sarticles-admin input[type="checkbox"].form-checkbox.form-control:focus {
+  outline: 2px solid color-mix(in oklab, var(--color-warning) 34%, transparent);
+  outline-offset: 2px;
+}
+
+.sarticles-admin label,
+.sarticles-admin .warning {
+  margin-bottom: 0;
+  color: var(--color-base-content) !important;
+  font-weight: 600;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) label,
+.sarticles-settings > .row.form-row:not(.widgets) .warning {
+  color: var(--sa-muted) !important;
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.18;
+}
+
+.sarticles-settings > .row.form-row:not(.widgets) .form-control:not(.form-checkbox),
+.sarticles-settings > .row.form-row:not(.widgets) .input-group-text {
+  font-size: 0.82rem;
+}
+
+.sarticles-admin [data-tooltip].fa-question-circle {
+  color: var(--color-info);
+}
+
+.sarticles-admin .btn,
+html.sarticles-page #actions .btn,
+html.sarticles-page .modal .btn,
+html.sarticles-page .alertify .ajs-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 1.7rem;
+  padding: 0.24rem 0.5rem;
+  border: 1px solid var(--sa-border);
+  border-radius: 6px;
+  background: var(--sa-surface);
+  color: var(--color-base-content);
+  font-size: 0.76rem;
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.sarticles-admin .btn i,
+html.sarticles-page #actions .btn i,
+html.sarticles-page .modal .btn i {
+  margin: 0 !important;
+  font-size: 0.78rem !important;
+}
+
+.sarticles-admin .btn:hover,
+html.sarticles-page #actions .btn:hover,
+html.sarticles-page .modal .btn:hover {
+  border-color: color-mix(in oklab, var(--color-primary) 42%, var(--sa-border));
+  background: var(--sa-hover);
+  color: var(--color-base-content);
+}
+
+.sarticles-admin .btn-primary,
+.sarticles-admin .btn-outline-primary,
+html.sarticles-page #actions .btn-primary {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-content) !important;
+}
+
+.sarticles-admin .btn-secondary,
+.sarticles-admin .btn-outline-secondary,
+html.sarticles-page #actions .btn-secondary {
+  border-color: var(--sa-border);
+  background: var(--sa-surface-muted);
+  color: var(--color-base-content) !important;
+}
+
+.sarticles-admin .btn-success,
+.sarticles-admin .btn-outline-success,
+html.sarticles-page #actions .btn-success {
+  border-color: var(--color-success);
+  background: var(--color-success);
+  color: var(--color-success-content) !important;
+}
+
+html.sarticles-page #actions .btn-success.is-disabled,
+html.sarticles-page #actions .btn-success.disabled,
+html.sarticles-page #actions .btn-success[aria-disabled="true"] {
+  border-color: var(--sa-border);
+  background: color-mix(in oklab, var(--color-base-content) 10%, var(--sa-surface));
+  color: var(--sa-muted) !important;
+  cursor: default;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.sarticles-admin .btn-danger,
+.sarticles-admin .btn-outline-danger,
+html.sarticles-page #actions .btn-danger,
+html.sarticles-page .alertify .ajs-footer .ajs-buttons .ajs-button.ajs-ok {
+  border-color: var(--color-error);
+  background: var(--color-error);
+  color: var(--color-error-content) !important;
+}
+
+.sarticles-admin .btn-light,
+.sarticles-admin .btn-default,
+html.sarticles-page .modal .btn-default {
+  border-color: var(--sa-border);
+  background: var(--sa-surface-muted);
+  color: var(--color-base-content) !important;
+}
+
+.sarticles-admin .btn-group,
+html.sarticles-page #actions .btn-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.sarticles-admin .sarticles-list-table .table td:last-child .btn-group {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 0.16rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  white-space: nowrap;
+}
+
+.sarticles-admin .sarticles-list-table .table td:last-child .btn-group .btn-icon {
+  flex: 0 0 1.9rem;
+  border-radius: 6px !important;
+}
+
+.sarticles-admin .btn-sm,
+html.sarticles-page #actions .btn-sm {
+  min-height: 1.6rem;
+  padding: 0.2rem 0.44rem;
+  font-size: 0.72rem;
+}
+
+.sarticles-admin .btn-icon {
+  width: 1.9rem;
+  min-width: 1.9rem;
+  min-height: 1.8rem;
+  padding: 0.22rem;
+}
+
+.sarticles-admin .btn-icon .sarticles-icon {
+  width: 0.96rem;
+  height: 0.96rem;
+}
+
+.sarticles-admin .js__approve_comment[data-value="0"] {
+  border-color: var(--color-success) !important;
+  background: var(--color-success) !important;
+  color: var(--color-success-content) !important;
+}
+
+.sarticles-admin .js__approve_comment[data-value="1"] {
+  border-color: var(--color-error) !important;
+  background: var(--color-error) !important;
+  color: var(--color-error-content) !important;
+}
+
+.sarticles-admin .js__approve_comment[data-value="0"] .sarticles-icon-hide,
+.sarticles-admin .js__approve_comment[data-value="1"] .sarticles-icon-show,
+.sarticles-admin .js__publish_article[data-value="0"] .sarticles-icon-hide,
+.sarticles-admin .js__publish_article[data-value="1"] .sarticles-icon-show {
+  display: none;
+}
+
+.sarticles-admin .btn-block {
+  width: 100%;
+}
+
+.sarticles-admin .dropdown-menu,
+html.sarticles-page #actions .dropdown-menu {
+  border: 1px solid var(--sa-border);
+  border-radius: 7px;
+  background: var(--sa-surface);
+  box-shadow: none;
+}
+
+.sarticles-admin .badge,
+.sarticles-admin .badge.bg-seigerit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.25rem;
+  padding: 0.14rem 0.42rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.sarticles-admin .badge-dark {
+  background: var(--color-neutral);
+  color: var(--color-neutral-content);
+}
+
+.sarticles-admin .badge-success {
+  background: var(--color-success);
+  color: var(--color-success-content);
+}
+
+.sarticles-admin .badge.bg-seigerit {
+  background: var(--color-primary) !important;
+  color: var(--color-primary-content) !important;
+}
+
+.sarticles-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin: 0 auto;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.sarticles-status-cell {
+  text-align: center;
+}
+
+.sarticles-status-icon .sarticles-icon {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 2.3;
+}
+
+.sarticles-status-icon--published {
+  color: var(--color-success);
+  background: color-mix(in oklab, var(--color-success) 14%, transparent);
+}
+
+.sarticles-status-icon--unpublished {
+  color: var(--color-error);
+  background: color-mix(in oklab, var(--color-error) 14%, transparent);
+}
+
+.sarticles-admin .image_for_field[data-image],
+.sarticles-admin .post-thumbnail {
+  border-color: var(--sa-border);
+  border-radius: 7px;
+  background-color: var(--sa-surface-muted);
+}
+
+.sarticles-admin .select2-container--default .select2-selection--single,
+.sarticles-admin .select2-container--default .select2-selection--multiple {
+  min-height: 2.1rem;
+  border-color: var(--sa-border);
+  border-radius: 6px;
+  background: var(--sa-surface);
+  color: var(--color-base-content);
+}
+
+.sarticles-admin .select2-container--default .select2-selection--multiple .select2-selection__choice {
+  border-color: var(--sa-border);
+  border-radius: 999px;
+  background: var(--sa-surface-muted);
+  color: var(--color-base-content);
+}
+
+.sarticles-admin .select2-dropdown {
+  border-color: var(--sa-border);
+  background: var(--sa-surface);
+  color: var(--color-base-content);
+}
+
+.sarticles-admin .select2-results__option--highlighted[aria-selected] {
+  background: var(--color-primary);
+  color: var(--color-primary-content);
+}
+
+.sarticles-admin .card {
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--sa-border) !important;
+  border-radius: 8px;
+  background: var(--sa-surface) !important;
+  color: var(--color-base-content) !important;
+  box-shadow: none;
+}
+
+.sarticles-admin .card-header {
+  position: relative;
+  min-height: 2.25rem;
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--sa-border) !important;
+  background: var(--sa-surface-muted) !important;
+  color: var(--sa-muted) !important;
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: none !important;
+}
+
+.sarticles-admin .card-body,
+.sarticles-admin .card-block {
+  background: transparent !important;
+  color: var(--color-base-content) !important;
+}
+
+.sarticles-admin .widgets .card-header .fas,
+.sarticles-admin .widgets .card-header .fa {
+  color: var(--sa-muted) !important;
+  opacity: 0.72;
+}
+
+.sarticles-admin .widgets .card-header .close-icon {
+  color: var(--sa-muted) !important;
+  opacity: 0.72;
+}
+
+.sarticles-admin .widgets .card-header .close-icon:hover,
+.sarticles-admin .widgets .card-header .close-icon:hover .fa {
+  color: var(--color-error) !important;
+  opacity: 1;
+}
+
+.sarticles-admin .builder .b-item,
+.sarticles-admin .builder .row-col {
+  border-color: var(--sa-border);
+  border-radius: 6px;
+  background: var(--sa-surface);
+}
+
+.sarticles-admin .builder .b-resize {
+  background-color: var(--color-primary);
+}
+
+.sarticles-admin .builder .row-col-wrap:hover .row-col,
+.sarticles-admin .builder .row-col-wrap:hover .b-resize,
+.sarticles-admin .builder .b-btn-wrap,
+.sarticles-admin .builder .b-settings .col-12:first-child {
+  border-color: color-mix(in oklab, var(--color-primary) 42%, var(--sa-border));
+}
+
+.sarticles-admin .text-primary {
+  color: var(--color-primary) !important;
+}
+
+.sarticles-admin .text-danger {
+  color: var(--color-error) !important;
+}
+
+.sarticles-admin .paginator {
+  display: flex;
+  justify-content: center;
+  margin: 0.75rem 0 2.5rem;
+  padding: 0.2rem 0;
+}
+
+.sarticles-admin .pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sarticles-admin .pagination .page-item {
+  display: inline-flex;
+  margin: 0 !important;
+}
+
+.sarticles-admin .pagination .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.72rem;
+  height: 1.72rem;
+  padding: 0 0.46rem;
+  border: 1px solid var(--sa-border);
+  border-radius: 7px !important;
+  background: color-mix(in oklab, var(--color-base-content) 3%, var(--color-base-100));
+  color: var(--sa-muted) !important;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: none !important;
+}
+
+.sarticles-admin .pagination .page-link:hover,
+.sarticles-admin .pagination .page-link:focus {
+  border-color: var(--color-primary);
+  background: color-mix(in oklab, var(--color-primary) 12%, var(--sa-surface));
+  color: var(--color-primary) !important;
+  outline: 0;
+}
+
+.sarticles-admin .pagination .page-item.active .page-link {
+  border-color: transparent;
+  background: var(--color-primary);
+  color: var(--color-primary-content) !important;
+}
+
+.sarticles-admin .pagination .page-item.disabled .page-link {
+  border-color: transparent;
+  background: transparent;
+  color: var(--sa-muted) !important;
+  opacity: 0.58;
+}
+
+html.sarticles-page #actions {
+  position: fixed !important;
+  top: 0.35rem !important;
+  right: 0.75rem !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 1.85rem;
+  min-width: min(14.6rem, calc(100vw - 1rem));
+  margin: 0;
+  padding: 0.12rem !important;
+  border: 0 !important;
+  border-radius: 6px;
+  background: transparent !important;
+  box-shadow: none !important;
+  white-space: nowrap;
+  contain: layout paint;
+  pointer-events: none;
+}
+
+html.sarticles-page #actions .btn-group {
+  flex-wrap: nowrap;
+  gap: 0.16rem;
+  align-items: center;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html.sarticles-page #actions .btn-group .btn {
+  border-radius: 6px !important;
+}
+
+html.sarticles-page #actions .btn {
+  min-height: 1.58rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.76rem;
+}
+
+html.sarticles-page #actions .dropdown-menu .btn,
+html.sarticles-page #actions .dropdown-item {
+  min-height: 1.7rem;
+  padding: 0.26rem 0.55rem;
+  font-size: 0.76rem;
+}
+
+html.sarticles-page #actions a,
+html.sarticles-page #actions button,
+html.sarticles-page #actions .btn,
+html.sarticles-page #actions .dropdown,
+html.sarticles-page #actions .dropdown-menu {
+  pointer-events: auto;
+}
+
+html.sarticles-page #actions .dropdown:hover .dropdown-menu,
+html.sarticles-page #actions .dropdown.open .dropdown-menu {
+  display: block;
+}
+
+html.sarticles-page .modal-content,
+html.sarticles-page .alertify .ajs-dialog {
+  border: 1px solid var(--sa-border);
+  border-radius: 8px;
+  background: var(--sa-surface);
+  color: var(--color-base-content);
+  box-shadow: none;
+}
+
+html.sarticles-page .alertify .ajs-dialog {
+  overflow: hidden;
+  max-width: min(34rem, calc(100vw - 2rem));
+  padding: 0;
+  border-color: var(--sa-border);
+  background: var(--sa-surface) !important;
+}
+
+html.sarticles-page .alertify .ajs-header {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--sa-border-soft);
+  background: var(--sa-surface-muted) !important;
+  color: var(--color-base-content) !important;
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+html.sarticles-page .alertify .ajs-body {
+  color: var(--color-base-content) !important;
+}
+
+html.sarticles-page .alertify .ajs-content {
+  padding: 1rem;
+  color: var(--color-base-content) !important;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+html.sarticles-page .alertify .ajs-content b {
+  color: var(--color-base-content);
+  font-weight: 700;
+}
+
+html.sarticles-page .alertify .ajs-footer {
+  padding: 0.75rem 1rem 1rem;
+  border: 0;
+  background: var(--sa-surface) !important;
+}
+
+html.sarticles-page .alertify .ajs-footer .ajs-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+html.sarticles-page .alertify .ajs-footer .ajs-buttons .ajs-button {
+  min-width: 5rem;
+  min-height: 2rem;
+  margin: 0;
+  padding: 0.35rem 0.8rem;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+html.sarticles-page .alertify .ajs-footer .ajs-buttons .ajs-button:focus,
+html.sarticles-page .alertify .ajs-footer .ajs-buttons .ajs-button:active {
+  box-shadow: 0 0 0 0.12rem color-mix(in oklab, var(--color-primary) 20%, transparent) !important;
+}
+
+html.sarticles-page .alertify .ajs-footer .ajs-buttons .ajs-button.ajs-cancel {
+  border-color: var(--sa-border);
+  background: var(--sa-surface-muted) !important;
+  color: var(--sa-muted) !important;
+}
+
+html.sarticles-page .alertify .ajs-footer .ajs-buttons .ajs-button.ajs-cancel:hover {
+  color: var(--color-base-content) !important;
+}
+
+html.sarticles-page .alertify .ajs-footer .ajs-buttons .ajs-button.ajs-ok {
+  border-color: var(--color-error) !important;
+  background: var(--color-error) !important;
+  color: var(--color-error-content) !important;
+}
+
+html.sarticles-page .alertify .ajs-commands {
+  top: 0.68rem;
+  right: 0.75rem;
+  margin: 0;
+}
+
+html.sarticles-page .alertify .ajs-commands button,
+html.sarticles-page .alertify .ajs-close {
+  color: var(--sa-muted) !important;
+  opacity: 0.8;
+}
+
+html.sarticles-page .alertify .ajs-commands button:hover,
+html.sarticles-page .alertify .ajs-close:hover {
+  color: var(--color-base-content) !important;
+  opacity: 1;
+}
+
+html.sarticles-page .modal-header,
+html.sarticles-page .modal-footer {
+  border-color: var(--sa-border);
+}
+
+html.sarticles-page .modal-backdrop {
+  background-color: color-mix(in oklab, #000 55%, transparent);
+}
+
+html.sarticles-page #copyright {
+  right: 0.5rem;
+  bottom: 0.5rem;
+  opacity: 0.72;
+}
+
+html.sarticles-page .sarticles-admin .sarticles-filter-menu__toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 !important;
+  border: 1px solid var(--sa-border) !important;
+  border-radius: 7px !important;
+  background: var(--sa-surface) !important;
+  background-color: var(--sa-surface) !important;
+  background-image: none !important;
+  color: var(--color-primary) !important;
+  box-shadow: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__toggle,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu__toggle,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu__toggle {
+  background: color-mix(in oklab, black 10%, var(--sa-surface)) !important;
+  background-color: color-mix(in oklab, black 10%, var(--sa-surface)) !important;
+}
+
+html.sarticles-page .sarticles-admin .sarticles-filter-menu__toggle:hover,
+html.sarticles-page .sarticles-admin .sarticles-filter-menu__toggle:focus,
+html.sarticles-page .sarticles-admin .sarticles-filter-menu__toggle.is-active,
+html.sarticles-page .sarticles-admin .sarticles-filter-menu.is-open .sarticles-filter-menu__toggle {
+  border-color: color-mix(in oklab, var(--color-primary) 42%, var(--sa-border)) !important;
+  background: color-mix(in oklab, var(--color-primary) 14%, var(--sa-surface)) !important;
+  background-color: color-mix(in oklab, var(--color-primary) 14%, var(--sa-surface)) !important;
+}
+
+html.sarticles-page .sarticles-admin .sarticles-filter-menu__action,
+html.sarticles-page .sarticles-admin .sarticles-filter-menu__apply {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 5px !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+html.sarticles-page .sarticles-admin .sarticles-filter-menu__action {
+  border: 1px solid var(--sa-border) !important;
+  background: color-mix(in oklab, var(--color-primary) 7%, var(--sa-surface)) !important;
+  background-color: color-mix(in oklab, var(--color-primary) 7%, var(--sa-surface)) !important;
+  color: var(--color-primary) !important;
+}
+
+html.sarticles-page .sarticles-admin .sarticles-filter-menu__apply {
+  border: 1px solid var(--color-primary) !important;
+  background: var(--color-primary) !important;
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-content) !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__toggle {
+  border-color: color-mix(in oklab, white 15%, transparent) !important;
+  background: var(--sa-dark-control) !important;
+  background-color: var(--sa-dark-control) !important;
+  color: var(--color-primary) !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__toggle:hover,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__toggle:focus,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__toggle.is-active,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu.is-open .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__toggle:hover,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__toggle:focus,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__toggle.is-active,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu.is-open .sarticles-filter-menu__toggle,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__toggle:hover,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__toggle:focus,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__toggle.is-active,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu.is-open .sarticles-filter-menu__toggle,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu__toggle:hover,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu__toggle:focus,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu__toggle.is-active,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu.is-open .sarticles-filter-menu__toggle,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu__toggle:hover,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu__toggle:focus,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu__toggle.is-active,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu.is-open .sarticles-filter-menu__toggle {
+  border-color: color-mix(in oklab, var(--color-primary) 52%, transparent) !important;
+  background: var(--sa-dark-control-active) !important;
+  background-color: var(--sa-dark-control-active) !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-segmented,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-segmented,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-segmented,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-strip,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-strip,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-strip,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-list-table .table td:last-child .btn-group,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-list-table .table td:last-child .btn-group,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-list-table .table td:last-child .btn-group,
+html.sarticles-page[data-theme-mode="dark"] #actions .btn-group,
+html.sarticles-page[data-theme="evodark"] #actions .btn-group,
+html.sarticles-page[data-theme="evodarkness"] #actions .btn-group,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__panel,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__panel,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__panel,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__panel::before,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__panel::before,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__panel::before,
+html.sarticles-page body.dark .sarticles-admin .sarticles-segmented,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-segmented,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu__panel,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu__panel,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu__panel::before,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu__panel::before {
+  border-color: color-mix(in oklab, white 15%, transparent) !important;
+  background: var(--sa-dark-panel) !important;
+  background-color: var(--sa-dark-panel) !important;
+}
+
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__search,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__search,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__search,
+html.sarticles-page[data-theme-mode="dark"] .sarticles-admin .sarticles-filter-menu__action,
+html.sarticles-page[data-theme="evodark"] .sarticles-admin .sarticles-filter-menu__action,
+html.sarticles-page[data-theme="evodarkness"] .sarticles-admin .sarticles-filter-menu__action,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu__search,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu__search,
+html.sarticles-page body.dark .sarticles-admin .sarticles-filter-menu__action,
+html.sarticles-page body.darkness .sarticles-admin .sarticles-filter-menu__action {
+  border-color: color-mix(in oklab, white 14%, transparent) !important;
+  background: var(--sa-dark-field) !important;
+  background-color: var(--sa-dark-field) !important;
+}
+
+@media (max-width: 840px) {
+  .sarticles-admin__title {
+    font-size: 1.15rem;
+  }
+
+  .sarticles-admin .tab-row,
+  .sarticles-admin .tab-row-container {
+    overflow-x: auto;
+  }
+
+  .sarticles-admin .tab-row .tab a {
+    white-space: nowrap;
+  }
+
+  .sarticles-admin .form-row .row-col {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+}
+
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__toggle,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__toggle {
+  border-color: color-mix(in oklab, white 15%, transparent) !important;
+  border-radius: 7px !important;
+  background: var(--sa-dark-control) !important;
+  background-color: var(--sa-dark-control) !important;
+  background-image: none !important;
+  color: var(--color-primary) !important;
+}
+
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__toggle:hover,
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__toggle:focus,
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__toggle.is-active,
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu.is-open .sarticles-filter-menu__toggle,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__toggle:hover,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__toggle:focus,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__toggle.is-active,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu.is-open .sarticles-filter-menu__toggle {
+  border-color: color-mix(in oklab, var(--color-primary) 52%, transparent) !important;
+  background: var(--sa-dark-control-active) !important;
+  background-color: var(--sa-dark-control-active) !important;
+}
+
+body.sarticles-page.dark .sarticles-admin .sarticles-segmented,
+body.sarticles-page.darkness .sarticles-admin .sarticles-segmented,
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-strip,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-strip,
+body.sarticles-page.dark .sarticles-admin .sarticles-list-table .table td:last-child .btn-group,
+body.sarticles-page.darkness .sarticles-admin .sarticles-list-table .table td:last-child .btn-group,
+body.sarticles-page.dark #actions .btn-group,
+body.sarticles-page.darkness #actions .btn-group,
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__panel,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__panel,
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__panel::before,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__panel::before {
+  border-color: color-mix(in oklab, white 15%, transparent) !important;
+  background: var(--sa-dark-panel) !important;
+  background-color: var(--sa-dark-panel) !important;
+}
+
+html.sarticles-page #actions .btn-group,
+html.sarticles-page[data-theme-mode="dark"] #actions .btn-group,
+html.sarticles-page[data-theme="evodark"] #actions .btn-group,
+html.sarticles-page[data-theme="evodarkness"] #actions .btn-group,
+html.sarticles-page body.dark #actions .btn-group,
+html.sarticles-page body.darkness #actions .btn-group,
+body.sarticles-page.dark #actions .btn-group,
+body.sarticles-page.darkness #actions .btn-group {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__search,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__search,
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__action,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__action {
+  border-color: color-mix(in oklab, white 14%, transparent) !important;
+  background: var(--sa-dark-field) !important;
+  background-color: var(--sa-dark-field) !important;
+}
+
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__option input[type="checkbox"],
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__option input[type="checkbox"] {
+  border-color: color-mix(in oklab, white 20%, transparent) !important;
+  background: var(--sa-dark-field) !important;
+  background-color: var(--sa-dark-field) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, black 18%, transparent);
+}
+
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-menu__option input[type="checkbox"]:checked,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-menu__option input[type="checkbox"]:checked {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary) !important;
+  background-color: var(--color-primary) !important;
+  box-shadow: none;
+}
+
+html.sarticles-page .sarticles-admin .sarticles-filter-strip,
+body.sarticles-page.dark .sarticles-admin .sarticles-filter-strip,
+body.sarticles-page.darkness .sarticles-admin .sarticles-filter-strip {
+  border: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}

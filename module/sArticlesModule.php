@@ -71,7 +71,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
-        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (sArticles::config('general.categories_on', 1) == 1) {
@@ -159,7 +159,13 @@ switch ($data['get']) {
         $article = sArticle::where('s_articles.id', $requestId)->firstOrNew();
         $alias = request()->alias;
         if (empty($alias)) {
-            $translate = sArticleTranslate::whereArticle($requestId)->whereIn('lang', ['en', $defaultLng, 'base'])->orderByRaw('FIELD(lang, "en", "'.$defaultLng.'", "base")')->first();
+            $translate = sArticleTranslate::whereArticle($requestId)
+                ->whereIn('lang', ['en', $defaultLng, 'base'])
+                ->orderByRaw(
+                    'CASE WHEN `lang` = ? THEN 0 WHEN `lang` = ? THEN 1 WHEN `lang` = ? THEN 2 ELSE 3 END',
+                    ['en', $defaultLng, 'base']
+                )
+                ->first();
             if ($translate) {
                 $alias = $translate->pagetitle;
             } else {
@@ -398,7 +404,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
-        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (sArticles::config('general.categories_on', 1) == 1) {
@@ -418,7 +424,11 @@ switch ($data['get']) {
         $name = request()->get('name') ?? '';
         $lastname = request()->get('lastname') ?? '';
         $office = request()->get('office') ?? '';
+        if ($lastname === '' && str_contains($name, 'lastname=')) {
+            [$name, $lastname] = explode('lastname=', $name, 2);
+        }
         if (!empty($name) && $name = trim($name)) {
+            $lastname = trim($lastname);
             $author = sArticlesAuthor::where($defaultLng.'_name', $name)->first();
             if (!$author) {
                 $author = new sArticlesAuthor();
@@ -490,21 +500,38 @@ switch ($data['get']) {
         $data['tabs'] = ['poll'];
         $data['poll_url'] = '&i='.request()->i;
         $data['poll'] = $poll = sArticlesPoll::find(request()->i);
+        $data['question'] = [];
+        $data['answers'] = [];
+        $data['votes'] = ['total' => 0];
         if ($poll) {
-            $data['question'] = $poll->question;
-            $data['answers'] = data_is_json($poll->answers ?? '', true);
-            $data['votes'] = data_is_json($poll->votes ?? '', true);
+            $data['question'] = $poll->question ?: [];
+            $data['answers'] = data_is_json($poll->answers ?? '', true) ?: [];
+            $data['votes'] = data_is_json($poll->votes ?? '', true) ?: ['total' => 0];
         }
         break;
     case "pollSave":
         $answers = [];
-        if (is_array(request()->answers)) {
-            $firstArrayKey = array_key_first(request()->answers);
-            if (is_array(request()->answers[$firstArrayKey]) && count(request()->answers[$firstArrayKey])) {
-                foreach (request()->answers[$firstArrayKey] as $key => $answer) {
-                    foreach ($sArticlesController->langList() as $item) {
-                        $answers[$key][$item] = request()->answers[$item][$key];
+        $postedAnswers = request()->input('answers', []);
+        if (is_array($postedAnswers)) {
+            $answerKeys = [];
+            foreach ($sArticlesController->langList() as $lang) {
+                if (isset($postedAnswers[$lang]) && is_array($postedAnswers[$lang])) {
+                    foreach (array_keys($postedAnswers[$lang]) as $key) {
+                        $answerKeys[$key] = $key;
                     }
+                }
+            }
+            ksort($answerKeys, SORT_NUMERIC);
+            foreach ($answerKeys as $key) {
+                $answer = [];
+                $hasText = false;
+                foreach ($sArticlesController->langList() as $lang) {
+                    $value = trim($postedAnswers[$lang][$key] ?? '');
+                    $answer[$lang] = $value;
+                    $hasText = $hasText || $value !== '';
+                }
+                if ($hasText) {
+                    $answers[$key] = $answer;
                 }
             }
         }
@@ -513,20 +540,20 @@ switch ($data['get']) {
             $poll = new sArticlesPoll();
         }
         $poll->question = request()->question;
-        $poll->answers = json_encode($answers);
         $votes = data_is_json($poll->votes ?? '', true);
         if (!$votes) {
             $votes = [];
             $votes['total'] = 0;
         }
-        if (count($answers)) {
-            foreach ($answers as $key => $answer) {
-                if (!isset($votes[$key])) {
-                    $votes[strval($key)] = 0;
-                }
-            }
+        $normalizedAnswers = [];
+        $normalizedVotes = ['total' => (int)($votes['total'] ?? 0)];
+        foreach ($answers as $key => $answer) {
+            $normalizedKey = count($normalizedAnswers);
+            $normalizedAnswers[$normalizedKey] = $answer;
+            $normalizedVotes[(string)$normalizedKey] = (int)($votes[(string)$key] ?? $votes[$key] ?? 0);
         }
-        $poll->votes = json_encode($votes);
+        $poll->answers = json_encode($normalizedAnswers);
+        $poll->votes = json_encode($normalizedVotes);
         $poll->save();
         Cache::forget('sArticles-polls-list');
         $back = str_replace('&i=0', '&i=' . $poll->pollid, (request()->back ?? '&get=polls'));
@@ -602,7 +629,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
-        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (sArticles::config('general.categories_on', 1) == 1) {
@@ -695,7 +722,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
-        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (sArticles::config('general.categories_on', 1) == 1) {
@@ -771,7 +798,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
-        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (sArticles::config('general.categories_on', 1) == 1) {
@@ -887,7 +914,7 @@ switch ($data['get']) {
         if (evo()->getConfig('sart_comments_on', 1) == 1) {
             $data['tabs'][] = 'comments';
         }
-        if (evo()->getConfig('sart_polls_on', 0) == 1) {
+        if (evo()->getConfig('sart_polls_on', 1) == 1) {
             $data['tabs'][] = 'polls';
         }
         if (sArticles::config('general.categories_on', 1) == 1) {

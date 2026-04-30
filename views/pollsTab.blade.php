@@ -8,20 +8,33 @@
         </tr>
         </thead>
         <tbody>
-        @php($polls = \Seiger\sArticles\Models\sArticlesPoll::all())
+        @php $polls = \Seiger\sArticles\Models\sArticlesPoll::all(); @endphp
         @foreach($polls as $poll)
+            @php
+                $votes = data_is_json($poll->votes ?? '', true) ?: [];
+                $totalVotes = (int)($votes['total'] ?? 0);
+            @endphp
             <tr>
                 <td>
                     <b>{{trim($poll->question[$sArticlesController->langDefault()] ?? '') ?: __('sArticles::global.no_text')}}</b>
                 </td>
-                <td>@php($votes = data_is_json($poll->votes ?? '', true)){{$votes['total'] ?? 0}}</td>
+                <td style="text-align:center;">{{$totalVotes}}</td>
                 <td style="text-align:center;">
                     <div class="btn-group">
-                        <a href="{{$url}}&get=poll&i={{$poll->pollid}}" class="btn btn-outline-success">
-                            <i class="fa fa-pencil"></i> <span>@lang('global.edit')</span>
+                        <a href="{{$url}}&get=poll&i={{$poll->pollid}}"
+                           class="btn btn-primary btn-icon"
+                           title="@lang('global.edit')"
+                           aria-label="@lang('global.edit')">
+                            {!! svg('tabler-edit', 'sarticles-icon')->toHtml() !!}
                         </a>
-                        <a href="#" data-href="{{$url}}&get=pollDelete&i={{$poll->pollid}}" data-delete="{{$poll->pollid}}" data-name="{{$poll->question[$sArticlesController->langDefault()] ?? ''}}" class="btn btn-outline-danger">
-                            <i class="fa fa-trash"></i> <span>@lang('global.remove')</span>
+                        <a href="#"
+                           data-href="{{$url}}&get=pollDelete&i={{$poll->pollid}}"
+                           data-delete="{{$poll->pollid}}"
+                           data-name="{{$poll->question[$sArticlesController->langDefault()] ?? ''}}"
+                           class="btn btn-outline-danger btn-icon"
+                           title="@lang('global.remove')"
+                           aria-label="@lang('global.remove')">
+                            {!! svg('tabler-trash', 'sarticles-icon')->toHtml() !!}
                         </a>
                     </div>
                 </td>

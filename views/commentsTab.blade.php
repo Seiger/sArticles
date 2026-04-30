@@ -1,5 +1,11 @@
+<div class="sarticles-listbar sarticles-comments-toolbar">
+    <label class="sarticles-search" title="@lang('global.search')">
+        {!! svg('tabler-search', 'sarticles-icon sarticles-search__icon')->toHtml() !!}
+        <input type="search" name="search" value="{{request()->search ?? ''}}" autocomplete="off" />
+    </label>
+</div>
 <div class="split my-1"></div>
-<div class="table-responsive">
+<div class="table-responsive sarticles-comments-table">
     <table class="table table-condensed table-hover sectionTrans">
         <thead>
         <tr>
@@ -28,23 +34,27 @@
                 <td style="text-align:center;">
                     <div class="btn-group">
                         @if($comment->approved)
-                            <button  class="btn btn-info js__approve_comment" data-value="0">
-                                <i class="fa fa-plus"></i> <span>@lang('sArticles::global.comment_hidden')</span>
+                            <button type="button" class="btn btn-outline-success btn-icon js__approve_comment" data-value="0" title="@lang('sArticles::global.comment_hidden')" aria-label="@lang('sArticles::global.comment_hidden')">
+                                {!! svg('tabler-eye-off', 'sarticles-icon sarticles-icon-hide')->toHtml() !!}
+                                {!! svg('tabler-eye', 'sarticles-icon sarticles-icon-show')->toHtml() !!}
                             </button>
                         @else
-                            <button  class="btn btn-primary js__approve_comment" data-value="1">
-                                <i class="fa fa-plus"></i> <span>@lang('sArticles::global.approved')</span>
+                            <button type="button" class="btn btn-outline-danger btn-icon js__approve_comment" data-value="1" title="@lang('sArticles::global.approved')" aria-label="@lang('sArticles::global.approved')">
+                                {!! svg('tabler-eye-off', 'sarticles-icon sarticles-icon-hide')->toHtml() !!}
+                                {!! svg('tabler-eye', 'sarticles-icon sarticles-icon-show')->toHtml() !!}
                             </button>
                         @endif
-                        <button  class="btn btn-outline-success js__comment_edit" data-toggle="modal" data-target="#editComment" data-item="{{ $comment->toJson() }}">
-                            <i class="fa fa-pencil"></i> <span>@lang('global.edit')</span>
+                        <button class="btn btn-primary btn-icon js__comment_edit" data-toggle="modal" data-target="#editComment" data-item="{{ $comment->toJson() }}" title="@lang('global.edit')" aria-label="@lang('global.edit')">
+                            {!! svg('tabler-edit', 'sarticles-icon')->toHtml() !!}
                         </button>
                         <a href="#"
-                           class="btn btn-outline-danger"
+                           class="btn btn-outline-danger btn-icon"
                            data-href="{{$url}}&get=commentDelete&i={{ $comment->comid }}{{ (request()->get('page')) ? '&page='.request()->get('page') : '' }}"
                            data-delete="{{$comment->comid}}"
-                           data-name="{!! Str::limit($comment->comment, 50, "...") !!}">
-                            <i class="fa fa-trash"></i> <span>@lang('global.remove')</span>
+                           data-name="{!! Str::limit($comment->comment, 50, "...") !!}"
+                           title="@lang('global.remove')"
+                           aria-label="@lang('global.remove')">
+                            {!! svg('tabler-trash', 'sarticles-icon')->toHtml() !!}
                         </a>
                     </div>
                 </td>
@@ -72,5 +82,33 @@
     </div>
 </div>
 @push('scripts.bot')
+    <script>
+        function sArticlesApplySearch() {
+            var input = jQuery(document).find("[name=\"search\"]");
+            var target = new URL(window.location.href);
+            var value = input.val();
+
+            if (value) {
+                target.searchParams.set('search', value);
+            } else {
+                target.searchParams.delete('search');
+            }
+            target.searchParams.delete('page');
+
+            if (window.sArticlesLoadModuleView) {
+                sArticlesLoadModuleView(target.toString());
+            } else {
+                window.location.href = target.toString();
+            }
+        }
+
+        jQuery(document).on("click", ".sarticles-search__icon", sArticlesApplySearch);
+        jQuery(document).on('keydown', "[name=\"search\"]", function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sArticlesApplySearch();
+            }
+        });
+    </script>
     @include('sArticles::partials.commentsjs')
 @endpush
