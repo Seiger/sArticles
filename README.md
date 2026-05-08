@@ -9,12 +9,22 @@
 
 **sArticles** Blog News and Articles Management Module for Evolution CMS admin panel.
 
+> sArticles 1.x is the stable maintenance line for the current Evolution CMS manager UI.
+> The upcoming 2.x line will include the new evo-ui based design.
+
+## Versions
+
+| Version | Branch | Status | Notes |
+| --- | --- | --- | --- |
+| 1.x | `1.x` | Stable / maintenance | Current manager UI, bug fixes only |
+| 2.x | `2.x` | In development | New evo-ui based interface |
+
 ## Install by artisan package installer
 
 Run in you /core/ folder:
 
 ```console
-php artisan package:installrequire seiger/sarticles "*"
+php artisan package:installrequire seiger/sarticles "^1.0"
 ```
 
 Generate the config file in **core/custom/config/cms/settings** with
