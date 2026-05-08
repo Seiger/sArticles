@@ -28,10 +28,5 @@
                 "sArticles": "Seiger\\sArticles\\Facades\\sArticles"
             }
         }
-    },
-    "scripts": {
-        "post-autoload-dump": [
-            "php artisan migrate"
-        ]
     }
 }
