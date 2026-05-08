@@ -1,7 +1,7 @@
 <small>Файл</small>
 <div class="row form-row">
     <div class="col-auto col-title-7">
-        <div id="image_for_{{$id ?? ''}}" class="image_for_field icon" data-image="{{$value['icon'] ?? 'singlefile'}}" onclick="BrowseServer('{{$id ?? ''}}')" style="background-image: url('{{MODX_SITE_URL.($value['icon'] ?? '')}}')"></div>
+        <div id="image_for_{{$id ?? ''}}" class="image_for_field icon" data-image="{{$value['icon'] ?? 'singlefile'}}" onclick="BrowseServer('{{$id ?? ''}}')" style="background-image: url('{{EVO_SITE_URL.($value['icon'] ?? '')}}')"></div>
     </div>
     <div class="col">
         <div class="input-group mb-3">

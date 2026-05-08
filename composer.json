@@ -1,7 +1,7 @@
 {
     "name": "seiger/sarticles",
-    "license": "GPL-3.0",
-    "type": "EvolutionCMS-Module",
+    "license": "GPL-3.0-or-later",
+    "type": "evolution-cms-module",
     "description": "Blog News and Articles Management Module for Evolution CMS admin panel.",
     "keywords": ["evocms", "evolution-cms"],
     "authors": [
@@ -11,8 +11,9 @@
         }
     ],
     "require": {
-      "php": "^8.3",
-        "evolution-cms/evolution": "^3.3"
+        "php": "^8.3",
+        "evolution-cms/evolution": "^3.5.7",
+        "evolution-cms/evo-ui": "*"
     },
     "autoload": {
         "psr-4": {

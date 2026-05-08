@@ -7,7 +7,7 @@
                 <button class="btn btn-outline-secondary" type="button" onclick="BrowseServer('{{$id ?? ''}}')"><i class="fas fa-image"></i></button>
             </div>
         </div>
-        <div id="image_for_{{$id ?? ''}}" class="image_for_field" data-image="{{$value['src'] ?? 'quote'}}" onclick="BrowseServer('{{$id ?? ''}}')" style="background-image: url('{{MODX_SITE_URL.($value['src'] ?? 'quote')}}');"></div>
+        <div id="image_for_{{$id ?? ''}}" class="image_for_field" data-image="{{$value['src'] ?? 'quote'}}" onclick="BrowseServer('{{$id ?? ''}}')" style="background-image: url('{{EVO_SITE_URL.($value['src'] ?? 'quote')}}');"></div>
     </div>
     <div class="col">
         <div class="input-group mb-3">

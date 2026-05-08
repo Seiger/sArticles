@@ -1,9 +1,18 @@
 <?php return [
     "general" => [
         "authors_on" => 1,
+        "categories_on" => 1,
+        "comments_on" => 1,
         "features_on" => 1,
         "filter_types_on" => 1,
+        "in_main_menu" => 0,
+        "main_menu_order" => 11,
+        "editor" => "system",
+        "polls_on" => 1,
+        "rating_on" => 1,
+        "tag_texts_on" => 1,
         "tags_on" => 1,
+        "tinymce5_theme" => "custom",
     ],
     "types" => [
         "article" => [

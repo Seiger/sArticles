@@ -1,1 +1,0 @@
-<button data-element="{{$id}}" data-type="{{$field['type']}}" type="button" class="btn btn-primary btn-sm btn-block">{{$field['title']}}</button>{!!$field['script'] ?? ''!!}

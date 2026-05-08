@@ -178,10 +178,10 @@ class sArticle extends Model
      */
     public function getCoverSrcAttribute()
     {
-        if (!empty($this->cover) && is_file(MODX_BASE_PATH . $this->cover)) {
-            $coverSrc = MODX_SITE_URL . $this->cover;
+        if (!empty($this->cover) && is_file(EVO_BASE_PATH . $this->cover)) {
+            $coverSrc = EVO_SITE_URL . $this->cover;
         } else {
-            $coverSrc = MODX_SITE_URL . 'assets/images/noimage.png';
+            $coverSrc = EVO_SITE_URL . 'assets/images/noimage.png';
         }
 
         return $coverSrc;
@@ -199,7 +199,7 @@ class sArticle extends Model
         }
         $base_url = UrlProcessor::makeUrl($this->parent);
         if (str_starts_with($base_url, '/')) {
-            $base_url = MODX_SITE_URL . trim($base_url, '/');
+            $base_url = EVO_SITE_URL . trim($base_url, '/');
         }
         if (!str_ends_with($base_url, '/')) {
             $base_url = rtrim($base_url, evo()->getConfig('friendly_url_suffix', '')) . '/';

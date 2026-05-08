@@ -2,6 +2,7 @@
 
 use EvolutionCMS\ServiceProvider;
 use Event;
+use Livewire\Livewire;
 
 class sArticlesServiceProvider extends ServiceProvider
 {
@@ -14,6 +15,8 @@ class sArticlesServiceProvider extends ServiceProvider
     {
         // Add custom routes for package
         include(__DIR__ . '/Http/routes.php');
+
+        $this->mergeConfigFrom(dirname(__DIR__) . '/config/sArticlesSettings.php', 'seiger.settings.sArticles');
 
         // Only Manager
         if (IN_MANAGER_MODE) {
@@ -28,6 +31,16 @@ class sArticlesServiceProvider extends ServiceProvider
 
             // Check sArticles configuration
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/sArticlesCheck.php', 'cms.settings');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/articles/table.php', 'sarticles.articles.table');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/authors/table.php', 'sarticles.authors.table');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/tags/table.php', 'sarticles.tags.table');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/categories/table.php', 'sarticles.categories.table');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/features/table.php', 'sarticles.features.table');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/comments/table.php', 'sarticles.comments.table');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/polls/table.php', 'sarticles.polls.table');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/tvparams/table.php', 'sarticles.tvparams.table');
+            $this->mergeConfigFrom(dirname(__DIR__) . '/config/settings/form.php', 'evo-ui.forms.sarticles.settings');
+            Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
 
             // For use config
             $this->publishes([
@@ -35,9 +48,6 @@ class sArticlesServiceProvider extends ServiceProvider
                 dirname(__DIR__) . '/config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php', true),
                 dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png'),
                 dirname(__DIR__) . '/images/seigerit-blue.svg' => public_path('assets/site/seigerit-blue.svg'),
-                dirname(__DIR__) . '/assets/css/themes.css' => public_path('assets/modules/sarticles/css/themes.css'),
-                dirname(__DIR__) . '/assets/css/admin.css' => public_path('assets/modules/sarticles/css/admin.css'),
-                dirname(__DIR__) . '/assets/js/admin.js' => public_path('assets/modules/sarticles/js/admin.js'),
                 dirname(__DIR__) . '/views/s_articles_article.blade.php' => public_path('views/s_articles_article.blade.php'),
                 dirname(__DIR__) . '/builder/accordion/config.php' => public_path('assets/modules/sarticles/builder/accordion/config.php'),
                 dirname(__DIR__) . '/builder/accordion/render.blade.php' => public_path('assets/modules/sarticles/builder/accordion/render.blade.php'),

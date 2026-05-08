@@ -1,0 +1,38 @@
+<?php
+
+return [
+    'enabled' => true,
+    'icon' => 'article',
+    'size' => 'content',
+    'layout' => 'split',
+    'title_create' => 'sArticles::global.add_article',
+    'title_edit' => 'sArticles::global.edit_article',
+    'submit_label' => 'evo::global.action_save',
+    'cancel_label' => 'evo::global.action_cancel',
+    'tabs' => [
+        ['name' => 'main', 'label' => 'sArticles::global.article_tab_main', 'icon' => 'settings'],
+        ['name' => 'content', 'label' => 'sArticles::global.content', 'icon' => 'file-text'],
+    ],
+    'fields' => [
+        ['name' => 'pagetitle', 'type' => 'text', 'label' => 'global.resource_title', 'help' => 'global.resource_title_help', 'tab' => 'main', 'section' => 'main', 'live' => true, 'rules' => ['required', 'string', 'max:100']],
+        ['name' => 'longtitle', 'type' => 'text', 'label' => 'global.long_title', 'help' => 'global.resource_long_title_help', 'tab' => 'main', 'section' => 'main', 'rules' => ['nullable', 'string', 'max:255']],
+        ['name' => 'introtext', 'type' => 'textarea', 'label' => 'global.resource_summary', 'help' => 'global.resource_summary_help', 'tab' => 'main', 'section' => 'main', 'rows' => 4, 'rules' => ['nullable', 'string']],
+        ['name' => 'alias', 'type' => 'alias', 'label' => 'sArticles::global.alias', 'help' => 'global.resource_alias_help', 'tab' => 'main', 'source' => ['pagetitle'], 'rules' => ['nullable', 'string', 'max:255']],
+        ['name' => 'description', 'type' => 'textarea', 'label' => 'global.description', 'help' => 'global.resource_description_help', 'tab' => 'main', 'section' => 'main', 'rows' => 5, 'rules' => ['nullable', 'string']],
+        ['name' => 'cover', 'type' => 'image', 'label' => 'sArticles::global.image', 'help' => 'sArticles::global.image_help', 'tab' => 'main', 'span' => 'full', 'rules' => ['nullable', 'string', 'max:255']],
+        ['name' => 'cover_title', 'type' => 'text', 'label' => 'sArticles::global.cover_title', 'help' => 'sArticles::global.cover_title_help', 'tab' => 'main', 'section' => 'main', 'rules' => ['nullable', 'string', 'max:255']],
+
+        ['name' => 'published', 'type' => 'checkbox', 'label' => 'global.resource_opt_published', 'help' => 'global.resource_opt_published_help', 'tab' => 'main', 'section' => 'relations', 'rules' => ['boolean']],
+        ['name' => 'published_at', 'type' => 'datetime-local', 'label' => 'sArticles::global.published_at', 'help' => 'sArticles::global.published_at_help', 'tab' => 'main', 'section' => 'relations', 'rules' => ['nullable', 'string']],
+        ['name' => 'parent', 'type' => 'select', 'label' => 'sArticles::global.section', 'help' => 'global.resource_parent_help', 'tab' => 'main', 'section' => 'relations', 'options_provider' => 'articleModalOptions', 'rules' => ['nullable', 'integer']],
+        ['name' => 'author_id', 'type' => 'select', 'label' => 'sArticles::global.author', 'help' => 'sArticles::global.author_help', 'tab' => 'main', 'section' => 'relations', 'options_provider' => 'articleModalOptions', 'rules' => ['nullable', 'integer']],
+        ['name' => 'position', 'type' => 'number', 'label' => 'sArticles::global.position', 'help' => 'sArticles::global.position_help', 'tab' => 'main', 'section' => 'relations', 'min' => 0, 'rules' => ['nullable', 'integer', 'min:0']],
+        ['name' => 'categories', 'type' => 'choices', 'label' => 'sArticles::global.categories', 'help' => 'sArticles::global.categories_article_help', 'tab' => 'main', 'section' => 'relations', 'options_provider' => 'articleModalOptions', 'rules' => ['array']],
+        ['name' => 'main_tag', 'type' => 'choices', 'label' => 'sArticles::global.main_tag_article', 'help' => 'sArticles::global.main_tag_article_help', 'tab' => 'main', 'section' => 'relations', 'multiple' => false, 'clearable' => true, 'options_provider' => 'articleModalOptions', 'rules' => ['nullable', 'integer']],
+        ['name' => 'tags', 'type' => 'choices', 'label' => 'sArticles::global.tags_article', 'help' => 'sArticles::global.tags_article_help', 'tab' => 'main', 'section' => 'relations', 'options_provider' => 'articleModalOptions', 'rules' => ['array']],
+        ['name' => 'features', 'type' => 'choices', 'label' => 'sArticles::global.features', 'help' => 'sArticles::global.features_article_help', 'tab' => 'main', 'section' => 'relations', 'options_provider' => 'articleModalOptions', 'rules' => ['array']],
+        ['name' => 'relevants', 'type' => 'choices', 'label' => 'sArticles::global.relevant_articles', 'help' => 'sArticles::global.relevant_articles_help', 'tab' => 'main', 'section' => 'relations', 'options_provider' => 'articleModalOptions', 'rules' => ['array']],
+
+        ['name' => 'content_builder', 'type' => 'builder', 'label' => 'sArticles::global.content', 'tab' => 'content', 'section' => 'content', 'show_label' => false, 'span' => 'full', 'blocks_provider' => 'articleBuilderBlocks', 'rules' => ['array']],
+    ],
+];

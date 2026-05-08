@@ -2,8 +2,10 @@
 
 use EvolutionCMS\Facades\UrlProcessor;
 use EvolutionCMS\Models\SiteContent;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -33,7 +35,14 @@ class sArticlesController
      */
     public function index(): View
     {
-        return $this->view('index');
+        return $this->view('articles.shell', [
+            'tabs' => ['articles'],
+            'get' => 'articles',
+            'sArticlesController' => $this,
+            'url' => $this->url,
+            'linkType' => '',
+            'checkType' => request()->type ?? 'article',
+        ]);
     }
 
     /**
@@ -64,7 +73,9 @@ class sArticlesController
      */
     public function langDefault(): string
     {
-        return evo()->getConfig('s_lang_default', 'base');
+        $language = trim((string) evo()->getConfig('s_lang_default', 'base'));
+
+        return preg_match('/^[A-Za-z0-9_]+$/', $language) === 1 ? $language : 'base';
     }
 
     /**
@@ -76,11 +87,17 @@ class sArticlesController
     {
         $lang = evo()->getConfig('s_lang_config', '');
         if (trim($lang)) {
-            $lang = explode(',', $lang);
+            $lang = collect(explode(',', $lang))
+                ->map(fn ($language) => trim((string) $language))
+                ->filter(fn ($language) => $language !== '' && preg_match('/^[A-Za-z0-9_]+$/', $language) === 1)
+                ->unique()
+                ->values()
+                ->all();
         } else {
             $lang = ['base'];
         }
-        return $lang;
+
+        return $lang !== [] ? $lang : ['base'];
     }
 
     /**
@@ -90,92 +107,74 @@ class sArticlesController
      */
     public function setModifyTables($table = ''): void
     {
-        $needs = [];
+        $languages = collect($this->langList())
+            ->map(fn ($language) => trim((string) $language))
+            ->filter(fn ($language) => $language !== '' && $language !== 'base')
+            ->filter(fn ($language) => preg_match('/^[A-Za-z0-9_]+$/', $language) === 1)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($languages === []) {
+            return;
+        }
+
+        match ($table) {
+            'features' => $this->ensureLanguageColumns('s_articles_features', $languages, fn (string $language) => [
+                $language => 'string',
+            ]),
+            'tags' => $this->ensureLanguageColumns('s_articles_tags', $languages, fn (string $language) => [
+                $language => 'string',
+                $language . '_content' => 'mediumText',
+            ]),
+            'authors' => $this->ensureLanguageColumns('s_articles_authors', $languages, fn (string $language) => [
+                $language . '_name' => 'string',
+                $language . '_lastname' => 'string',
+                $language . '_office' => 'string',
+            ]),
+            'categories' => $this->ensureLanguageColumns('s_articles_categories', $languages, fn (string $language) => [
+                $language => 'string',
+            ]),
+            default => null,
+        };
+    }
+
+    /**
+     * Ensure multilingual columns for legacy taxonomy tables using Laravel schema APIs.
+     *
+     * The old manager flow used raw MySQL schema SQL. The Livewire demo can run on
+     * SQLite too, so these updates go through the framework abstraction.
+     */
+    protected function ensureLanguageColumns(string $tableName, array $languages, callable $columnsForLanguage): void
+    {
+        if (!Schema::hasTable($tableName)) {
+            return;
+        }
+
         $columns = [];
-        $lang = $this->langList();
-        if ($lang != ['base']) {
-            switch ($table) {
-                case 'features': // Features table
-                    $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_articles_features'));
-                    if ($query) {
-                        $fields = evo()->getDatabase()->makeArray($query);
-                        foreach ($fields as $field) {
-                            $columns[$field['Field']] = $field;
-                        }
-                        foreach ($lang as $item) {
-                            if (!isset($columns[$item])) {
-                                $needs[] = "ADD `{$item}` varchar(255) COMMENT '" . strtoupper($item) . " Value version'";
-                            }
-                        }
-                    }
-                    if (count($needs)) {
-                        $need = implode(', ', $needs);
-                        $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_features')."` {$need}";
-                        evo()->getDatabase()->query($query);
-                    }
-                    break;
-                case 'tags': // Tags table
-                    $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_articles_tags'));
-                    if ($query) {
-                        $fields = evo()->getDatabase()->makeArray($query);
-                        foreach ($fields as $field) {
-                            $columns[$field['Field']] = $field;
-                        }
-                        foreach ($lang as $item) {
-                            if (!isset($columns[$item])) {
-                                $needs[] = "ADD `{$item}` varchar(255) COMMENT '" . strtoupper($item) . " Value version'";
-                                $needs[] = "ADD `{$item}_content` mediumtext COMMENT '" . strtoupper($item) . " Text version'";
-                            }
-                        }
-                    }
-                    if (count($needs)) {
-                        $need = implode(', ', $needs);
-                        $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_tags')."` {$need}";
-                        evo()->getDatabase()->query($query);
-                    }
-                    break;
-                case 'authors': // Authors table
-                    $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_articles_authors'));
-                    if ($query) {
-                        $fields = evo()->getDatabase()->makeArray($query);
-                        foreach ($fields as $field) {
-                            $columns[$field['Field']] = $field;
-                        }
-                        foreach ($lang as $item) {
-                            if (!isset($columns[$item.'_name'])) {
-                                $needs[] = "ADD `{$item}_name` varchar(255) COMMENT '" . strtoupper($item) . " Name version'";
-                                $needs[] = "ADD `{$item}_lastname` varchar(255) COMMENT '" . strtoupper($item) . " Lastname version'";
-                                $needs[] = "ADD `{$item}_office` varchar(255) COMMENT '" . strtoupper($item) . " Office position version'";
-                            }
-                        }
-                    }
-                    if (count($needs)) {
-                        $need = implode(', ', $needs);
-                        $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_authors')."` {$need}";
-                        evo()->getDatabase()->query($query);
-                    }
-                    break;
-                case 'categories': // Categories table
-                    $query = evo()->getDatabase()->query("DESCRIBE " . evo()->getDatabase()->getFullTableName('s_articles_categories'));
-                    if ($query) {
-                        $fields = evo()->getDatabase()->makeArray($query);
-                        foreach ($fields as $field) {
-                            $columns[$field['Field']] = $field;
-                        }
-                        foreach ($lang as $item) {
-                            if (!isset($columns[$item])) {
-                                $needs[] = "ADD `{$item}` varchar(255) COMMENT '" . strtoupper($item) . " Value version'";
-                            }
-                        }
-                    }
-                    if (count($needs)) {
-                        $need = implode(', ', $needs);
-                        $query = "ALTER TABLE `".evo()->getDatabase()->getFullTableName('s_articles_categories')."` {$need}";
-                        evo()->getDatabase()->query($query);
-                    }
-                    break;
+
+        foreach ($languages as $language) {
+            foreach ((array) $columnsForLanguage($language) as $column => $type) {
+                if (!Schema::hasColumn($tableName, $column)) {
+                    $columns[$column] = $type;
+                }
             }
         }
+
+        if ($columns === []) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($columns) {
+            foreach ($columns as $column => $type) {
+                if ($type === 'mediumText') {
+                    $table->mediumText($column)->nullable();
+                    continue;
+                }
+
+                $table->string($column, 255)->nullable();
+            }
+        });
     }
 
     /**
@@ -304,7 +303,7 @@ class sArticlesController
             $editor = evo()->getConfig('which_editor', 'TinyMCE5');
         }
         if ($editor == 'TinyMCE5') {
-            $theme = evo()->getConfig('sart_tinymce5_theme', 'custom');
+            $theme = \sArticles::config('general.tinymce5_theme', evo()->getConfig('sart_tinymce5_theme', 'custom'));
         }
 
         foreach ($ids as $id) {
@@ -438,27 +437,6 @@ class sArticlesController
      */
     protected function dataToString(mixed $data): string
     {
-        ob_start();
-        var_dump($data);
-        $data = ob_get_contents();
-        ob_end_clean();
-
-        $data = Str::of($data)->replaceMatches('/string\(\d+\) .*/', function ($match) {
-            return substr($match[0], (strpos($match[0], ') ') + 2)) . ',';
-        })->replaceMatches('/bool\(\w+\)/', function ($match) {
-            return str_replace(['bool(', ')'], ['', ','], $match[0]);
-        })->replaceMatches('/int\(\d+\)/', function ($match) {
-            return str_replace(['int(', ')'], ['', ','], $match[0]);
-        })->replaceMatches('/float\(\d+\)/', function ($match) {
-            return str_replace(['float(', ')'], ['', ','], $match[0]);
-        })->replaceMatches('/array\(\d+\) /', function ($match) {
-            return str_replace($match[0], '', $match[0]);
-        })->replaceMatches('/=>\n[ \t]{1,}/', function () {
-            return ' => ';
-        })->replaceMatches('/  /', function () {
-            return '    ';
-        })->remove('[')->remove(']')->replace('{', '[')->replace('}', '],')->rtrim(",\n");
-
-        return $data;
+        return var_export($data, true);
     }
 }

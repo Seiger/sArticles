@@ -1,7 +1,7 @@
 <small>Зображення та текст</small>
 <div class="row form-row">
     <div class="col-auto col-title-7">
-        <div id="image_for_img-{{$id ?? ''}}" class="image_for_field" data-image="{{$value['src'] ?? 'imgandtext'}}" onclick="BrowseServer('img-{{$id ?? ''}}')" style="background-image: url('{{MODX_SITE_URL.($value['src'] ?? '')}}')"></div>
+        <div id="image_for_img-{{$id ?? ''}}" class="image_for_field" data-image="{{$value['src'] ?? 'imgandtext'}}" onclick="BrowseServer('img-{{$id ?? ''}}')" style="background-image: url('{{EVO_SITE_URL.($value['src'] ?? '')}}')"></div>
     </div>
     <div class="col">
         <div class="input-group mb-3">

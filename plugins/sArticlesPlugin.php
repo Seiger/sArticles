@@ -27,16 +27,16 @@ Event::listen('evolution.OnPageNotFound', function($params) {
     $aliasArr = request()->segments();
     $find = Arr::last($aliasArr);
     $check = implode('/', $aliasArr);
-    if ($check == 'sarticles/rating/'.$find && evo()->getConfig('sart_rating_on', 1) == 1) {
+    if ($check == 'sarticles/rating/'.$find && sArticles::config('general.rating_on', evo()->getConfig('sart_rating_on', 1)) == 1) {
         die(sArticles::ratingVotes((int)$find));
     }
-    if ($check == 'sarticles/poll/'.$find && evo()->getConfig('sart_polls_on', 1) == 1) {
+    if ($check == 'sarticles/poll/'.$find && sArticles::config('general.polls_on', evo()->getConfig('sart_polls_on', 1)) == 1) {
         die(sArticles::showPoll((int)$find));
     }
-    if ($check == 'sarticles/comment/'.$find && evo()->getConfig('sart_comments_on', 1) == 1) {
+    if ($check == 'sarticles/comment/'.$find && sArticles::config('general.comments_on', evo()->getConfig('sart_comments_on', 1)) == 1) {
         die(sArticles::setComment((int)$find));
     }
-    if ($check == 'sarticles/comment-approve' && evo()->getConfig('sart_comments_on', 1) == 1) {
+    if ($check == 'sarticles/comment-approve' && sArticles::config('general.comments_on', evo()->getConfig('sart_comments_on', 1)) == 1) {
         die(sArticles::approveComment());
     }
 });
@@ -113,7 +113,7 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
  * Add Menu item
  */
 Event::listen('evolution.OnManagerMenuPrerender', function($params) {
-    if (evo()->getConfig('sart_in_main_menu', 0) == 1) {
+    if (sArticles::config('general.in_main_menu', evo()->getConfig('sart_in_main_menu', 0)) == 1) {
         $menu['sarticles'] = [
             'sarticles',
             'main',
@@ -124,7 +124,7 @@ Event::listen('evolution.OnManagerMenuPrerender', function($params) {
             "",
             "main",
             0,
-            evo()->getConfig('sart_main_menu_order', 11),
+            sArticles::config('general.main_menu_order', evo()->getConfig('sart_main_menu_order', 11)),
             '',
         ];
 

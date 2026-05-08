@@ -1,0 +1,31 @@
+# sArticles Dokumentation
+
+sArticles ist ein Evolution CMS Modul fur Publikationen, News, Blogartikel, Kommentare, Umfragen, Autoren, Tags, Themen, Merkmale und publikationsbezogene TV-Parameter.
+
+Die neue Manager-Oberflache basiert auf **evo-ui** und **Livewire**. Tabs, Filter, Sortierung, Pagination, Tabellen-/Listenansicht, Modale und Editorfelder aktualisieren sich ohne kompletten iframe Reload.
+
+## Leitfaden
+
+- [Benutzerhandbuch](user-guide.md)
+- [Entwicklerhandbuch](developer-guide.md)
+
+## Funktionen
+
+- Publikationen mit konfigurierbaren Typen.
+- Tabellen- und Listenansicht.
+- Suche, Filter, Sortierung, Pagination und Session-State.
+- GroBes Bearbeitungsmodal fur Artikel.
+- Content Builder: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion, File.
+- Verwaltung von Autoren, Tags, Tag-Texten, Themen, Merkmalen, Kommentaren, Umfragen und TV-Parametern.
+- Native Integrationen mit sSeo, sLang, eTinyMCE und dTui.editor.
+
+## Wichtige Dateien
+
+- `config/sArticlesSettings.php`
+- `config/settings/form.php`
+- `config/articles/table.php`
+- `config/articles/modal.php`
+- `src/Tables/ArticlesTableData.php`
+- `src/Support/SeoIntegration.php`
+- `src/Support/LangIntegration.php`
+- `builder/*`

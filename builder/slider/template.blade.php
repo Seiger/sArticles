@@ -7,7 +7,7 @@
             @endif
             <div class="slide row form-row">
                 <div class="col-auto col-title-7">
-                    <div id="image_for_{{$id}}" class="image_for_field" data-image="{{$src}}" onclick="BrowseServer('{{$id}}')" style="background-image: url('{{MODX_SITE_URL . $src}}')"></div>
+                    <div id="image_for_{{$id}}" class="image_for_field" data-image="{{$src}}" onclick="BrowseServer('{{$id}}')" style="background-image: url('{{EVO_SITE_URL . $src}}')"></div>
                 </div>
                 <div class="col">
                     <div class="input-group mb-3">
@@ -35,7 +35,7 @@
 @else
     <div class="slide row form-row">
         <div class="col-auto col-title-7">
-            <div id="image_for_{{$id ?? ''}}" class="image_for_field" data-image="slider" onclick="BrowseServer('{{$id ?? ''}}')" style="background-image: url('{{MODX_SITE_URL}}')"></div>
+            <div id="image_for_{{$id ?? ''}}" class="image_for_field" data-image="slider" onclick="BrowseServer('{{$id ?? ''}}')" style="background-image: url('{{EVO_SITE_URL}}')"></div>
         </div>
         <div class="col">
             <div class="input-group mb-3">

@@ -31,6 +31,19 @@ $data['url'] = $sArticlesController->url;
 $data['linkType'] = $linkType;
 $data['checkType'] = request()->type ?? "article";
 
+$oldViewTabs = ['article', 'content', 'article_comments', 'tvs', 'poll'];
+if (in_array($data['get'], $oldViewTabs, true)) {
+    return header('Location: ' . $sArticlesController->url . '&get=articles' . $linkType);
+}
+
+evo()->setConfig('sart_comments_on', sArticles::config('general.comments_on', evo()->getConfig('sart_comments_on', 1)));
+evo()->setConfig('sart_polls_on', sArticles::config('general.polls_on', evo()->getConfig('sart_polls_on', 1)));
+evo()->setConfig('sart_rating_on', sArticles::config('general.rating_on', evo()->getConfig('sart_rating_on', 1)));
+evo()->setConfig('sart_tag_texts_on', sArticles::config('general.tag_texts_on', evo()->getConfig('sart_tag_texts_on', 1)));
+evo()->setConfig('sart_in_main_menu', sArticles::config('general.in_main_menu', evo()->getConfig('sart_in_main_menu', 0)));
+evo()->setConfig('sart_main_menu_order', sArticles::config('general.main_menu_order', evo()->getConfig('sart_main_menu_order', 11)));
+evo()->setConfig('sart_tinymce5_theme', sArticles::config('general.tinymce5_theme', evo()->getConfig('sart_tinymce5_theme', 'custom')));
+
 switch ($data['get']) {
     default:
         $checkType = request()->type ?? "article";
@@ -54,6 +67,7 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
+            $data['tabs'][] = 'tvparams';
             $data['tabs'][] = 'settings';
         }
         $data['checkType'] = $checkType;
@@ -81,16 +95,11 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
+            $data['tabs'][] = 'tvparams';
             $data['tabs'][] = 'settings';
         }
-        $comments = sArticles::comments(50);
-        $data['comments'] = $comments;
-        $data['articles'] = sArticle::whereIn('id', $comments->pluck('article_id')->toArray())->get()->mapWithKeys(function ($item) {
-            return [$item->id => $item];
-        })->all();
-        $data['usersComments'] = UserAttribute::whereIn('internalKey', $comments->pluck('user_id')->toArray())->get()->mapWithKeys(function ($item) {
-            return [$item->internalKey => $item];
-        })->all();
+        $_SESSION['itemaction'] = 'Viewing a list of comments';
+        $_SESSION['itemname'] = __('sArticles::global.comments');
         break;
     case "article_comments":
         $checkType = request()->type ?? "article";
@@ -241,8 +250,8 @@ switch ($data['get']) {
         $buttons = [];
         $elements = [];
         $templates = [];
-        $fields = glob(MODX_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
-        View::getFinder()->setPaths([MODX_BASE_PATH . 'assets/modules/sarticles/builder']);
+        $fields = glob(EVO_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
+        View::getFinder()->setPaths([EVO_BASE_PATH . 'assets/modules/sarticles/builder']);
 
         if (count($fields)) {
             foreach ($fields as $idx => $field) {
@@ -257,7 +266,7 @@ switch ($data['get']) {
                         while (isset($buttons[$order])) {
                             $order++;
                         }
-                        $buttons[$order] = $sArticlesController->view('partials.addBlockButton', compact(['id', 'field']))->render();
+                        $buttons[$order] = '<button type="button" class="btn btn-secondary add-block" data-id="' . e((string) $id) . '">' . e((string) ($field['title'] ?? $id)) . '</button>';
                         $elements[] = view($template . '.template', compact(['id']))->render();
                         if (strtolower($field['type']) == 'richtext') {
                             $richtexts[$id] = [];
@@ -301,7 +310,7 @@ switch ($data['get']) {
 
         $constructor = data_is_json($content->constructor ?? '', true);
         $data['constructor'] = $constructor;
-        $settings = require MODX_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
+        $settings = require EVO_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
         if (is_array($settings)) {
             foreach ($settings as $key => $setting) {
                 if (!in_array($key, ['general', 'types'])) {
@@ -336,8 +345,8 @@ switch ($data['get']) {
     case "contentSave":
         $contentField = '';
         $renders = [];
-        $fields = glob(MODX_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
-        View::getFinder()->setPaths([MODX_BASE_PATH . 'assets/modules/sarticles/builder']);
+        $fields = glob(EVO_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
+        View::getFinder()->setPaths([EVO_BASE_PATH . 'assets/modules/sarticles/builder']);
 
         if (count($fields)) {
             foreach ($fields as $field) {
@@ -414,6 +423,7 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
+            $data['tabs'][] = 'tvparams';
             $data['tabs'][] = 'settings';
         }
         $data['authors'] = sArticlesAuthor::orderBy('base_name')->get();
@@ -639,6 +649,7 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
+            $data['tabs'][] = 'tvparams';
             $data['tabs'][] = 'settings';
         }
         $data['categories'] = sArticlesCategory::orderBy('position')->get();
@@ -730,6 +741,7 @@ switch ($data['get']) {
         }
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
+            $data['tabs'][] = 'tvparams';
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
@@ -808,6 +820,7 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
+            $data['tabs'][] = 'tvparams';
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
@@ -899,7 +912,6 @@ switch ($data['get']) {
         }
         $sArticlesController->updateFileConfigs($settings);
         evo()->clearCache('full');
-        sleep(5);
         $back = request()->back ?? '&get=settings';
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
     case "tags":
@@ -924,6 +936,7 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
+            $data['tabs'][] = 'tvparams';
             $data['tabs'][] = 'settings';
         }
         $data['tags'] = sArticlesTag::orderBy($defaultLng)->get();
@@ -980,4 +993,4 @@ switch ($data['get']) {
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
 }
 
-echo $sArticlesController->view('index', $data);
+echo $sArticlesController->view('articles.shell', $data);
