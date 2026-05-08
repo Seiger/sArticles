@@ -25,10 +25,10 @@ comma-separated list of templates.
 php artisan vendor:publish --provider="Seiger\sArticles\sArticlesServiceProvider"
 ```
 
-Run make DB structure with command:
+Create only the sArticles database structure with command:
 
 ```console
-php artisan migrate
+php artisan migrate --path=vendor/seiger/sarticles/database/migrations --force
 ```
 
 ## Events
