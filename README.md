@@ -135,4 +135,4 @@ Per-field editor selectors are intentionally hidden in sArticles forms to keep t
 
 ## License
 
-GPL-3.0-or-later. 
+GPL-3.0-or-later.
