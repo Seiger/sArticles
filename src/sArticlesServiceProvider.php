@@ -33,6 +33,9 @@ class sArticlesServiceProvider extends ServiceProvider
 
             // Views
             $this->loadViewsFrom(dirname(__DIR__) . '/views', 'sArticles');
+            $this->app->booted(function () {
+                app('view')->prependNamespace('evo', dirname(__DIR__) . '/views/evo-overrides');
+            });
 
             // MultiLang
             $this->loadTranslationsFrom(dirname(__DIR__) . '/lang', 'sArticles');
