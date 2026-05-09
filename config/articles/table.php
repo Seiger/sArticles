@@ -67,7 +67,6 @@
             'icon' => 'folder',
             'label' => 'sArticles::global.all_sections',
             'search_label' => 'sArticles::global.filter_by_section',
-            'auto_apply' => true,
         ],
         [
             'state' => 'tag',
@@ -75,7 +74,6 @@
             'icon' => 'hash',
             'label' => 'sArticles::global.all_tags',
             'search_label' => 'sArticles::global.filter_by_tag',
-            'auto_apply' => true,
         ],
         [
             'state' => 'category',
@@ -83,7 +81,6 @@
             'icon' => 'category',
             'label' => 'sArticles::global.all_categories',
             'search_label' => 'sArticles::global.filter_by_category',
-            'auto_apply' => true,
         ],
         [
             'state' => 'feature',
@@ -91,7 +88,6 @@
             'icon' => 'highlight',
             'label' => 'sArticles::global.all_features',
             'search_label' => 'sArticles::global.filter_by_feature',
-            'auto_apply' => true,
         ],
         [
             'state' => 'published_at',
