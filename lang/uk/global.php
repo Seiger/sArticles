@@ -39,6 +39,8 @@
     'article' => 'Публікація',
     'articles_help' => 'Список публікацій та їх статус.',
     'articles_icon' => 'tabler-rss',
+    'module_title' => 'Публікації',
+    'module_icon' => 'tabler-rss',
     'articles' => 'Публікації',
     'author_help' => 'Оберіть автора публікації серед зареєстрованих авторів на вкладці «Автори».',
     'author_lastname' => 'Прізвище',

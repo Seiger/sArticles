@@ -39,6 +39,8 @@
     'article' => 'Publication',
     'articles_help' => 'List of publications and their status.',
     'articles_icon' => 'tabler-rss',
+    'module_title' => 'Publications',
+    'module_icon' => 'tabler-rss',
     'articles' => 'Publications',
     'author_help' => 'Select the author of the publication from among the registered authors on the "Authors" tab.',
     'author_lastname' => 'Last name',

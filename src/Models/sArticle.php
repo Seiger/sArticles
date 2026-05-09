@@ -48,10 +48,10 @@ class sArticle extends Model
                     ->where('sat.lang', function ($leftJoin) use ($builder, $locale) {
                         $leftJoin->select('lang')
                             ->from('s_article_translates as t')
-                            ->whereRaw('`' . DB::getTablePrefix() . 't`.`article` = `' . DB::getTablePrefix() . 's_articles`.`id`')
+                            ->whereColumn('t.article', 's_articles.id')
                             ->whereIn('lang', [$locale, 'base'])
                             ->orderByRaw(
-                                'CASE WHEN `lang` = ? THEN 0 WHEN `lang` = ? THEN 1 ELSE 2 END',
+                                'CASE lang WHEN ? THEN 0 WHEN ? THEN 1 ELSE 2 END',
                                 [$locale, 'base']
                             )
                             ->limit(1);

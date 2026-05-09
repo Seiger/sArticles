@@ -2,7 +2,7 @@
 
 ## Architektura
 
-sArticles jest modulem evo-ui + Livewire. `ModulePanel` zarzadza zakladkami, evo-ui renderuje tabele i formularze, a `src/Tables/*TableData.php` dostarcza dane i logike biznesowa.
+sArticles jest modulem EvoUI + Livewire. `ModulePanel` zarzadza zakladkami, EvoUI renderuje tabele i formularze, a `src/Tables/*TableData.php` dostarcza dane i logike biznesowa.
 
 ## Instalacja
 
@@ -60,5 +60,5 @@ Metody: `all`, `comments`, `getArticle`, `getArticleByAlias`, `resolveArticleByU
 
 - Uzywac `EVO_*` dla sciezek Evolution.
 - Logike sArticles trzymac w sArticles.
-- evo-ui zostawic generyczne.
+- EvoUI zostawic generyczne.
 - Po zmianach uruchamiac PHP lint.

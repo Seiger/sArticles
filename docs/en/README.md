@@ -2,7 +2,7 @@
 
 sArticles is an Evolution CMS manager module for publications, news, blog posts, comments, polls, authors, tags, topics, features, and publication-specific TV parameters.
 
-The current admin interface is built with **evo-ui** and **Livewire**. The module behaves like a compact SPA inside the Evolution manager: tabs, filters, pagination, sorting, table/list view, modals, and editor fields update without reloading the whole manager iframe.
+The current admin interface is built with **EvoUI** and **Livewire**. The module behaves like a compact SPA inside the Evolution manager: tabs, filters, pagination, sorting, table/list view, modals, and editor fields update without reloading the whole manager iframe.
 
 ## Guides
 
@@ -25,7 +25,7 @@ The current admin interface is built with **evo-ui** and **Livewire**. The modul
 sArticles uses:
 
 - Evolution CMS service provider.
-- evo-ui table and form presets.
+- EvoUI table and form presets.
 - Livewire module panel.
 - Laravel-style config, migrations, translations, and views.
 - Published builder templates for frontend rendering.

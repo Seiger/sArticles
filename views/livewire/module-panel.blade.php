@@ -5,7 +5,9 @@
         pendingTab: null,
         showUnsavedPrompt: false,
         isDirty() {
-            return document.querySelector('[data-evo-form-dirty=&quot;true&quot;]') !== null;
+            return window.EvoUI?.form?.isDirty
+                ? window.EvoUI.form.isDirty()
+                : document.querySelector('[data-evo-form-dirty=&quot;true&quot;]') !== null;
         },
         requestModuleTab(tab) {
             if (this.activeTab === tab) {
@@ -24,23 +26,34 @@
             this.showUnsavedPrompt = false;
             this.pendingTab = null;
         },
-        discardAndSwitch() {
+        applyPendingNavigation() {
             if (this.pendingTab) {
                 this.activeTab = this.pendingTab;
             }
 
             this.closeUnsavedPrompt();
         },
+        discardAndSwitch() {
+            this.applyPendingNavigation();
+        },
         saveAndSwitch() {
             document.querySelector('[data-evo-form]')?.requestSubmit();
+            this.waitForCleanAndSwitch();
+        },
+        waitForCleanAndSwitch() {
+            if (!window.EvoUI?.form?.waitForClean) {
+                this.afterSaved();
+                return;
+            }
+
+            window.EvoUI.form.waitForClean(() => this.applyPendingNavigation());
         },
         afterSaved() {
             if (!this.showUnsavedPrompt || !this.pendingTab) {
                 return;
             }
 
-            this.activeTab = this.pendingTab;
-            this.closeUnsavedPrompt();
+            this.$nextTick(() => this.waitForCleanAndSwitch());
         }
     }"
     x-on:evo-ui:form.saved.window="afterSaved()"

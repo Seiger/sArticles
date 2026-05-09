@@ -2219,7 +2219,7 @@ class ArticlesTableData
         return trim((string) DB::table('s_article_translates')
             ->where('article', $articleId)
             ->orderByRaw(
-                'CASE WHEN `lang` = ? THEN 0 WHEN `lang` = ? THEN 1 ELSE 2 END',
+                'CASE lang WHEN ? THEN 0 WHEN ? THEN 1 ELSE 2 END',
                 [app()->getLocale(), 'base']
             )
             ->value('pagetitle'));

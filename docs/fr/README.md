@@ -2,7 +2,7 @@
 
 sArticles est un module Evolution CMS pour les publications, actualites, articles de blog, commentaires, sondages, auteurs, tags, thematiques, caracteristiques et parametres TV de publication.
 
-La nouvelle interface manager est construite avec **evo-ui** et **Livewire**. Les onglets, filtres, tris, pagination, vues table/liste, modales et champs editeur se mettent a jour sans recharger tout l'iframe du manager.
+La nouvelle interface manager est construite avec **EvoUI** et **Livewire**. Les onglets, filtres, tris, pagination, vues table/liste, modales et champs editeur se mettent a jour sans recharger tout l'iframe du manager.
 
 ## Guides
 

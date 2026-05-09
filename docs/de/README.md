@@ -2,7 +2,7 @@
 
 sArticles ist ein Evolution CMS Modul fur Publikationen, News, Blogartikel, Kommentare, Umfragen, Autoren, Tags, Themen, Merkmale und publikationsbezogene TV-Parameter.
 
-Die neue Manager-Oberflache basiert auf **evo-ui** und **Livewire**. Tabs, Filter, Sortierung, Pagination, Tabellen-/Listenansicht, Modale und Editorfelder aktualisieren sich ohne kompletten iframe Reload.
+Die neue Manager-Oberflache basiert auf **EvoUI** und **Livewire**. Tabs, Filter, Sortierung, Pagination, Tabellen-/Listenansicht, Modale und Editorfelder aktualisieren sich ohne kompletten iframe Reload.
 
 ## Leitfaden
 

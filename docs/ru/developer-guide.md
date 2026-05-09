@@ -2,7 +2,7 @@
 
 ## Архитектура
 
-sArticles работает как evo-ui + Livewire модуль. `ModulePanel` управляет вкладками, evo-ui рисует таблицы и формы, а `src/Tables/*TableData.php` классы предоставляют данные и бизнес-логику.
+sArticles работает как EvoUI + Livewire модуль. `ModulePanel` управляет вкладками, EvoUI рисует таблицы и формы, а `src/Tables/*TableData.php` классы предоставляют данные и бизнес-логику.
 
 ## Установка
 
@@ -60,5 +60,5 @@ $article = sArticles::getArticleByAlias('alias');
 
 - Использовать `EVO_*`.
 - Логику sArticles держать в sArticles.
-- evo-ui оставлять универсальным.
+- EvoUI оставлять универсальным.
 - После изменений запускать PHP lint.

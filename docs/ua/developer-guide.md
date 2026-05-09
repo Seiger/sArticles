@@ -2,13 +2,13 @@
 
 ## Архітектура
 
-sArticles тепер працює як конфігураційний evo-ui + Livewire модуль.
+sArticles тепер працює як конфігураційний EvoUI + Livewire модуль.
 
 Основні частини:
 
 - `Seiger\sArticles\sArticlesServiceProvider` реєструє міграції, views, переклади, конфіги, Livewire-компонент і публікацію assets.
 - `Seiger\sArticles\Livewire\ModulePanel` рендерить оболонку модуля і перемикає вкладки без iframe reload.
-- evo-ui відповідає за таблиці, фільтри, choices, форми, модалки, builder, delete dialogs і session state.
+- EvoUI відповідає за таблиці, фільтри, choices, форми, модалки, builder, delete dialogs і session state.
 - `src/Tables/*TableData.php` відповідають за дані, опції, збереження, видалення, фільтрацію і дії.
 
 ## Встановлення
@@ -125,7 +125,7 @@ sArticles::trackView($article);
 
 - Для шляхів використовувати `EVO_*`.
 - Модульні хуки тримати в sArticles.
-- evo-ui лишати універсальним.
+- EvoUI лишати універсальним.
 - Конфіги мають бути декларативні.
 - Після змін запускати PHP lint.
 

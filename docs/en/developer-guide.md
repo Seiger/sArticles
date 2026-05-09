@@ -2,13 +2,13 @@
 
 ## Architecture
 
-sArticles is now a config-driven evo-ui + Livewire module.
+sArticles is now a config-driven EvoUI + Livewire module.
 
 Core pieces:
 
 - `Seiger\sArticles\sArticlesServiceProvider` registers migrations, views, translations, config presets, the Livewire module panel, and published assets.
 - `Seiger\sArticles\Livewire\ModulePanel` renders the manager shell and switches internal tabs without iframe reloads.
-- `evo-ui` renders tables, filters, choices, forms, modals, builder fields, delete dialogs, and session state.
+- `EvoUI` renders tables, filters, choices, forms, modals, builder fields, delete dialogs, and session state.
 - `src/Tables/*TableData.php` classes provide rows, options, modal defaults, saves, deletes, filters, and custom action logic.
 
 ## Installation
@@ -118,7 +118,7 @@ Values:
 - `system` - use EVO `which_editor`.
 - registered editor name - force that editor for sArticles.
 
-evo-ui supports `options_source.type = rich_text_editors`, which reads registered editors from `OnRichTextEditorRegister`.
+EvoUI supports `options_source.type = rich_text_editors`, which reads registered editors from `OnRichTextEditorRegister`.
 
 ## sSeo Integration
 
@@ -193,13 +193,13 @@ Event::listen('evolution.sArticlesManagerAddAfterEvent', function ($params) {
 });
 ```
 
-Prefer new evo-ui configuration and provider methods for new manager functionality.
+Prefer new EvoUI configuration and provider methods for new manager functionality.
 
 ## Development Rules
 
 - Use `EVO_*` constants for Evolution paths.
-- Keep module-specific behavior in sArticles, not evo-ui.
-- Keep evo-ui generic.
+- Keep module-specific behavior in sArticles, not EvoUI.
+- Keep EvoUI generic.
 - Keep table config declarative.
 - Keep provider methods typed and focused.
 - Run PHP lint after changes.

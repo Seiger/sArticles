@@ -541,7 +541,7 @@ class CommentsTableData
             ->whereIn('article', $ids->all())
             ->whereIn('lang', [$locale, 'base'])
             ->orderByRaw(
-                'CASE WHEN `lang` = ? THEN 0 WHEN `lang` = ? THEN 1 ELSE 2 END',
+                'CASE lang WHEN ? THEN 0 WHEN ? THEN 1 ELSE 2 END',
                 [$locale, 'base']
             )
             ->get()
