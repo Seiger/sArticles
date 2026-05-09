@@ -110,14 +110,29 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
 });
 
 /**
- * Add Menu item
+ * Add the sArticles shortcut to the Evolution CMS manager top menu.
+ *
+ * The native manager menu renders Tabler icons as inline SVG, while older package
+ * shortcuts often inject icon names into an `<i>` class. Keeping the same SVG
+ * markup here makes the optional "main menu" entry visually match system items
+ * such as Elements and Modules.
  */
 Event::listen('evolution.OnManagerMenuPrerender', function($params) {
     if (sArticles::config('general.in_main_menu', evo()->getConfig('sart_in_main_menu', 0)) == 1) {
+        $icon = __('sArticles::global.articles_icon');
+        $iconHtml = '<i class="' . $icon . '"></i>';
+        if (strpos($icon, 'tabler-') === 0 && function_exists('svg')) {
+            $iconHtml = svg($icon, '', [
+                'aria-hidden' => 'true',
+                'focusable' => 'false',
+                'style' => 'flex:0 0 auto;display:block;',
+            ])->toHtml();
+        }
+
         $menu['sarticles'] = [
             'sarticles',
             'main',
-            '<i class="' . __('sArticles::global.articles_icon') . '"></i>' . __('sArticles::global.articles'),
+            $iconHtml . '<span class="menu-item-text">' . __('sArticles::global.articles') . '</span>',
             sArticles::moduleUrl(),
             __('sArticles::global.articles'),
             "",
