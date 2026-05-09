@@ -116,6 +116,15 @@
             'class' => 'evo-ui-table__image-column',
         ],
         [
+            'key' => 'id',
+            'type' => 'text',
+            'label' => 'ID',
+            'class' => 'evo-ui-table__number-column evo-ui-table__id-column',
+            'meta_icon' => 'hash',
+            'sortable' => true,
+            'sort_field' => 's_articles.id',
+        ],
+        [
             'key' => 'title',
             'type' => 'link',
             'label' => 'global.name',
@@ -127,6 +136,8 @@
             'key' => 'section',
             'type' => 'link',
             'label' => 'sArticles::global.section',
+            'sortable' => true,
+            'sort_field' => 'section_title',
         ],
         [
             'key' => 'categories',

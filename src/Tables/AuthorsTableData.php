@@ -291,13 +291,17 @@ class AuthorsTableData
     }
 
     /**
-     * Persist modal data.
+     * Persist author modal data from the manager.
      *
-     * This method keeps the save modal responsibility inside AuthorsTableData, so callers can
-     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
-     * storage details evolve.
+     * Single-language installs render simple top-level fields (`name`, `lastname`, `office`), while
+     * multilingual installs render language-scoped fields under `translations.*`. The save flow must
+     * honor the fields the editor actually sees; otherwise stale hidden translation data can win over
+     * the edited value and make a successful save look like it was ignored.
      *
-     * @return int Count, identifier, position, or status value for the package workflow.
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param int|null $authorId Existing author ID or null when creating a new author.
+     * @param string $mode Modal mode supplied by evo-ui (`create` or `edit`).
+     * @return int Saved author identifier.
      * @since 2.0.0
      */
     public function saveModal(array $data, ?int $authorId = null, string $mode = 'create'): int
@@ -308,10 +312,11 @@ class AuthorsTableData
             $author = new sArticlesAuthor();
         }
 
+        $usesLanguageFields = $this->hasLanguageFields();
         $language = $this->defaultLanguage();
-        $name = trim((string) data_get($data, 'translations.' . $language . '.name', data_get($data, 'name', '')));
-        $lastname = trim((string) data_get($data, 'translations.' . $language . '.lastname', data_get($data, 'lastname', '')));
-        $office = trim((string) data_get($data, 'translations.' . $language . '.office', data_get($data, 'office', '')));
+        $name = $this->modalAuthorTextValue($data, $language, 'name', $usesLanguageFields);
+        $lastname = $this->modalAuthorTextValue($data, $language, 'lastname', $usesLanguageFields);
+        $office = $this->modalAuthorTextValue($data, $language, 'office', $usesLanguageFields);
         $alias = trim((string) data_get($data, 'alias', ''));
 
         $author->image = $this->normalizeImagePath((string) data_get($data, 'image', ''));
@@ -320,9 +325,9 @@ class AuthorsTableData
 
         foreach ($this->languageCodes() as $lang) {
             $values = [
-                'name' => trim((string) data_get($data, 'translations.' . $lang . '.name', '')),
-                'lastname' => trim((string) data_get($data, 'translations.' . $lang . '.lastname', '')),
-                'office' => trim((string) data_get($data, 'translations.' . $lang . '.office', '')),
+                'name' => $this->modalAuthorTextValue($data, $lang, 'name', $usesLanguageFields),
+                'lastname' => $this->modalAuthorTextValue($data, $lang, 'lastname', $usesLanguageFields),
+                'office' => $this->modalAuthorTextValue($data, $lang, 'office', $usesLanguageFields),
             ];
 
             foreach ($values as $field => $value) {
@@ -345,6 +350,29 @@ class AuthorsTableData
         $author->save();
 
         return (int) $author->autid;
+    }
+
+    /**
+     * Resolve an editable author text value from modal payload.
+     *
+     * In multilingual mode values are read from `translations.{lang}.{field}`. In the default
+     * single-language mode evo-ui shows top-level fields only, so those fields must override any
+     * stale translation payload that may still be present in Livewire state.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param string $language Language code currently being persisted.
+     * @param string $field Author text field (`name`, `lastname`, or `office`).
+     * @param bool $usesLanguageFields True when multilingual fields are visible in the modal.
+     * @return string Trimmed value ready for author storage.
+     * @since 2.1.0
+     */
+    protected function modalAuthorTextValue(array $data, string $language, string $field, bool $usesLanguageFields): string
+    {
+        if (!$usesLanguageFields && ($language === $this->defaultLanguage() || $language === 'base')) {
+            return trim((string) data_get($data, $field, ''));
+        }
+
+        return trim((string) data_get($data, 'translations.' . $language . '.' . $field, ''));
     }
 
     /**
