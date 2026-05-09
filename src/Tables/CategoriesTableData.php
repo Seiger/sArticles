@@ -209,19 +209,24 @@ class CategoriesTableData
     }
 
     /**
-     * Persist modal data.
+     * Persist topic modal data from the manager.
      *
-     * This method keeps the save modal responsibility inside CategoriesTableData, so callers can
-     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
-     * storage details evolve.
+     * Topics share the same single-language versus multilingual modal split as tags. In the common
+     * single-language manager UI the editable value is the top-level `name` field, while
+     * multilingual installs submit language-scoped `translations.*.name` fields. Reading from the
+     * active shape keeps stale hidden Livewire state from overwriting the value the editor saved.
      *
-     * @return int Count, identifier, position, or status value for the package workflow.
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param int|null $categoryId Existing topic ID or null when creating a new topic.
+     * @param string $mode Modal mode supplied by evo-ui (`create` or `edit`).
+     * @return int Saved topic identifier.
      * @since 2.0.0
      */
     public function saveModal(array $data, ?int $categoryId = null, string $mode = 'create'): int
     {
+        $usesLanguageFields = $this->hasLanguageFields();
         $language = $this->defaultLanguage();
-        $name = trim((string) data_get($data, 'translations.' . $language . '.name', data_get($data, 'name', '')));
+        $name = $this->modalCategoryTextValue($data, $language, $usesLanguageFields);
 
         if ($name === '') {
             $name = __('sArticles::global.new_category');
@@ -246,7 +251,7 @@ class CategoriesTableData
         $category->cover = $this->normalizeImagePath((string) data_get($data, 'cover', ''));
 
         foreach ($this->languageCodes() as $lang) {
-            $value = trim((string) data_get($data, 'translations.' . $lang . '.name', ''));
+            $value = $this->modalCategoryTextValue($data, $lang, $usesLanguageFields);
             $category->{$this->languageTextField($lang)} = $value;
 
             if ($lang === $this->controller->langDefault() || $lang === 'base') {
@@ -262,6 +267,29 @@ class CategoriesTableData
         $this->normalizePositions();
 
         return (int) $category->catid;
+    }
+
+    /**
+     * Resolve an editable topic name from modal payload.
+     *
+     * Single-language installs expose a simple `name` input and still may carry older nested
+     * translation data in the component state. This helper makes the visible field authoritative
+     * for the default/base language while preserving translation-specific reads when multilingual
+     * fields are actually rendered.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param string $language Language code currently being persisted.
+     * @param bool $usesLanguageFields True when multilingual fields are visible in the modal.
+     * @return string Trimmed topic name ready for storage.
+     * @since 2.1.0
+     */
+    protected function modalCategoryTextValue(array $data, string $language, bool $usesLanguageFields): string
+    {
+        if (!$usesLanguageFields && ($language === $this->defaultLanguage() || $language === 'base')) {
+            return trim((string) data_get($data, 'name', ''));
+        }
+
+        return trim((string) data_get($data, 'translations.' . $language . '.name', ''));
     }
 
     /**
