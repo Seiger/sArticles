@@ -171,7 +171,7 @@ switch ($data['get']) {
             $translate = sArticleTranslate::whereArticle($requestId)
                 ->whereIn('lang', ['en', $defaultLng, 'base'])
                 ->orderByRaw(
-                    'CASE WHEN `lang` = ? THEN 0 WHEN `lang` = ? THEN 1 WHEN `lang` = ? THEN 2 ELSE 3 END',
+                    'CASE lang WHEN ? THEN 0 WHEN ? THEN 1 WHEN ? THEN 2 ELSE 3 END',
                     ['en', $defaultLng, 'base']
                 )
                 ->first();
