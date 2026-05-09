@@ -11,6 +11,8 @@
 
 The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. It works as a responsive SPA-like manager module: tabs, filters, sorting, pagination, modal forms, inline actions, and content editing update through Livewire instead of full iframe reloads.
 
+![sArticles publications manager](docs/assets/articles-manager.png)
+
 ## Features
 
 - Publications with multiple configurable resource types.
@@ -21,6 +23,16 @@ The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. I
 - Native optional integrations with `sSeo`, `sLang`, `eTinyMCE`, and `dTui.editor`.
 - Publication comments, rating, poll votes, view tracking, aliases, and frontend helper API.
 - Configurable module settings stored in `core/custom/config/seiger/settings/sArticles.php`.
+
+## Screenshots
+
+### Article editor
+
+![sArticles article editor](docs/assets/article-editor.png)
+
+### Module settings
+
+![sArticles module settings](docs/assets/settings.png)
 
 ## Requirements
 
