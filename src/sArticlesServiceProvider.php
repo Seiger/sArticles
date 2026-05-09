@@ -1,6 +1,7 @@
 <?php namespace Seiger\sArticles;
 
 use EvolutionCMS\ServiceProvider;
+use EvoUI\EvoUI;
 use Event;
 use Livewire\Livewire;
 
@@ -47,6 +48,7 @@ class sArticlesServiceProvider extends ServiceProvider
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/polls/table.php', 'sarticles.polls.table');
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/tvparams/table.php', 'sarticles.tvparams.table');
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/settings/form.php', 'evo-ui.forms.sarticles.settings');
+            app(EvoUI::class)->registerFormField('types', 'sArticles::evo-ui.form.types-config-map');
             Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
 
             // For use config
