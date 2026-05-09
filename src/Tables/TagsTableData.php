@@ -284,19 +284,24 @@ class TagsTableData
     }
 
     /**
-     * Persist modal data.
+     * Persist tag modal data from the manager.
      *
-     * This method keeps the save modal responsibility inside TagsTableData, so callers can rely
-     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
-     * details evolve.
+     * The manager can render the tag editor in two shapes. Single-language installs expose one
+     * visible top-level `name` field, while multilingual installs submit language-scoped values
+     * under `translations.*.name`. The save flow reads from the active shape deliberately so stale
+     * hidden translation state cannot overwrite the value the editor just changed.
      *
-     * @return int Count, identifier, position, or status value for the package workflow.
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param int|null $tagId Existing tag ID or null when creating a new tag.
+     * @param string $mode Modal mode supplied by evo-ui (`create` or `edit`).
+     * @return int Saved tag identifier.
      * @since 2.0.0
      */
     public function saveModal(array $data, ?int $tagId = null, string $mode = 'create'): int
     {
+        $usesLanguageFields = $this->hasLanguageFields();
         $language = $this->defaultLanguage();
-        $name = trim((string) data_get($data, 'translations.' . $language . '.name', data_get($data, 'name', '')));
+        $name = $this->modalTagTextValue($data, $language, $usesLanguageFields);
 
         if ($name === '') {
             $name = __('sArticles::global.new_tag');
@@ -320,7 +325,7 @@ class TagsTableData
         );
 
         foreach ($this->languageCodes() as $lang) {
-            $value = trim((string) data_get($data, 'translations.' . $lang . '.name', ''));
+            $value = $this->modalTagTextValue($data, $lang, $usesLanguageFields);
             $tag->{$this->languageTextField($lang)} = $value;
 
             if ($lang === $this->controller->langDefault() || $lang === 'base') {
@@ -344,6 +349,28 @@ class TagsTableData
         $tag->save();
 
         return (int) $tag->tagid;
+    }
+
+    /**
+     * Resolve an editable tag name from modal payload.
+     *
+     * In multilingual mode the modal owns separate `translations.{lang}.name` fields. In the
+     * default single-language mode evo-ui shows only `name`, so that visible field must drive the
+     * default/base language value even if Livewire still carries an older nested translation value.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param string $language Language code currently being persisted.
+     * @param bool $usesLanguageFields True when multilingual fields are visible in the modal.
+     * @return string Trimmed tag name ready for storage.
+     * @since 2.1.0
+     */
+    protected function modalTagTextValue(array $data, string $language, bool $usesLanguageFields): string
+    {
+        if (!$usesLanguageFields && ($language === $this->defaultLanguage() || $language === 'base')) {
+            return trim((string) data_get($data, 'name', ''));
+        }
+
+        return trim((string) data_get($data, 'translations.' . $language . '.name', ''));
     }
 
     /**
