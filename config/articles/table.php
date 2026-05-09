@@ -1,6 +1,4 @@
-<?php
-
-return [
+<?php return [
     'key' => 'sarticles.articles',
     'provider' => \Seiger\sArticles\Tables\ArticlesTableData::class,
     'wire_target' => 'search,perPage,applySelectFilter,applyMultiFilter,applyDateRangeFilter,setFilter,setSort,switchView,togglePublished,duplicateRow,duplicateSelected,openCreateModal,openEditModal,saveModal,closeModal,openDeleteModal,closeDeleteModal,deleteConfirmed,goToPage,firstPage,previousPage,nextPage,goLastPage',

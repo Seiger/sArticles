@@ -1,6 +1,4 @@
-<?php
-
-return [
+<?php return [
     'key' => 'sarticles.comments',
     'provider' => \Seiger\sArticles\Tables\CommentsTableData::class,
     'wire_target' => 'search,perPage,applyMultiFilter,applyDateRangeFilter,setFilter,setSort,switchView,togglePublished,openEditModal,saveModal,closeModal,openDeleteModal,closeDeleteModal,deleteConfirmed,goToPage,firstPage,previousPage,nextPage,goLastPage',

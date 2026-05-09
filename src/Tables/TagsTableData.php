@@ -1,6 +1,4 @@
-<?php
-
-namespace Seiger\sArticles\Tables;
+<?php namespace Seiger\sArticles\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -9,6 +7,12 @@ use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Tables\Concerns\HandlesLanguageFields;
 
+/**
+ * TagsTableData package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class TagsTableData
 {
     use HandlesLanguageFields;
@@ -16,6 +20,17 @@ class TagsTableData
     protected string $moduleUrl;
     protected sArticlesController $controller;
 
+    /**
+     * Initialize TagsTableData with evo-ui table context.
+     *
+     * Stores manager context, table state, and configuration so row loading, modal
+     * building, and persistence helpers operate against the same request snapshot.
+     *
+     * @param array<string, mixed> $context Runtime context passed by the manager module.
+     * @param array<string, mixed> $state Current table state, including filters and sorting.
+     * @param array<string, mixed> $config Resolved table or modal configuration.
+     * @since 2.0.0
+     */
     public function __construct(
         protected array $context = [],
         protected array $state = [],
@@ -26,11 +41,31 @@ class TagsTableData
         $this->controller->setModifyTables('tags');
     }
 
+    /**
+     * Total for TagsTableData.
+     *
+     * This method keeps the total responsibility inside TagsTableData, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function total(): int
     {
         return (clone $this->tagsQuery())->toBase()->getCountForPagination();
     }
 
+    /**
+     * Rows for TagsTableData.
+     *
+     * This method keeps the rows responsibility inside TagsTableData, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function rows(int $page, int $perPage): array
     {
         return $this->tagRows(
@@ -40,16 +75,46 @@ class TagsTableData
         );
     }
 
+    /**
+     * Filter groups for TagsTableData.
+     *
+     * This method keeps the filter groups responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function filterGroups(): array
     {
         return [];
     }
 
+    /**
+     * Delete name data from the manager flow.
+     *
+     * This method keeps the delete name responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function deleteName(int $tagId): string
     {
         return $this->tagNameById($tagId);
     }
 
+    /**
+     * Modal defaults for TagsTableData.
+     *
+     * This method keeps the modal defaults responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalDefaults(): array
     {
         $defaults = [
@@ -65,6 +130,16 @@ class TagsTableData
         return $defaults;
     }
 
+    /**
+     * Modal data for TagsTableData.
+     *
+     * This method keeps the modal data responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalData(int $tagId): array
     {
         $tag = sArticlesTag::find($tagId);
@@ -89,6 +164,16 @@ class TagsTableData
         return $data;
     }
 
+    /**
+     * Modal options for TagsTableData.
+     *
+     * This method keeps the modal options responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalOptions(array $config, array $data = [], ?int $tagId = null, string $mode = 'create'): array
     {
         if ($this->hasLanguageFields() && in_array($mode, ['create', 'edit'], true)) {
@@ -98,6 +183,16 @@ class TagsTableData
         return $config;
     }
 
+    /**
+     * Row actions for TagsTableData.
+     *
+     * This method keeps the row actions responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function rowActions(array $actions): array
     {
         if (!$this->hasLanguageFields()) {
@@ -110,6 +205,16 @@ class TagsTableData
             ->all();
     }
 
+    /**
+     * Modal fields for TagsTableData.
+     *
+     * This method keeps the modal fields responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalFields(array $fields, array $data = [], ?int $tagId = null, string $mode = 'create'): array
     {
         if ($mode === 'texts') {
@@ -178,6 +283,16 @@ class TagsTableData
         return $dynamicFields;
     }
 
+    /**
+     * Persist modal data.
+     *
+     * This method keeps the save modal responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function saveModal(array $data, ?int $tagId = null, string $mode = 'create'): int
     {
         $language = $this->defaultLanguage();
@@ -231,6 +346,16 @@ class TagsTableData
         return (int) $tag->tagid;
     }
 
+    /**
+     * Tag text modal data for TagsTableData.
+     *
+     * This method keeps the tag text modal data responsibility inside TagsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function tagTextModalData(int $tagId): array
     {
         $tag = sArticlesTag::find($tagId);
@@ -247,6 +372,16 @@ class TagsTableData
         ];
     }
 
+    /**
+     * Persist tag text modal data.
+     *
+     * This method keeps the save tag text modal responsibility inside TagsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function saveTagTextModal(array $data, ?int $tagId = null): int
     {
         if (!$tagId) {
@@ -283,6 +418,16 @@ class TagsTableData
         return (int) $tag->tagid;
     }
 
+    /**
+     * Tag text editor html for TagsTableData.
+     *
+     * This method keeps the tag text editor html responsibility inside TagsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function tagTextEditorHtml(string $fieldId, array $field = []): string
     {
         return $this->controller->textEditor(
@@ -292,6 +437,16 @@ class TagsTableData
         );
     }
 
+    /**
+     * Configured editor for TagsTableData.
+     *
+     * This method keeps the configured editor responsibility inside TagsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function configuredEditor(): string
     {
         $configured = trim((string) \sArticles::config('general.editor', 'system'));
@@ -303,11 +458,31 @@ class TagsTableData
         return $configured;
     }
 
+    /**
+     * Delete row data from the manager flow.
+     *
+     * This method keeps the delete row responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function deleteRow(int $tagId): void
     {
         sArticlesTag::where('tagid', $tagId)->delete();
     }
 
+    /**
+     * Tags query for TagsTableData.
+     *
+     * This method keeps the tags query responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return Builder Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function tagsQuery(): Builder
     {
         $query = sArticlesTag::query();
@@ -321,6 +496,16 @@ class TagsTableData
         return $query;
     }
 
+    /**
+     * Tag rows for TagsTableData.
+     *
+     * This method keeps the tag rows responsibility inside TagsTableData, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function tagRows(Collection $tags): array
     {
         return $tags
@@ -337,6 +522,16 @@ class TagsTableData
             ->all();
     }
 
+    /**
+     * Apply search rules to the current workflow.
+     *
+     * This method keeps the apply search responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applySearch(Builder $query): void
     {
         $search = trim((string) $this->state('search', ''));
@@ -362,6 +557,16 @@ class TagsTableData
         });
     }
 
+    /**
+     * Apply sort rules to the current workflow.
+     *
+     * This method keeps the apply sort responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     protected function applySort(Builder $query): bool
     {
         $key = (string) $this->state('sort', '');
@@ -393,6 +598,16 @@ class TagsTableData
         return true;
     }
 
+    /**
+     * Tag name by id for TagsTableData.
+     *
+     * This method keeps the tag name by id responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function tagNameById(int $tagId): string
     {
         $tag = sArticlesTag::find($tagId);
@@ -400,6 +615,16 @@ class TagsTableData
         return $tag ? $this->tagName($tag) : '';
     }
 
+    /**
+     * Existing tag for TagsTableData.
+     *
+     * This method keeps the existing tag responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return ?sArticlesTag Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function existingTag(string $name): ?sArticlesTag
     {
         $language = $this->defaultLanguage();
@@ -410,6 +635,16 @@ class TagsTableData
             ->first();
     }
 
+    /**
+     * Tag name for TagsTableData.
+     *
+     * This method keeps the tag name responsibility inside TagsTableData, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function tagName(sArticlesTag $tag): string
     {
         $language = $this->defaultLanguage();
@@ -418,16 +653,46 @@ class TagsTableData
         return $name !== '' ? $name : trim((string) $tag->base);
     }
 
+    /**
+     * Delete url data from the manager flow.
+     *
+     * This method keeps the delete url responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function deleteUrl(int $tagId): string
     {
         return $this->moduleUrl . '&get=tagDelete&i=' . $tagId;
     }
 
+    /**
+     * Default language for TagsTableData.
+     *
+     * This method keeps the default language responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function defaultLanguage(): string
     {
         return $this->controller->langDefault();
     }
 
+    /**
+     * Content column for TagsTableData.
+     *
+     * This method keeps the content column responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function contentColumn(): string
     {
         $language = $this->defaultLanguage();
@@ -435,6 +700,16 @@ class TagsTableData
         return ($language !== '' ? $language : 'base') . '_content';
     }
 
+    /**
+     * Has rich content for TagsTableData.
+     *
+     * This method keeps the has rich content responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     protected function hasRichContent(string $content): bool
     {
         $content = trim($content);
@@ -453,6 +728,16 @@ class TagsTableData
         return trim($text) !== '';
     }
 
+    /**
+     * Tag has content for TagsTableData.
+     *
+     * This method keeps the tag has content responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     protected function tagHasContent(sArticlesTag $tag): bool
     {
         foreach ($this->languageCodes() as $language) {
@@ -464,6 +749,16 @@ class TagsTableData
         return $this->hasRichContent((string) data_get($tag, 'base_content', ''));
     }
 
+    /**
+     * Tag content for TagsTableData.
+     *
+     * This method keeps the tag content responsibility inside TagsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function tagContent(sArticlesTag $tag, string $language): string
     {
         $content = (string) data_get($tag, $this->languageContentField($language), '');
@@ -475,6 +770,16 @@ class TagsTableData
         return $content;
     }
 
+    /**
+     * Name sort field for TagsTableData.
+     *
+     * This method keeps the name sort field responsibility inside TagsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function nameSortField(): string
     {
         $language = $this->defaultLanguage();
@@ -482,6 +787,16 @@ class TagsTableData
         return $language !== 'base' ? $language : 'base';
     }
 
+    /**
+     * Like sql for TagsTableData.
+     *
+     * This method keeps the like sql responsibility inside TagsTableData, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function likeSql(Builder $query, string $field): string
     {
         $sql = 'LOWER(' . $query->getGrammar()->wrap($field) . ') LIKE ?';
@@ -489,6 +804,16 @@ class TagsTableData
         return DB::connection()->getDriverName() === 'sqlite' ? $sql : $sql . " ESCAPE '\\\\'";
     }
 
+    /**
+     * State for TagsTableData.
+     *
+     * This method keeps the state responsibility inside TagsTableData, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function state(?string $key = null, mixed $default = null): mixed
     {
         return $key ? data_get($this->state, $key, $default) : $this->state;

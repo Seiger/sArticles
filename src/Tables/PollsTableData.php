@@ -1,6 +1,4 @@
-<?php
-
-namespace Seiger\sArticles\Tables;
+<?php namespace Seiger\sArticles\Tables;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -10,6 +8,12 @@ use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticlesPoll;
 use Seiger\sArticles\Tables\Concerns\HandlesLanguageFields;
 
+/**
+ * PollsTableData package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class PollsTableData
 {
     use HandlesLanguageFields;
@@ -17,6 +21,17 @@ class PollsTableData
     protected string $moduleUrl;
     protected sArticlesController $controller;
 
+    /**
+     * Initialize PollsTableData with evo-ui table context.
+     *
+     * Stores manager context, table state, and configuration so row loading, modal
+     * building, and persistence helpers operate against the same request snapshot.
+     *
+     * @param array<string, mixed> $context Runtime context passed by the manager module.
+     * @param array<string, mixed> $state Current table state, including filters and sorting.
+     * @param array<string, mixed> $config Resolved table or modal configuration.
+     * @since 2.0.0
+     */
     public function __construct(
         protected array $context = [],
         protected array $state = [],
@@ -26,11 +41,31 @@ class PollsTableData
         $this->controller = new sArticlesController();
     }
 
+    /**
+     * Total for PollsTableData.
+     *
+     * This method keeps the total responsibility inside PollsTableData, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function total(): int
     {
         return $this->pollsCollection()->count();
     }
 
+    /**
+     * Rows for PollsTableData.
+     *
+     * This method keeps the rows responsibility inside PollsTableData, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function rows(int $page, int $perPage): array
     {
         return $this->pollRows(
@@ -40,11 +75,31 @@ class PollsTableData
         );
     }
 
+    /**
+     * Filter groups for PollsTableData.
+     *
+     * This method keeps the filter groups responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function filterGroups(): array
     {
         return [];
     }
 
+    /**
+     * Delete name data from the manager flow.
+     *
+     * This method keeps the delete name responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function deleteName(int $pollId): string
     {
         $poll = sArticlesPoll::find($pollId);
@@ -52,6 +107,16 @@ class PollsTableData
         return $poll ? $this->questionText($this->jsonArray($poll->question)) : (string) $pollId;
     }
 
+    /**
+     * Delete row data from the manager flow.
+     *
+     * This method keeps the delete row responsibility inside PollsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function deleteRow(int $pollId): void
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -62,6 +127,16 @@ class PollsTableData
         Cache::forget('sArticles-polls-list');
     }
 
+    /**
+     * Modal defaults for PollsTableData.
+     *
+     * This method keeps the modal defaults responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalDefaults(): array
     {
         $answer = ['answer' => '', 'votes' => 0];
@@ -82,6 +157,16 @@ class PollsTableData
         return $defaults;
     }
 
+    /**
+     * Modal data for PollsTableData.
+     *
+     * This method keeps the modal data responsibility inside PollsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalData(int $pollId): array
     {
         $poll = sArticlesPoll::find($pollId);
@@ -122,6 +207,16 @@ class PollsTableData
         return $data;
     }
 
+    /**
+     * Modal fields for PollsTableData.
+     *
+     * This method keeps the modal fields responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalFields(array $fields, array $data = [], ?int $pollId = null, string $mode = 'create'): array
     {
         if (!$this->hasLanguageFields()) {
@@ -186,6 +281,16 @@ class PollsTableData
         return $dynamicFields;
     }
 
+    /**
+     * Persist modal data.
+     *
+     * This method keeps the save modal responsibility inside PollsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function saveModal(array $data, ?int $pollId = null, string $mode = 'create'): int
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -266,6 +371,16 @@ class PollsTableData
         return (int) $poll->pollid;
     }
 
+    /**
+     * Polls collection for PollsTableData.
+     *
+     * This method keeps the polls collection responsibility inside PollsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return Collection Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function pollsCollection(): Collection
     {
         $polls = sArticlesPoll::query()->get();
@@ -275,6 +390,16 @@ class PollsTableData
         return $this->sortPolls($polls)->values();
     }
 
+    /**
+     * Poll rows for PollsTableData.
+     *
+     * This method keeps the poll rows responsibility inside PollsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function pollRows(Collection $polls): array
     {
         return $polls
@@ -311,6 +436,16 @@ class PollsTableData
             ->all();
     }
 
+    /**
+     * Apply search rules to the current workflow.
+     *
+     * This method keeps the apply search responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return Collection Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function applySearch(Collection $polls): Collection
     {
         $search = mb_strtolower(trim((string) $this->state('search', '')));
@@ -333,6 +468,16 @@ class PollsTableData
             ->values();
     }
 
+    /**
+     * Apply created date filter rules to the current workflow.
+     *
+     * This method keeps the apply created date filter responsibility inside PollsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return Collection Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function applyCreatedDateFilter(Collection $polls): Collection
     {
         $value = (array) $this->filterState('created_at', []);
@@ -364,6 +509,16 @@ class PollsTableData
             ->values();
     }
 
+    /**
+     * Sort polls for PollsTableData.
+     *
+     * This method keeps the sort polls responsibility inside PollsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return Collection Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function sortPolls(Collection $polls): Collection
     {
         $key = (string) $this->state('sort', '');
@@ -381,6 +536,16 @@ class PollsTableData
         return $sorted->values();
     }
 
+    /**
+     * Sort value for PollsTableData.
+     *
+     * This method keeps the sort value responsibility inside PollsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function sortValue(sArticlesPoll $poll, string $field): mixed
     {
         return match ($field) {
@@ -394,6 +559,16 @@ class PollsTableData
         };
     }
 
+    /**
+     * Answers with votes for PollsTableData.
+     *
+     * This method keeps the answers with votes responsibility inside PollsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function answersWithVotes(array $answers, array $votes): array
     {
         return collect($answers)
@@ -414,6 +589,16 @@ class PollsTableData
             ->all();
     }
 
+    /**
+     * Question text for PollsTableData.
+     *
+     * This method keeps the question text responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function questionText(array $question): string
     {
         $text = $this->translatedValue($question);
@@ -421,6 +606,16 @@ class PollsTableData
         return $text !== '' ? Str::limit($text, 120) : __('sArticles::global.no_text');
     }
 
+    /**
+     * Translated value for PollsTableData.
+     *
+     * This method keeps the translated value responsibility inside PollsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function translatedValue(array $value): string
     {
         $language = $this->defaultLanguage();
@@ -428,6 +623,16 @@ class PollsTableData
         return trim((string) ($value[$language] ?? $value['base'] ?? reset($value) ?: ''));
     }
 
+    /**
+     * Total votes for PollsTableData.
+     *
+     * This method keeps the total votes responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     protected function totalVotes(array $votes): int
     {
         if (array_key_exists('total', $votes)) {
@@ -437,6 +642,16 @@ class PollsTableData
         return collect($votes)->sum(fn ($value) => (int) $value);
     }
 
+    /**
+     * Json array for PollsTableData.
+     *
+     * This method keeps the json array responsibility inside PollsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function jsonArray(mixed $value): array
     {
         if (is_array($value)) {
@@ -458,11 +673,31 @@ class PollsTableData
         return [];
     }
 
+    /**
+     * Delete url data from the manager flow.
+     *
+     * This method keeps the delete url responsibility inside PollsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function deleteUrl(int $pollId): string
     {
         return $this->moduleUrl . '&get=pollDelete&i=' . $pollId;
     }
 
+    /**
+     * Format date for display.
+     *
+     * This method keeps the format date responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function formatDate(mixed $value): string
     {
         if (!$value) {
@@ -472,6 +707,16 @@ class PollsTableData
         return Carbon::parse($value)->format('d.m.Y H:i');
     }
 
+    /**
+     * Normalize filter date for package-safe usage.
+     *
+     * This method keeps the normalize filter date responsibility inside PollsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeFilterDate(string $value): string
     {
         $value = trim($value);
@@ -479,16 +724,46 @@ class PollsTableData
         return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
     }
 
+    /**
+     * Default language for PollsTableData.
+     *
+     * This method keeps the default language responsibility inside PollsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function defaultLanguage(): string
     {
         return $this->controller->langDefault();
     }
 
+    /**
+     * State for PollsTableData.
+     *
+     * This method keeps the state responsibility inside PollsTableData, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function state(?string $key = null, mixed $default = null): mixed
     {
         return $key ? data_get($this->state, $key, $default) : $this->state;
     }
 
+    /**
+     * Filter state for PollsTableData.
+     *
+     * This method keeps the filter state responsibility inside PollsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function filterState(string $key, mixed $default = null): mixed
     {
         return data_get($this->state('filters', []), $key, $default);

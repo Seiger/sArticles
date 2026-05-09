@@ -1,6 +1,4 @@
-<?php
-
-return [
+<?php return [
     'enabled' => true,
     'icon' => 'article',
     'size' => 'content',

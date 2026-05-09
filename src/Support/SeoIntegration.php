@@ -1,16 +1,30 @@
-<?php
-
-namespace Seiger\sArticles\Support;
+<?php namespace Seiger\sArticles\Support;
 
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleTranslate;
 
+/**
+ * SeoIntegration package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class SeoIntegration
 {
     protected const RESOURCE_TYPE = 'article';
     protected const DOMAIN_KEY = 'default';
     protected const BASE_LANG = 'base';
 
+    /**
+     * Enabled for SeoIntegration.
+     *
+     * This method keeps the enabled responsibility inside SeoIntegration, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     public function enabled(): bool
     {
         return (bool) evo()->getConfig('check_sSeo', false)
@@ -18,16 +32,46 @@ class SeoIntegration
             && class_exists('\Seiger\sSeo\Models\sSeoModel');
     }
 
+    /**
+     * Multilingual for SeoIntegration.
+     *
+     * This method keeps the multilingual responsibility inside SeoIntegration, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     public function multilingual(): bool
     {
         return (bool) evo()->getConfig('check_sLang', false);
     }
 
+    /**
+     * Standalone tab enabled for SeoIntegration.
+     *
+     * This method keeps the standalone tab enabled responsibility inside SeoIntegration, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     public function standaloneTabEnabled(): bool
     {
         return $this->enabled() && !$this->multilingual();
     }
 
+    /**
+     * Defaults for SeoIntegration.
+     *
+     * This method keeps the defaults responsibility inside SeoIntegration, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function defaults(): array
     {
         return [
@@ -42,6 +86,16 @@ class SeoIntegration
         ];
     }
 
+    /**
+     * Article data for SeoIntegration.
+     *
+     * This method keeps the article data responsibility inside SeoIntegration, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function articleData(int $articleId, string $lang = self::BASE_LANG): array
     {
         if (!$this->enabled() || $articleId <= 0) {
@@ -72,6 +126,16 @@ class SeoIntegration
         ]);
     }
 
+    /**
+     * Persist article data.
+     *
+     * This method keeps the save article responsibility inside SeoIntegration, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function saveArticle(sArticle $article, sArticleTranslate $content, array $seo): void
     {
         if (!$this->standaloneTabEnabled() || !(int) $article->id) {
@@ -91,6 +155,16 @@ class SeoIntegration
         $facadeClass::updateSeoFields($payload);
     }
 
+    /**
+     * Persist article translations data.
+     *
+     * This method keeps the save article translations responsibility inside SeoIntegration, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function saveArticleTranslations(sArticle $article, array $seoByLanguage, array $languages): void
     {
         if (!$this->enabled() || !$this->multilingual() || !(int) $article->id) {
@@ -118,6 +192,16 @@ class SeoIntegration
         $facadeClass::updateSeoFields($payload);
     }
 
+    /**
+     * Robots options for SeoIntegration.
+     *
+     * This method keeps the robots options responsibility inside SeoIntegration, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function robotsOptions(): array
     {
         return [
@@ -128,6 +212,16 @@ class SeoIntegration
         ];
     }
 
+    /**
+     * Priority options for SeoIntegration.
+     *
+     * This method keeps the priority options responsibility inside SeoIntegration, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function priorityOptions(): array
     {
         return collect(range(10, 1))
@@ -138,6 +232,16 @@ class SeoIntegration
             ->all();
     }
 
+    /**
+     * Change frequency options for SeoIntegration.
+     *
+     * This method keeps the change frequency options responsibility inside SeoIntegration, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function changeFrequencyOptions(): array
     {
         return collect(['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'])
@@ -145,6 +249,16 @@ class SeoIntegration
             ->all();
     }
 
+    /**
+     * Payload fields for SeoIntegration.
+     *
+     * This method keeps the payload fields responsibility inside SeoIntegration, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function payloadFields(array $seo): array
     {
         return [
@@ -159,6 +273,16 @@ class SeoIntegration
         ];
     }
 
+    /**
+     * Allowed value for SeoIntegration.
+     *
+     * This method keeps the allowed value responsibility inside SeoIntegration, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function allowedValue(string $value, array $allowed, string $default): string
     {
         return in_array($value, $allowed, true) ? $value : $default;

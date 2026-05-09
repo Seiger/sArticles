@@ -12,10 +12,25 @@ use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleComment;
 use Seiger\sArticles\Models\sArticlesPoll;
 
+/**
+ * sArticles package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class sArticles
 {
     public $url = '';
 
+    /**
+     * Initialize sArticles with its runtime dependencies.
+     *
+     * This method keeps the construct responsibility inside sArticles, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @since 2.0.0
+     */
     public function __construct()
     {
         if (IN_MANAGER_MODE) {
@@ -27,9 +42,13 @@ class sArticles
     }
 
     /**
-     * Get all offers
+     * Return paginated articles for frontend or manager use.
      *
-     * @return object
+     * Frontend calls only expose active articles, while manager calls may include availability
+     * and relation filters.
+     *
+     * @param mixed $paginate Number of items per pagination page.
+     * @return object Paginated or model-like object returned by the package query.
      */
     public function all($paginate = 30): object
     {
@@ -83,7 +102,14 @@ class sArticles
     }
 
     /**
-     * Read comma separated manager filter ids from request.
+     * Read and sanitize manager filter IDs.
+     *
+     * Accepts array or comma-separated input and returns unique positive integer IDs for
+     * relation filters.
+     *
+     * @param string $key Configuration or request key to read.
+     * @return array<string, mixed> Structured array payload consumed by the manager UI or package runtime.
+     * @since 2.0.0
      */
     protected function filterIds(string $key): array
     {
@@ -99,9 +125,13 @@ class sArticles
     }
 
     /**
-     *  Get all comments
+     * Return paginated article comments.
      *
-     *  @return object
+     * Optional article ID and manager search filters can narrow the result set for frontend
+     * widgets or manager tables.
+     *
+     * @param mixed $paginate Number of items per pagination page.
+     * @param mixed $artids Optional article IDs used to limit the comment query.
      */
     public function comments($paginate = 30, $artids = [])
     {
@@ -120,10 +150,12 @@ class sArticles
     }
 
     /**
-     * Get article object with translation by ID
+     * Load one translated article by ID.
      *
-     * @param int $articleId
-     * @return object
+     * When no article exists, an empty model is returned so templates can avoid null checks.
+     *
+     * @param int $articleId Internal article identifier.
+     * @return object Paginated or model-like object returned by the package query.
      */
     public function getArticle(int $articleId): object
     {
@@ -131,10 +163,13 @@ class sArticles
     }
 
     /**
-     * Get article object with translation by Alias
+     * Load one translated article by alias.
      *
-     * @param string $articleAlias
-     * @return object
+     * When no article exists, an empty model is returned so frontend templates have a
+     * consistent object shape.
+     *
+     * @param string $articleAlias Public article alias.
+     * @return object Paginated or model-like object returned by the package query.
      */
     public function getArticleByAlias(string $articleAlias): object
     {
@@ -142,20 +177,26 @@ class sArticles
     }
 
     /**
-     * Determine whether the package should use legacy blank resource mode.
+     * Check whether legacy blank-resource routing is enabled.
      *
-     * @return bool
+     * Legacy mode controls whether articles are rendered through the historical blank resource
+     * strategy.
+     *
+     * @return bool True when the condition is met, false otherwise.
      */
     public function isLegacyMode(): bool
     {
-        return (int)evo()->getConfig('sart_blank', 1) > 1;
+        return (int) evo()->getConfig('sart_blank', 1) > 1;
     }
 
     /**
-     * Resolve article by request URI segments.
+     * Resolve an article from request URI segments.
      *
-     * @param array $segments
-     * @return sArticle|null
+     * The method checks cached article aliases and validates the resolved article link before
+     * returning a model.
+     *
+     * @param array<string, mixed> $segments Request URI segments after Evolution routing parsing.
+     * @return ?sArticle Resolved article model or null when no article matches the URI.
      */
     public function resolveArticleByUri(array $segments): ?sArticle
     {
@@ -168,7 +209,7 @@ class sArticles
         $articleId = sArticles::documentListing()[$alias] ?? 0;
 
         if ($articleId > 0) {
-            $article = sArticles::getArticle((int)$articleId);
+            $article = sArticles::getArticle((int) $articleId);
             if ($article->id ?? 0) {
                 return $article;
             }
@@ -195,10 +236,13 @@ class sArticles
     }
 
     /**
-     * Increment article views once per session.
+     * Increment frontend view counters for an article.
      *
-     * @param sArticle $article
-     * @return void
+     * Only persisted article models should be passed here so statistics remain tied to real
+     * records.
+     *
+     * @param sArticle $article Article model being read or persisted.
+     * @return void No value is returned.
      */
     public function trackView(sArticle $article): void
     {
@@ -211,9 +255,12 @@ class sArticles
     }
 
     /**
-     * List articles aliases
+     * Return the cached article URL map.
      *
-     * @return array
+     * If the cache is missing, the manager controller rebuilds it from published article links
+     * before returning the mapping.
+     *
+     * @return array<string, mixed> Structured array payload consumed by the manager UI or package runtime.
      */
     public function documentListing(): array
     {
@@ -229,10 +276,12 @@ class sArticles
     }
 
     /**
-     * Show Poll or result votes
+     * Render a poll and optionally process a submitted vote.
      *
-     * @param $id
-     * @return void
+     * The method handles visitor vote cookies and returns the appropriate poll or results
+     * partial.
+     *
+     * @param mixed $id Internal record identifier.
      */
     public function showPoll($id)
     {
@@ -261,10 +310,12 @@ class sArticles
     }
 
     /**
-     * Rating of Article votes
+     * Read or update rating votes for an article.
      *
-     * @param $id
-     * @return void
+     * Votes are tracked for visitors or logged-in users and converted into response data for
+     * frontend interactions.
+     *
+     * @param mixed $id Internal record identifier.
      */
     public function ratingVotes($id)
     {
@@ -311,10 +362,12 @@ class sArticles
     }
 
     /**
-     * Rating of Article votes
+     * Store a frontend article comment.
      *
-     * @param $id
-     * @return void
+     * The method creates the comment, loads user metadata when available, and renders the
+     * requested comment partial for the response.
+     *
+     * @param mixed $id Internal record identifier.
      */
     public function setComment($id)
     {
@@ -339,9 +392,9 @@ class sArticles
     }
 
     /**
-     * Approve user comment
+     * Approve or unapprove a comment from the manager.
      *
-     * @return void
+     * The AJAX action validates the manager session and returns the updated comment state.
      */
     public function approveComment()
     {
@@ -369,7 +422,12 @@ class sArticles
     }
 
     /**
-     * Publish or unpublish an article from the manager list.
+     * Publish or unpublish an article from the manager.
+     *
+     * This AJAX endpoint validates the manager session, updates the article state, and returns
+     * the fresh model payload.
+     *
+     * @since 2.0.0
      */
     public function publishArticle()
     {
@@ -392,9 +450,12 @@ class sArticles
     }
 
     /**
-     * Module url
+     * Build the Evolution manager module URL.
      *
-     * @return string
+     * The URL is reused by table row actions, modal actions, and links back into the package
+     * manager module.
+     *
+     * @return string String value ready for manager or frontend use.
      */
     public function moduleUrl(): string
     {
@@ -403,11 +464,14 @@ class sArticles
     }
 
     /**
-     * Retrieves the value from the config file based on the given key.
+     * Read one merged sArticles configuration value.
      *
-     * @param string $key The key to retrieve the value from the config file.
-     * @param mixed $default (optional) The default value to return if the key does not exist. Default is null.
-     * @return mixed The value retrieved from the config file or the default value if the key does not exist.
+     * Provides a small facade-friendly wrapper around package settings with a caller-provided
+     * fallback.
+     *
+     * @param string $key Configuration or request key to read.
+     * @param mixed $default Fallback value used when input is missing or invalid.
+     * @return mixed Value returned for the caller.
      */
     public function config(string $key, mixed $default = null): mixed
     {

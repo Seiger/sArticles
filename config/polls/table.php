@@ -1,6 +1,4 @@
-<?php
-
-return [
+<?php return [
     'key' => 'sarticles.polls',
     'provider' => \Seiger\sArticles\Tables\PollsTableData::class,
     'wire_target' => 'search,perPage,applyDateRangeFilter,setSort,switchView,openCreateModal,openEditModal,saveModal,closeModal,openDeleteModal,closeDeleteModal,deleteConfirmed,addModalItem,removeModalItem,moveModalItem,goToPage,firstPage,previousPage,nextPage,goLastPage',

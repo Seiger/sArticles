@@ -4,12 +4,19 @@ use EvolutionCMS\ServiceProvider;
 use Event;
 use Livewire\Livewire;
 
+/**
+ * sArticlesServiceProvider package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class sArticlesServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * Bootstrap package services after registration.
      *
-     * @return void
+     * Routes, config, migrations, views, translations, Livewire components, and publishable
+     * assets are wired here.
      */
     public function boot()
     {
@@ -91,9 +98,10 @@ class sArticlesServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the service provider.
+     * Register package services with Evolution CMS.
      *
-     * @return void
+     * The provider adds plugins, manager module metadata, singleton bindings, and aliases used
+     * by facade access.
      */
     public function register()
     {

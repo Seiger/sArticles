@@ -1,6 +1,4 @@
-<?php
-
-namespace Seiger\sArticles\Tables;
+<?php namespace Seiger\sArticles\Tables;
 
 use EvolutionCMS\Models\SiteContent;
 use EvolutionCMS\Models\SiteTemplate;
@@ -12,11 +10,28 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Models\sArticle;
 
+/**
+ * TvParametersTableData package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class TvParametersTableData
 {
     protected string $moduleUrl;
     protected bool $legacyFieldsEnsured = false;
 
+    /**
+     * Initialize TvParametersTableData with evo-ui table context.
+     *
+     * Stores manager context, table state, and configuration so row loading, modal
+     * building, and persistence helpers operate against the same request snapshot.
+     *
+     * @param array<string, mixed> $context Runtime context passed by the manager module.
+     * @param array<string, mixed> $state Current table state, including filters and sorting.
+     * @param array<string, mixed> $config Resolved table or modal configuration.
+     * @since 2.0.0
+     */
     public function __construct(
         protected array $context = [],
         protected array $state = [],
@@ -25,6 +40,16 @@ class TvParametersTableData
         $this->moduleUrl = (string) ($context['moduleUrl'] ?? '');
     }
 
+    /**
+     * Total for TvParametersTableData.
+     *
+     * This method keeps the total responsibility inside TvParametersTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function total(): int
     {
         $this->ensureLegacyConfigFields();
@@ -34,6 +59,16 @@ class TvParametersTableData
             : 0;
     }
 
+    /**
+     * Rows for TvParametersTableData.
+     *
+     * This method keeps the rows responsibility inside TvParametersTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function rows(int $page, int $perPage): array
     {
         $this->ensureLegacyConfigFields();
@@ -49,11 +84,31 @@ class TvParametersTableData
         );
     }
 
+    /**
+     * Filter groups for TvParametersTableData.
+     *
+     * This method keeps the filter groups responsibility inside TvParametersTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function filterGroups(): array
     {
         return [];
     }
 
+    /**
+     * Modal defaults for TvParametersTableData.
+     *
+     * This method keeps the modal defaults responsibility inside TvParametersTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalDefaults(): array
     {
         return [
@@ -67,6 +122,16 @@ class TvParametersTableData
         ];
     }
 
+    /**
+     * Modal data for TvParametersTableData.
+     *
+     * This method keeps the modal data responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalData(int $tvId): array
     {
         $tv = $this->findTv($tvId);
@@ -86,11 +151,31 @@ class TvParametersTableData
         ];
     }
 
+    /**
+     * Modal alias for TvParametersTableData.
+     *
+     * This method keeps the modal alias responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function modalAlias(string $source, ?int $ignoreId = null): string
     {
         return $this->uniqueTvName($source, $ignoreId);
     }
 
+    /**
+     * Persist modal data.
+     *
+     * This method keeps the save modal responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function saveModal(array $data, ?int $tvId = null, string $mode = 'create'): int
     {
         $templateId = $this->templateId();
@@ -140,6 +225,16 @@ class TvParametersTableData
         return (int) $tv->id;
     }
 
+    /**
+     * Delete name data from the manager flow.
+     *
+     * This method keeps the delete name responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function deleteName(int $tvId): string
     {
         $tv = $this->findTv($tvId);
@@ -151,6 +246,16 @@ class TvParametersTableData
         return trim((string) $tv->caption) ?: (string) $tv->name;
     }
 
+    /**
+     * Delete row data from the manager flow.
+     *
+     * This method keeps the delete row responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function deleteRow(int $tvId): void
     {
         $tv = $this->findTv($tvId);
@@ -176,6 +281,16 @@ class TvParametersTableData
         $this->normalizeRanks();
     }
 
+    /**
+     * Move row for TvParametersTableData.
+     *
+     * This method keeps the move row responsibility inside TvParametersTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function moveRow(int $tvId, string $direction = 'up'): void
     {
         $ordered = $this->orderedIds();
@@ -195,6 +310,16 @@ class TvParametersTableData
         $this->applyOrder($ordered);
     }
 
+    /**
+     * Reorder row for TvParametersTableData.
+     *
+     * This method keeps the reorder row responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function reorderRow(int $tvId, int $targetId, string $placement = 'before'): void
     {
         if ($tvId === $targetId) {
@@ -216,6 +341,16 @@ class TvParametersTableData
         $this->applyOrder($ordered);
     }
 
+    /**
+     * Tvs query for TvParametersTableData.
+     *
+     * This method keeps the tvs query responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return Builder Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function tvsQuery(): Builder
     {
         $query = $this->baseTvsQuery();
@@ -231,6 +366,16 @@ class TvParametersTableData
         return $query;
     }
 
+    /**
+     * Base tvs query for TvParametersTableData.
+     *
+     * This method keeps the base tvs query responsibility inside TvParametersTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return Builder Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function baseTvsQuery(): Builder
     {
         return SiteTmplvar::query()
@@ -240,6 +385,16 @@ class TvParametersTableData
             ->whereNotIn('site_tmplvars.name', ['menu_footer', 'menu_main']);
     }
 
+    /**
+     * Tv rows for TvParametersTableData.
+     *
+     * This method keeps the tv rows responsibility inside TvParametersTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function tvRows(Collection $tvs): array
     {
         return $tvs
@@ -258,6 +413,16 @@ class TvParametersTableData
             ->all();
     }
 
+    /**
+     * Apply search rules to the current workflow.
+     *
+     * This method keeps the apply search responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applySearch(Builder $query): void
     {
         $search = trim((string) $this->state('search', ''));
@@ -280,6 +445,16 @@ class TvParametersTableData
         });
     }
 
+    /**
+     * Apply sort rules to the current workflow.
+     *
+     * This method keeps the apply sort responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     protected function applySort(Builder $query): bool
     {
         $key = (string) $this->state('sort', '');
@@ -307,6 +482,16 @@ class TvParametersTableData
         return true;
     }
 
+    /**
+     * Find tv for TvParametersTableData.
+     *
+     * This method keeps the find tv responsibility inside TvParametersTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return ?SiteTmplvar Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function findTv(int $tvId): ?SiteTmplvar
     {
         if ($this->templateId() < 1) {
@@ -318,6 +503,16 @@ class TvParametersTableData
             ->first();
     }
 
+    /**
+     * Template id for TvParametersTableData.
+     *
+     * This method keeps the template id responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     protected function templateId(): int
     {
         static $templateId;
@@ -352,6 +547,16 @@ class TvParametersTableData
         return $templateId;
     }
 
+    /**
+     * Unique tv name for TvParametersTableData.
+     *
+     * This method keeps the unique tv name responsibility inside TvParametersTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function uniqueTvName(string $source, ?int $ignoreId = null): string
     {
         $base = $this->normalizeTvName($source);
@@ -371,6 +576,16 @@ class TvParametersTableData
         return $name;
     }
 
+    /**
+     * Normalize type for package-safe usage.
+     *
+     * This method keeps the normalize type responsibility inside TvParametersTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeType(string $type): string
     {
         $allowed = ['text', 'textarea', 'richtext', 'image', 'file', 'dropdown', 'listbox', 'listbox-multiple', 'checkbox'];
@@ -378,6 +593,16 @@ class TvParametersTableData
         return in_array($type, $allowed, true) ? $type : 'text';
     }
 
+    /**
+     * Next rank for TvParametersTableData.
+     *
+     * This method keeps the next rank responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     protected function nextRank(): int
     {
         $templateId = $this->templateId();
@@ -389,6 +614,16 @@ class TvParametersTableData
         return ((int) SiteTmplvarTemplate::query()->where('templateid', $templateId)->max('rank')) + 1;
     }
 
+    /**
+     * Ordered ids for TvParametersTableData.
+     *
+     * This method keeps the ordered ids responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function orderedIds(): array
     {
         if ($this->templateId() < 1) {
@@ -404,6 +639,16 @@ class TvParametersTableData
             ->all();
     }
 
+    /**
+     * Apply order rules to the current workflow.
+     *
+     * This method keeps the apply order responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applyOrder(array $ordered): void
     {
         $templateId = $this->templateId();
@@ -418,11 +663,31 @@ class TvParametersTableData
         }
     }
 
+    /**
+     * Normalize ranks for package-safe usage.
+     *
+     * This method keeps the normalize ranks responsibility inside TvParametersTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function normalizeRanks(): void
     {
         $this->applyOrder($this->orderedIds());
     }
 
+    /**
+     * Remove article tv values for TvParametersTableData.
+     *
+     * This method keeps the remove article tv values responsibility inside
+     * TvParametersTableData, so callers can rely on a stable package boundary while the manager
+     * UI, frontend runtime, or legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function removeArticleTvValues(string $name): void
     {
         if ($name === '') {
@@ -446,6 +711,16 @@ class TvParametersTableData
             });
     }
 
+    /**
+     * Ensure legacy config fields for TvParametersTableData.
+     *
+     * This method keeps the ensure legacy config fields responsibility inside
+     * TvParametersTableData, so callers can rely on a stable package boundary while the manager
+     * UI, frontend runtime, or legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function ensureLegacyConfigFields(): void
     {
         if ($this->legacyFieldsEnsured || $this->templateId() < 1) {
@@ -500,6 +775,16 @@ class TvParametersTableData
         $this->normalizeRanks();
     }
 
+    /**
+     * Legacy type for TvParametersTableData.
+     *
+     * This method keeps the legacy type responsibility inside TvParametersTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function legacyType(string $type): string
     {
         return match (Str::lower($type)) {
@@ -511,11 +796,31 @@ class TvParametersTableData
         };
     }
 
+    /**
+     * Normalize tv key for package-safe usage.
+     *
+     * This method keeps the normalize tv key responsibility inside TvParametersTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeTvKey(string $source): string
     {
         return $this->normalizeTvName($source);
     }
 
+    /**
+     * Normalize tv name for package-safe usage.
+     *
+     * This method keeps the normalize tv name responsibility inside TvParametersTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeTvName(string $source): string
     {
         $name = trim(substr(Str::slug(Str::ascii($source), '_'), 0, 50), '_');
@@ -523,6 +828,16 @@ class TvParametersTableData
         return $name !== '' ? $name : 'blog_tv';
     }
 
+    /**
+     * Like sql for TvParametersTableData.
+     *
+     * This method keeps the like sql responsibility inside TvParametersTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function likeSql(Builder $query, string $field): string
     {
         $driver = $query->getConnection()->getDriverName();
@@ -535,6 +850,16 @@ class TvParametersTableData
             : 'LOWER(' . $wrapped . ') LIKE ?';
     }
 
+    /**
+     * State for TvParametersTableData.
+     *
+     * This method keeps the state responsibility inside TvParametersTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function state(string $key, mixed $default = null): mixed
     {
         return data_get($this->state, $key, $default);

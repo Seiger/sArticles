@@ -1,9 +1,13 @@
-<?php
-
-namespace Seiger\sArticles\Livewire;
+<?php namespace Seiger\sArticles\Livewire;
 
 use Livewire\Component;
 
+/**
+ * ModulePanel package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class ModulePanel extends Component
 {
     public array $rawTabs = [];
@@ -11,6 +15,16 @@ class ModulePanel extends Component
 
     public string $activeTab = 'articles';
 
+    /**
+     * Mount for ModulePanel.
+     *
+     * This method keeps the mount responsibility inside ModulePanel, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function mount(array $tabs = [], string $activeTab = 'articles', array $context = []): void
     {
         $this->rawTabs = $tabs;
@@ -18,11 +32,31 @@ class ModulePanel extends Component
         $this->activeTab = $this->normalizeTab($activeTab);
     }
 
+    /**
+     * Switch tab for ModulePanel.
+     *
+     * This method keeps the switch tab responsibility inside ModulePanel, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function switchTab(string $tab): void
     {
         $this->activeTab = $this->normalizeTab($tab);
     }
 
+    /**
+     * Render for ModulePanel.
+     *
+     * This method keeps the render responsibility inside ModulePanel, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     public function render()
     {
         return view('sArticles::livewire.module-panel', [
@@ -33,6 +67,16 @@ class ModulePanel extends Component
         ]);
     }
 
+    /**
+     * Normalize tab for package-safe usage.
+     *
+     * This method keeps the normalize tab responsibility inside ModulePanel, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeTab(string $tab): string
     {
         $tab = trim($tab);
@@ -45,6 +89,16 @@ class ModulePanel extends Component
         return in_array($tab, $allowed, true) ? $tab : ($allowed[0] ?? 'articles');
     }
 
+    /**
+     * Navigation tabs for ModulePanel.
+     *
+     * This method keeps the navigation tabs responsibility inside ModulePanel, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function navigationTabs(): array
     {
         return collect($this->rawTabs)
@@ -65,6 +119,16 @@ class ModulePanel extends Component
             ->all();
     }
 
+    /**
+     * Preset for ModulePanel.
+     *
+     * This method keeps the preset responsibility inside ModulePanel, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function preset(): string
     {
         return match ($this->activeTab) {
@@ -80,6 +144,16 @@ class ModulePanel extends Component
         };
     }
 
+    /**
+     * Title for ModulePanel.
+     *
+     * This method keeps the title responsibility inside ModulePanel, so callers can rely on a
+     * stable package boundary while the manager UI, frontend runtime, or legacy storage details
+     * evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function title(): string
     {
         return match ($this->activeTab) {
@@ -95,6 +169,16 @@ class ModulePanel extends Component
         };
     }
 
+    /**
+     * Livewire tabs for ModulePanel.
+     *
+     * This method keeps the livewire tabs responsibility inside ModulePanel, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function livewireTabs(): array
     {
         return ['articles', 'authors', 'tags', 'categories', 'features', 'comments', 'polls', 'tvparams', 'settings'];

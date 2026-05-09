@@ -1,6 +1,4 @@
-<?php
-
-return [
+<?php return [
     'key' => 'sarticles.tags',
     'provider' => \Seiger\sArticles\Tables\TagsTableData::class,
     'wire_target' => 'search,perPage,setSort,switchView,openCreateModal,openEditModal,openActionModal,saveModal,closeModal,openDeleteModal,closeDeleteModal,deleteConfirmed,goToPage,firstPage,previousPage,nextPage,goLastPage',

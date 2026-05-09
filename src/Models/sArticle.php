@@ -8,11 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * Class sArticle
+ * Eloquent model for sArticles article records.
  *
- * Represents an article model.
- *
- * @property-read string $link The URL of the article.
+ * Adds translated content, frontend scopes, relation accessors, and generated link behavior
+ * around the core `s_articles` table.
  */
 class sArticle extends Model
 {
@@ -24,9 +23,10 @@ class sArticle extends Model
     protected $appends = ['coverSrc', 'link', 'dateObj'];
 
     /**
-     * The "booted" method of the model.
+     * Booted for the records manager flow.
      *
-     * @return void
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
      */
     protected static function booted()
     {
@@ -61,11 +61,12 @@ class sArticle extends Model
     }
 
     /**
-     * Apply search filters to the query
+     * Scope search for the records manager flow.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $builder The query builder object
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
      *
-     * @return \Illuminate\Database\Eloquent\Builder The modified query builder object
+     * @param mixed $builder Builder value.
      */
     public function scopeSearch($builder)
     {
@@ -125,7 +126,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the author associated with the article.
+     * Author for the records manager flow.
+     *
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function author()
     {
@@ -133,7 +139,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the features for the Article.
+     * Features for the records manager flow.
+     *
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function features()
     {
@@ -143,7 +154,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the tags for the Article.
+     * Tags for the records manager flow.
+     *
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function tags()
     {
@@ -151,7 +167,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the categories for the Book.
+     * Categories for the records manager flow.
+     *
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function categories()
     {
@@ -161,10 +182,13 @@ class sArticle extends Model
     }
 
     /**
-     * Only active articles
+     * Scope active for the records manager flow.
      *
-     * @param Builder $builder
-     * @return Builder
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param mixed $builder Builder value.
+     * @since 2.0.0
      */
     public function scopeActive($builder)
     {
@@ -172,9 +196,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the article cover src link
+     * Get cover src attribute for the records manager flow.
      *
-     * @return string cover_src
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function getCoverSrcAttribute()
     {
@@ -188,9 +215,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the article link
+     * Get link attribute for the records manager flow.
      *
-     * @return string link
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function getLinkAttribute()
     {
@@ -208,9 +238,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the article link
+     * Get date obj attribute for the records manager flow.
      *
-     * @return string link
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function getDateObjAttribute()
     {

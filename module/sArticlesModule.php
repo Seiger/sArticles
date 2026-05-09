@@ -126,13 +126,13 @@ switch ($data['get']) {
         $data['checkType'] = $checkType;
         break;
     case 'commentDelete':
-        sArticleComment::where('comid', (int)request()->i)->delete();
+        sArticleComment::where('comid', (int) request()->i)->delete();
         $get = '&get='.( request()->get('article') ? 'article_comments&i='.request()->get('article') : 'comments' );
         $page = request()->get('page') ?'&page='.request()->get('page') : '';
         return header('Location: ' . $sArticlesController->url . $get . $page . $linkType);
         break;
     case "article":
-        $requestId = (int)request()->input('i', 0);
+        $requestId = (int) request()->input('i', 0);
         $checkType = request()->type ?? "article";
         $data['tabs'] = ['article', 'content'];
         $data['article'] = sArticles::getArticle($requestId);
@@ -160,7 +160,7 @@ switch ($data['get']) {
         }
         break;
     case "articleSave":
-        $requestId = (int)request()->article;
+        $requestId = (int) request()->article;
         $publishedAt = request()->published_at;
         if (empty($publishedAt) || $publishedAt == '0000-00-00 00:00:00') {
             $publishedAt = evo()->now()->toDateTimeString();
@@ -192,11 +192,11 @@ switch ($data['get']) {
             $votes['4'] = 0;
             $votes['5'] = 1;
         }
-        $article->published = (int)request()->published;
-        $article->parent = (int)request()->parent;
-        $article->author_id = (int)request()->author_id;
+        $article->published = (int) request()->published;
+        $article->parent = (int) request()->parent;
+        $article->author_id = (int) request()->author_id;
         $article->alias = $sArticlesController->validateAlias($alias, request()->article);
-        $article->position = (int)request()->position;
+        $article->position = (int) request()->position;
         $article->cover = request()->cover;
         $article->type = request()->type ?? "article";
         $article->relevants = json_encode(request()->relevants);
@@ -213,7 +213,7 @@ switch ($data['get']) {
         $back = str_replace(['&i=0', '&type=article'], ['&i=' . $article->id, '&type=' . $article->type], (request()->back ?? '&get=articles'));
         return header('Location: ' . $sArticlesController->url . $back);
     case "articleDelete":
-        $requestId = (int)request()->input('i', 0);
+        $requestId = (int) request()->input('i', 0);
         $article = sArticle::find($requestId);
         $_SESSION['itemaction'] = 'Deleting Article';
         $_SESSION['itemname'] = $article->title;
@@ -233,13 +233,13 @@ switch ($data['get']) {
         if (request()->i && $template && SiteTmplvarTemplate::whereTemplateid($template)->first()) {
             $data['tabs'][] = 'tvs';
         }
-        $content = sArticleTranslate::whereArticle((int)request()->i)->whereLang(request()->lang)->first();
+        $content = sArticleTranslate::whereArticle((int) request()->i)->whereLang(request()->lang)->first();
         if (!$content && request()->lang == $sArticlesController->langDefault()) {
-            $content = sArticleTranslate::whereArticle((int)request()->i)->whereLang('base')->first();
+            $content = sArticleTranslate::whereArticle((int) request()->i)->whereLang('base')->first();
         }
         if (!$content) {
             $content = new sArticleTranslate();
-            $content->article = (int)request()->i;
+            $content->article = (int) request()->i;
             $content->lang = request()->lang;
         }
         $data['article_url'] = '&type='.$checkType.'&i='.request()->i;
@@ -259,7 +259,7 @@ switch ($data['get']) {
                     $template = basename(dirname($field));
                     $field = require $field;
 
-                    if ((int)$field['active']) {
+                    if ((int) $field['active']) {
                         $id = $field['id'];
                         $templates[$id] = $template;
                         $order = ($field['order'] ?? ($idx + 25));
@@ -372,9 +372,9 @@ switch ($data['get']) {
         }
         $contentField = str_replace([chr(9), chr(10), chr(13), '  '], '', $contentField);
 
-        $content = sArticleTranslate::whereArticle((int)request()->article)->whereLang(request()->lang)->firstOrNew();
+        $content = sArticleTranslate::whereArticle((int) request()->article)->whereLang(request()->lang)->firstOrNew();
         if (!$content->tid) {
-            $content->article = (int)request()->article;
+            $content->article = (int) request()->article;
             $content->lang = request()->lang;
         }
         $content->pagetitle = request()->pagetitle;
@@ -556,11 +556,11 @@ switch ($data['get']) {
             $votes['total'] = 0;
         }
         $normalizedAnswers = [];
-        $normalizedVotes = ['total' => (int)($votes['total'] ?? 0)];
+        $normalizedVotes = ['total' => (int) ($votes['total'] ?? 0)];
         foreach ($answers as $key => $answer) {
             $normalizedKey = count($normalizedAnswers);
             $normalizedAnswers[$normalizedKey] = $answer;
-            $normalizedVotes[(string)$normalizedKey] = (int)($votes[(string)$key] ?? $votes[$key] ?? 0);
+            $normalizedVotes[(string) $normalizedKey] = (int) ($votes[(string) $key] ?? $votes[$key] ?? 0);
         }
         $poll->answers = json_encode($normalizedAnswers);
         $poll->votes = json_encode($normalizedVotes);
@@ -601,7 +601,7 @@ switch ($data['get']) {
         $data['tvValues'] = data_is_json($data['article']->tmplvars, true) ?? [];
         break;
     case "tvsSave":
-        $article = sArticles::getArticle((int)request()->article);
+        $article = sArticles::getArticle((int) request()->article);
         $template = SiteContent::find(evo()->getConfig('sart_blank', 0))->template ?? 0;
         $tvs = SiteTmplvar::query()
             ->select('site_tmplvars.*', 'site_tmplvar_templates.rank as tvrank', 'site_tmplvar_templates.rank', 'site_tmplvars.id', 'site_tmplvars.rank')
@@ -718,7 +718,7 @@ switch ($data['get']) {
         }
         die($result);
     case "сategoryDelete":
-        DB::table('s_articles_categories')->where('catid', (int)request()->i)->delete();
+        DB::table('s_articles_categories')->where('catid', (int) request()->i)->delete();
         $back = '&get=categories';
         return header('Location: ' . $sArticlesController->url . $back);
     case "features":
@@ -988,7 +988,7 @@ switch ($data['get']) {
         $result = $sArticlesController->updateTranslateTag($_POST['source'], $_POST['target'], $_POST['value']);
         die($result);
     case "tagDelete":
-        DB::table('s_articles_tags')->where('tagid', (int)request()->i)->delete();
+        DB::table('s_articles_tags')->where('tagid', (int) request()->i)->delete();
         $back = '&get=tags';
         return header('Location: ' . $sArticlesController->url . $back . $linkType);
 }

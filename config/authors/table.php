@@ -1,6 +1,4 @@
-<?php
-
-return [
+<?php return [
     'key' => 'sarticles.authors',
     'provider' => \Seiger\sArticles\Tables\AuthorsTableData::class,
     'wire_target' => 'search,perPage,applyMultiFilter,setSort,switchView,openCreateModal,openEditModal,saveModal,closeModal,openDeleteModal,closeDeleteModal,deleteConfirmed,goToPage,firstPage,previousPage,nextPage,goLastPage',

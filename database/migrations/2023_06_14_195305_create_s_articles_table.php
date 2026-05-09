@@ -6,12 +6,19 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
 
+/**
+ * CreateSArticlesTable package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class CreateSArticlesTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Create the sArticles schema.
      *
-     * @return void
+     * Tables, relation pivots, comments, polls, taxonomy records, TV parameters, and starter
+     * Evolution content are created for a fresh install.
      */
     public function up()
     {
@@ -135,9 +142,10 @@ class CreateSArticlesTable extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Remove the sArticles schema.
      *
-     * @return void
+     * Drops package tables and removes the starter Evolution template content created by the
+     * migration.
      */
     public function down()
     {
