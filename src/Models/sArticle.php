@@ -43,14 +43,21 @@ class sArticle extends Model
                 }
             }
 
-            $builder->leftJoin('s_article_translates as sat', function ($leftJoin) use ($builder, $locale) {
+            $grammar = $builder->getQuery()->getGrammar();
+            $quotedLocale = DB::connection()->getPdo()->quote($locale);
+            $quotedBase = DB::connection()->getPdo()->quote('base');
+            $langOrderSql = 'CASE WHEN ' . $grammar->wrap('lang') . ' = ' . $quotedLocale
+                . ' THEN 0 WHEN ' . $grammar->wrap('lang') . ' = ' . $quotedBase
+                . ' THEN 1 ELSE 2 END';
+
+            $builder->leftJoin('s_article_translates as sat', function ($leftJoin) use ($locale, $langOrderSql) {
                 $leftJoin->on('s_articles.id', '=', 'sat.article')
-                    ->where('sat.lang', function ($leftJoin) use ($builder, $locale) {
+                    ->where('sat.lang', function ($leftJoin) use ($locale, $langOrderSql) {
                         $leftJoin->select('lang')
                             ->from('s_article_translates as t')
-                            ->whereRaw('`' . DB::getTablePrefix() . 't`.`article` = `' . DB::getTablePrefix() . 's_articles`.`id`')
+                            ->whereColumn('t.article', 's_articles.id')
                             ->whereIn('lang', [$locale, 'base'])
-                            ->orderByRaw('FIELD(`lang`, "' . $locale . '", "base")')
+                            ->orderByRaw($langOrderSql)
                             ->limit(1);
                     });
             });

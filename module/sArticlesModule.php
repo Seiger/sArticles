@@ -7,6 +7,7 @@ use EvolutionCMS\Models\SiteContent;
 use EvolutionCMS\Models\SiteTmplvar;
 use EvolutionCMS\Models\SiteTmplvarTemplate;
 use EvolutionCMS\Models\UserAttribute;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
@@ -159,7 +160,12 @@ switch ($data['get']) {
         $article = sArticle::where('s_articles.id', $requestId)->firstOrNew();
         $alias = request()->alias;
         if (empty($alias)) {
-            $translate = sArticleTranslate::whereArticle($requestId)->whereIn('lang', ['en', $defaultLng, 'base'])->orderByRaw('FIELD(lang, "en", "'.$defaultLng.'", "base")')->first();
+            $grammar = DB::connection()->getQueryGrammar();
+            $quotedDefaultLng = DB::connection()->getPdo()->quote($defaultLng);
+            $langColumn = $grammar->wrap('lang');
+            $langOrderSql = 'CASE WHEN ' . $langColumn . ' = \'en\' THEN 0 WHEN ' . $langColumn . ' = '
+                . $quotedDefaultLng . ' THEN 1 WHEN ' . $langColumn . ' = \'base\' THEN 2 ELSE 3 END';
+            $translate = sArticleTranslate::whereArticle($requestId)->whereIn('lang', ['en', $defaultLng, 'base'])->orderByRaw($langOrderSql)->first();
             if ($translate) {
                 $alias = $translate->pagetitle;
             } else {
