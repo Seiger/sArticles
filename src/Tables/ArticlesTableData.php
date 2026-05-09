@@ -2428,9 +2428,45 @@ class ArticlesTableData
             return true;
         }
 
+        if ($field === 'section_title') {
+            $this->applySectionTitleSort($query, $direction);
+
+            return true;
+        }
+
         $query->orderBy($field, $direction);
 
         return true;
+    }
+
+    /**
+     * Sort articles by the visible Evolution resource title.
+     *
+     * The table displays root-level article buckets as the configured site name and concrete
+     * section parents as their `site_content.pagetitle`. This sort mirrors that UI contract without
+     * joining `site_content` into the main select, avoiding duplicate `id` columns that would break
+     * Eloquent hydration for article rows.
+     *
+     * @param Builder $query Article listing query being mutated.
+     * @param string $direction Normalized SQL sort direction (`asc` or `desc`).
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.1.0
+     */
+    protected function applySectionTitleSort(Builder $query, string $direction): void
+    {
+        $grammar = $query->getGrammar();
+        $siteContent = $grammar->wrapTable((new SiteContent())->getTable());
+        $siteContentId = $siteContent . '.' . $grammar->wrap('id');
+        $siteContentTitle = $siteContent . '.' . $grammar->wrap('pagetitle');
+        $parent = $grammar->wrap('s_articles.parent');
+
+        $query->orderByRaw(
+            'LOWER(COALESCE(CASE WHEN ' . $parent . ' <= 1 THEN ? ELSE (SELECT ' . $siteContentTitle . ' FROM ' . $siteContent . ' WHERE ' . $siteContentId . ' = ' . $parent . ' LIMIT 1) END, ?)) ' . $direction,
+            [
+                (string) evo()->getConfig('site_name'),
+                '',
+            ]
+        );
     }
 
     /**

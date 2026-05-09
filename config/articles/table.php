@@ -131,6 +131,8 @@
             'key' => 'section',
             'type' => 'link',
             'label' => 'sArticles::global.section',
+            'sortable' => true,
+            'sort_field' => 'section_title',
         ],
         [
             'key' => 'categories',
