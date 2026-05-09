@@ -116,7 +116,11 @@ class sArticlesServiceProvider extends ServiceProvider
                 }
             }
             $lang = include_once dirname(__DIR__) . '/lang/' . $lang . '/global.php';
-            $this->app->registerModule($lang['articles'], dirname(__DIR__) . '/module/sArticlesModule.php', $lang['articles_icon']);
+            $this->app->registerModule(
+                $lang['module_title'] ?? $lang['articles'],
+                dirname(__DIR__) . '/module/sArticlesModule.php',
+                $lang['module_icon'] ?? $lang['articles_icon']
+            );
         }
     }
 }

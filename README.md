@@ -9,12 +9,12 @@
 
 **sArticles** is a publications, news, and blog management module for the Evolution CMS manager.
 
-The current manager interface is rebuilt on top of **evo-ui** and **Livewire**. It works as a responsive SPA-like manager module: tabs, filters, sorting, pagination, modal forms, inline actions, and content editing update through Livewire instead of full iframe reloads.
+The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. It works as a responsive SPA-like manager module: tabs, filters, sorting, pagination, modal forms, inline actions, and content editing update through Livewire instead of full iframe reloads.
 
 ## Features
 
 - Publications with multiple configurable resource types.
-- evo-ui tables with table/list views, filters, search, sorting, pagination, selection, bulk-style actions, and session state.
+- EvoUI tables with table/list views, filters, search, sorting, pagination, selection, bulk-style actions, and session state.
 - Large modal article editor with main fields, relations, SEO fields, multilingual tabs, and a content builder.
 - Content builder blocks: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion, and File.
 - Authors, tags, tag texts, topics, features, comments, polls, and TV parameter management.
@@ -27,7 +27,7 @@ The current manager interface is rebuilt on top of **evo-ui** and **Livewire**. 
 - PHP `^8.3`
 - Evolution CMS `^3.5.7`
 - `evolution-cms/evo-ui` `^1.0`
-- Livewire, as provided by the Evolution CMS/evo-ui runtime
+- Livewire, as provided by the Evolution CMS/EvoUI runtime
 
 Optional packages:
 
@@ -63,6 +63,7 @@ Localized documentation lives in `docs/`:
 
 - [English](docs/en/README.md)
 - [Ukrainian](docs/ua/README.md)
+- [Ukrainian `uk` locale](docs/uk/README.md)
 - [Russian](docs/ru/README.md)
 - [German](docs/de/README.md)
 - [French](docs/fr/README.md)
@@ -96,9 +97,9 @@ Useful facade methods:
 
 ## Native Integrations
 
-### evo-ui + Livewire
+### EvoUI + Livewire
 
-sArticles registers an evo-ui module panel and table/form presets. The manager UI is driven by Livewire components and package config files:
+sArticles registers an EvoUI module panel and table/form presets. The manager UI is driven by Livewire components and package config files:
 
 - `config/articles/table.php`
 - `config/articles/modal.php`
@@ -127,10 +128,10 @@ Per-field editor selectors are intentionally hidden in sArticles forms to keep t
 
 ## Development Notes
 
-- The new manager UI is config-driven and uses evo-ui/Livewire.
+- The new manager UI is config-driven and uses EvoUI/Livewire.
 - Legacy manager blades, scripts, and styles are removed from the new flow.
 - Use `EVO_*` constants for Evolution paths; old compatibility aliases should not be used in new code.
-- Keep module-specific hooks in sArticles, not in evo-ui.
+- Keep module-specific hooks in sArticles, not in EvoUI.
 - Use table presets for manager lists and modal presets for edit/create flows.
 
 ## License
