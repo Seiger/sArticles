@@ -122,7 +122,11 @@ Event::listen('evolution.OnManagerMenuPrerender', function($params) {
         $icon = __('sArticles::global.articles_icon');
         $iconHtml = '<i class="' . $icon . '"></i>';
         if (strpos($icon, 'tabler-') === 0 && function_exists('svg')) {
-            $iconHtml = svg($icon)->toHtml();
+            $iconHtml = svg($icon, '', [
+                'aria-hidden' => 'true',
+                'focusable' => 'false',
+                'style' => 'flex:0 0 auto;display:block;',
+            ])->toHtml();
         }
 
         $menu['sarticles'] = [
