@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
  * using Laravel package views, so sites can override individual blocks through
  * `views/vendor/sarticles/render/*.blade.php`.
  *
- * @since 2.1.0
+ * @since 2.0.0
  */
 class BuilderRenderer
 {
@@ -22,7 +22,7 @@ class BuilderRenderer
      *
      * @param array<int, array<string, mixed>> $builder Builder data in storage format.
      * @return string Materialized HTML for the article translation content column.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     public function renderContent(array $builder): string
     {
@@ -61,7 +61,7 @@ class BuilderRenderer
      * @param mixed $value Stored block payload.
      * @param int $position Zero-based block position inside the article builder.
      * @return string Rendered block HTML.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     public function renderBlock(string $view, string $id, mixed $value, int $position = 0): string
     {
@@ -75,7 +75,7 @@ class BuilderRenderer
      * templates are read from the package, while frontend render HTML is handled by package views.
      *
      * @return array<int, array<string, mixed>> Builder definitions keyed for manager and render flows.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     public function configs(): array
     {
@@ -118,7 +118,7 @@ class BuilderRenderer
      * `views/vendor/sarticles/render` override directory instead.
      *
      * @return string Absolute builder directory path.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     public function builderPath(): string
     {
@@ -132,7 +132,7 @@ class BuilderRenderer
      * frontend render output goes through namespaced package views.
      *
      * @return array<int, string> Absolute view roots for builder editor templates.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     public function builderTemplateRoots(): array
     {

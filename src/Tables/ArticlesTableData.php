@@ -1867,7 +1867,7 @@ class ArticlesTableData
      * normal Evolution runtime still receives the singleton registered by the service provider.
      *
      * @return BuilderRenderer Builder rendering service.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     protected function builderRenderer(): BuilderRenderer
     {
@@ -2257,7 +2257,7 @@ class ArticlesTableData
      *
      * @param string $value User-entered search phrase or token.
      * @return array<int, string> LIKE-ready values with escaped wildcards.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     protected function searchNeedles(string $value): array
     {
@@ -2430,7 +2430,7 @@ class ArticlesTableData
      * @param Builder $query Article listing query being mutated.
      * @param string $direction Normalized SQL sort direction (`asc` or `desc`).
      * @return void No value is returned; the relevant query, model, or storage state is updated in place.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     protected function applySectionTitleSort(Builder $query, string $direction): void
     {

@@ -492,7 +492,7 @@ class sArticlesController
      * @param string $tpl Tpl value.
      * @param array<string, mixed> $data Data value.
      * @return mixed Renderable manager view instance.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     public function view(string $tpl, array $data = [])
     {

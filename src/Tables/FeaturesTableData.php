@@ -293,7 +293,7 @@ class FeaturesTableData
      * @param string $language Language code currently being persisted.
      * @param bool $usesLanguageFields True when multilingual fields are visible in the modal.
      * @return string Trimmed feature name ready for storage.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     protected function modalFeatureTextValue(array $data, string $language, bool $usesLanguageFields): string
     {

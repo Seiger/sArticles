@@ -364,7 +364,7 @@ class AuthorsTableData
      * @param string $field Author text field (`name`, `lastname`, or `office`).
      * @param bool $usesLanguageFields True when multilingual fields are visible in the modal.
      * @return string Trimmed value ready for author storage.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     protected function modalAuthorTextValue(array $data, string $language, string $field, bool $usesLanguageFields): string
     {

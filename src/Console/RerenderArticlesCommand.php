@@ -11,7 +11,7 @@ use Seiger\sArticles\Support\BuilderRenderer;
  * until a site owner runs this command. Large ranges are processed in chunks so production sites
  * can safely refresh many translations without loading the full table into memory.
  *
- * @since 2.1.0
+ * @since 2.0.0
  */
 class RerenderArticlesCommand extends Command
 {
@@ -31,7 +31,7 @@ class RerenderArticlesCommand extends Command
      *
      * @param BuilderRenderer $renderer Builder renderer shared with manager save flows.
      * @return int Console exit code.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     public function handle(BuilderRenderer $renderer): int
     {
@@ -101,7 +101,7 @@ class RerenderArticlesCommand extends Command
      *
      * @param string $value Raw --articles option value.
      * @return array<string, mixed>|false Parsed query filter or false when invalid.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     protected function parseArticlesOption(string $value): array|false
     {
@@ -144,7 +144,7 @@ class RerenderArticlesCommand extends Command
      * @param mixed $query Eloquent query builder for translation rows.
      * @param array<string, mixed> $filter Parsed article filter.
      * @return void
-     * @since 2.1.0
+     * @since 2.0.0
      */
     protected function applyArticleFilter(mixed $query, array $filter): void
     {
@@ -166,7 +166,7 @@ class RerenderArticlesCommand extends Command
      *
      * @param int $chunk Requested chunk size.
      * @return int Safe chunk size between 1 and 1000.
-     * @since 2.1.0
+     * @since 2.0.0
      */
     protected function normalizeChunk(int $chunk): int
     {
