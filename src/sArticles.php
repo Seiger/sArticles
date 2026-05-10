@@ -34,7 +34,7 @@ class sArticles
     public function __construct()
     {
         if (IN_MANAGER_MODE) {
-            Paginator::defaultView('sArticles::partials.pagination');
+            Paginator::defaultView('sarticles::partials.pagination');
             $this->url = $this->moduleUrl();
         } else {
             Paginator::defaultView('partials.pagination');

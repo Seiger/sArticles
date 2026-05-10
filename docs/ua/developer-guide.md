@@ -60,17 +60,35 @@ UI-пресети:
 
 ```text
 builder/<block>/config.php
-builder/<block>/render.blade.php
 builder/<block>/template.blade.php
+views/render/<block>.blade.php
 ```
 
-Опубліковані блоки можуть перевизначати пакет:
+`builder/<block>/template.blade.php` використовується редактором у менеджері. Frontend HTML
+рендериться через lowercase Laravel package views:
 
 ```text
-assets/modules/sarticles/builder/<block>
+sarticles::render.<block>
 ```
 
-`ArticlesTableData` нормалізує builder data, зберігає її і рендерить через `render.blade.php`.
+Для кастомізації розмітки потрібно скопіювати тільки потрібний render-файл у site-level vendor
+override:
+
+```text
+views/vendor/sarticles/render/<block>.blade.php
+```
+
+Не публікуйте і не змінюйте всі render views за замовчуванням. Пакетні дефолти лишаються у vendor,
+а проєкт перевизначає тільки ті блоки, яким потрібна власна HTML-структура.
+
+`builder` JSON є source of truth, а поле `content` містить materialized HTML для сумісності,
+фронту і пошуку. Після зміни render views існуючі статті потрібно оновити явно:
+
+```console
+php artisan sarticles:rerender --dry-run
+php artisan sarticles:rerender --articles=123-10000 --chunk=200
+php artisan sarticles:rerender --articles=123,124,200 --lang=uk
+```
 
 ## Редактори
 

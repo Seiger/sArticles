@@ -7,6 +7,7 @@ use EvolutionCMS\Models\SiteContent;
 use EvolutionCMS\Models\SiteTmplvar;
 use EvolutionCMS\Models\SiteTmplvarTemplate;
 use EvolutionCMS\Models\UserAttribute;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
@@ -17,10 +18,12 @@ use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesPoll;
 use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticleTranslate;
+use Seiger\sArticles\Support\BuilderRenderer;
 
 if (!defined('IN_MANAGER_MODE') || IN_MANAGER_MODE != 'true') die("No access");
 
 $sArticlesController = new sArticlesController();
+$builderRenderer = app(BuilderRenderer::class);
 $linkType = request()->has('type') ? '&type=' . request()->type : '';
 $data['editor'] = '';
 $data['tabs'] = [];
@@ -250,27 +253,23 @@ switch ($data['get']) {
         $buttons = [];
         $elements = [];
         $templates = [];
-        $fields = glob(EVO_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
-        View::getFinder()->setPaths([EVO_BASE_PATH . 'assets/modules/sarticles/builder']);
+        $fields = $builderRenderer->configs();
+        View::getFinder()->setPaths($builderRenderer->builderTemplateRoots());
 
         if (count($fields)) {
             foreach ($fields as $idx => $field) {
-                if (is_file(dirname($field).'/template.blade.php')) {
-                    $template = basename(dirname($field));
-                    $field = require $field;
-
-                    if ((int) $field['active']) {
-                        $id = $field['id'];
-                        $templates[$id] = $template;
-                        $order = ($field['order'] ?? ($idx + 25));
-                        while (isset($buttons[$order])) {
-                            $order++;
-                        }
-                        $buttons[$order] = '<button type="button" class="btn btn-secondary add-block" data-id="' . e((string) $id) . '">' . e((string) ($field['title'] ?? $id)) . '</button>';
-                        $elements[] = view($template . '.template', compact(['id']))->render();
-                        if (strtolower($field['type']) == 'richtext') {
-                            $richtexts[$id] = [];
-                        }
+                if (is_file((string) ($field['template_path'] ?? '')) && (int) ($field['active'] ?? 0)) {
+                    $template = (string) ($field['template'] ?? '');
+                    $id = (string) ($field['id'] ?? $template);
+                    $templates[$id] = $template;
+                    $order = ($field['order'] ?? ($idx + 25));
+                    while (isset($buttons[$order])) {
+                        $order++;
+                    }
+                    $buttons[$order] = '<button type="button" class="btn btn-secondary add-block" data-id="' . e($id) . '">' . e((string) ($field['title'] ?? $id)) . '</button>';
+                    $elements[] = view($template . '.template', compact(['id']))->render();
+                    if (strtolower((string) ($field['type'] ?? '')) == 'richtext') {
+                        $richtexts[$id] = [];
                     }
                 }
             }
@@ -343,34 +342,8 @@ switch ($data['get']) {
         );
         break;
     case "contentSave":
-        $contentField = '';
-        $renders = [];
-        $fields = glob(EVO_BASE_PATH . 'assets/modules/sarticles/builder/*/config.php');
-        View::getFinder()->setPaths([EVO_BASE_PATH . 'assets/modules/sarticles/builder']);
-
-        if (count($fields)) {
-            foreach ($fields as $field) {
-                $render = str_replace('config.php', 'render.blade.php', $field);
-                if (is_file($render)) {
-                    $render = basename(dirname($render));
-                    $field = require $field;
-                    $id = $field['id'];
-                    $renders[$id] = $render;
-                }
-            }
-        }
-
         $contentBuilder = request()->input('builder', '');
-        if (is_array($contentBuilder) && count($contentBuilder)) {
-            foreach ($contentBuilder as $position => $item) {
-                $id = array_key_first($item);
-                if (isset($renders[$id])) {
-                    $value = $item[$id];
-                    $contentField .= view($renders[$id] . '.render', compact(['id', 'value']))->render();
-                }
-            }
-        }
-        $contentField = str_replace([chr(9), chr(10), chr(13), '  '], '', $contentField);
+        $contentField = is_array($contentBuilder) ? $builderRenderer->renderContent(array_values($contentBuilder)) : '';
 
         $content = sArticleTranslate::whereArticle((int) request()->article)->whereLang(request()->lang)->firstOrNew();
         if (!$content->tid) {

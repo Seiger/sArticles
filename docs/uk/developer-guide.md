@@ -69,6 +69,37 @@ return [
 
 При додаванні нового блоку UI прокручує форму до створеного блоку, щоб менеджер одразу бачив результат дії.
 
+Структура builder у 2.x:
+
+```text
+builder/<block>/config.php
+builder/<block>/template.blade.php
+views/render/<block>.blade.php
+```
+
+`template.blade.php` відповідає за manager UI, а frontend HTML рендериться через Laravel package
+view:
+
+```text
+sarticles::render.<block>
+```
+
+Для кастомізації не потрібно запускати `vendor:publish` для всіх render-шаблонів. Скопіюйте тільки
+потрібний файл у кореневий override:
+
+```text
+views/vendor/sarticles/render/<block>.blade.php
+```
+
+`builder` JSON є джерелом правди, а поле `content` зберігає materialized HTML. Якщо render view
+змінено, оновіть вже збережений HTML явно:
+
+```console
+php artisan sarticles:rerender --dry-run
+php artisan sarticles:rerender --articles=123-10000 --chunk=200
+php artisan sarticles:rerender --articles=123,124,200 --lang=uk
+```
+
 ## sSeo
 
 Якщо встановлено sSeo, sArticles додає SEO-поля до форми публікації. Без sLang SEO живе в базовому потоці, а з sLang - у мовних вкладках і зберігається для конкретної мови.

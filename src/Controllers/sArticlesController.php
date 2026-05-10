@@ -485,16 +485,18 @@ class sArticlesController
     /**
      * View for the records manager flow.
      *
-     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
-     * consumes it.
+     * Manager blade files are resolved through the lowercase Laravel package view namespace.
+     * Language lines intentionally keep the historical `sArticles::` namespace, but views now use
+     * `sarticles::` so Laravel vendor overrides match `views/vendor/sarticles`.
      *
      * @param string $tpl Tpl value.
      * @param array<string, mixed> $data Data value.
-     * @since 2.0.0
+     * @return mixed Renderable manager view instance.
+     * @since 2.1.0
      */
     public function view(string $tpl, array $data = [])
     {
-        return \View::make('sArticles::'.$tpl, $data);
+        return \View::make('sarticles::'.$tpl, $data);
     }
 
     /**

@@ -244,6 +244,32 @@ s_articles_group('builder', function (): void {
             s_articles_assert_contains($marker, $surface, 'Missing builder compatibility marker: ' . $marker);
         }
     });
+
+    s_articles_test('builder render views use Laravel vendor override conventions', function (): void {
+        $provider = s_articles_read('src/sArticlesServiceProvider.php');
+        $renderer = s_articles_read('src/Support/BuilderRenderer.php');
+        $command = s_articles_read('src/Console/RerenderArticlesCommand.php');
+
+        foreach ([
+            "loadViewsFrom(dirname(__DIR__) . '/views', 'sarticles')",
+            "view('sarticles::render.' . \$view",
+            "views/vendor/sarticles/render",
+            'sarticles:rerender',
+            '{--articles=',
+            '{--chunk=200',
+            'chunkById',
+        ] as $marker) {
+            s_articles_assert_contains($marker, $provider . "\n" . $renderer . "\n" . $command, 'Missing builder render marker: ' . $marker);
+        }
+
+        foreach (glob(s_articles_path('views/render/*.blade.php')) ?: [] as $renderView) {
+            s_articles_assert(is_file($renderView), 'Render view must exist: ' . $renderView);
+        }
+
+        foreach (glob(s_articles_path('builder/*/render.blade.php')) ?: [] as $legacyRender) {
+            s_articles_assert(false, 'Legacy asset render file should not remain: ' . $legacyRender);
+        }
+    });
 });
 
 if ($failed > 0) {
