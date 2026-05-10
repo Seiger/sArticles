@@ -59,7 +59,7 @@ class ModulePanel extends Component
      */
     public function render()
     {
-        return view('sArticles::livewire.module-panel', [
+        return view('sarticles::livewire.module-panel', [
             'tabs' => $this->navigationTabs(),
             'preset' => $this->preset(),
             'title' => $this->title(),

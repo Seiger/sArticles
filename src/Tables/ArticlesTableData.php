@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
@@ -16,6 +15,7 @@ use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesPoll;
 use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticleTranslate;
+use Seiger\sArticles\Support\BuilderRenderer;
 use Seiger\sArticles\Support\LangIntegration;
 use Seiger\sArticles\Support\SeoIntegration;
 
@@ -1833,8 +1833,9 @@ class ArticlesTableData
     /**
      * Render builder blocks into the legacy content field.
      *
-     * Builder templates are resolved from configured view roots and rendered with temporary view
-     * finder paths, then compacted for the historical content column.
+     * Builder JSON remains the editable source of truth. The shared renderer materializes it into
+     * the historical `content` column through `sarticles::render.*` package views, allowing
+     * Laravel-style overrides in `views/vendor/sarticles/render`.
      *
      * @param array $builder Builder data in storage format.
      * @return string String value ready for manager display, storage, or URL generation.
@@ -1842,109 +1843,37 @@ class ArticlesTableData
      */
     protected function renderBuilderContent(array $builder): string
     {
-        $renders = collect($this->builderConfigs())
-            ->filter(fn ($config) => is_file((string) ($config['render_path'] ?? '')))
-            ->mapWithKeys(fn ($config) => [(string) ($config['id'] ?? '') => (string) ($config['template'] ?? '')])
-            ->filter(fn ($template, $id) => $id !== '' && $template !== '')
-            ->all();
-
-        if (!count($renders)) {
-            return '';
-        }
-
-        $previousPaths = method_exists(View::getFinder(), 'getPaths') ? View::getFinder()->getPaths() : [];
-        View::getFinder()->setPaths($this->builderViewRoots());
-
-        try {
-            $content = collect($builder)
-                ->map(function (array $item, int $position) use ($renders) {
-                    $id = (string) array_key_first($item);
-
-                    if ($id === '' || !isset($renders[$id])) {
-                        return '';
-                    }
-
-                    $value = $item[$id] ?? '';
-
-                    return view($renders[$id] . '.render', compact('id', 'value', 'position'))->render();
-                })
-                ->implode('');
-        } finally {
-            if (count($previousPaths)) {
-                View::getFinder()->setPaths($previousPaths);
-            }
-        }
-
-        return str_replace([chr(9), chr(10), chr(13), '  '], '', $content);
+        return $this->builderRenderer()->renderContent($builder);
     }
 
     /**
      * Discover available content builder block configurations.
      *
-     * The package scans builder roots for config.php files, deduplicates block IDs, and attaches
-     * template metadata required by modal definitions and rendered output.
+     * The shared renderer scans package builder configs so manager fields, modal persistence, and
+     * CLI re-rendering all agree on the same block IDs and render view names.
      *
      * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
      * @since 2.0.0
      */
     protected function builderConfigs(): array
     {
-        $configs = [];
-
-        if (!class_exists('sArticles') && class_exists(\Seiger\sArticles\Facades\sArticles::class)) {
-            class_alias(\Seiger\sArticles\Facades\sArticles::class, 'sArticles');
-        }
-
-        foreach ($this->builderViewRoots() as $root) {
-            foreach (glob(rtrim($root, '/') . '/*/config.php') ?: [] as $path) {
-                $template = basename(dirname($path));
-                $config = require $path;
-
-                if (!is_array($config)) {
-                    continue;
-                }
-
-                $id = (string) ($config['id'] ?? $template);
-
-                if ($id === '' || isset($configs[$id])) {
-                    continue;
-                }
-
-                $configs[$id] = array_merge($config, [
-                    'id' => $id,
-                    'template' => $template,
-                    'render_path' => dirname($path) . '/render.blade.php',
-                ]);
-            }
-        }
-
-        return array_values($configs);
+        return $this->builderRenderer()->configs();
     }
 
     /**
-     * Resolve directories that may contain builder block templates.
+     * Resolve the shared builder renderer.
      *
-     * Installed assets take priority when Evolution exposes EVO_BASE_PATH, while the package source
-     * directory keeps symlinked local development usable.
+     * Keeping the renderer behind a helper lets tests instantiate this provider directly while
+     * normal Evolution runtime still receives the singleton registered by the service provider.
      *
-     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
-     * @since 2.0.0
+     * @return BuilderRenderer Builder rendering service.
+     * @since 2.1.0
      */
-    protected function builderViewRoots(): array
+    protected function builderRenderer(): BuilderRenderer
     {
-        $roots = [];
-
-        if (defined('EVO_BASE_PATH')) {
-            $roots[] = rtrim(EVO_BASE_PATH, '/') . '/assets/modules/sarticles/builder';
-        }
-
-        $roots[] = dirname(__DIR__, 2) . '/builder';
-
-        return collect($roots)
-            ->filter(fn ($root) => is_dir($root))
-            ->unique()
-            ->values()
-            ->all();
+        return app()->bound(BuilderRenderer::class)
+            ? app(BuilderRenderer::class)
+            : new BuilderRenderer();
     }
 
     /**

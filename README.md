@@ -69,6 +69,30 @@ After publishing, review:
 core/custom/config/seiger/settings/sArticles.php
 ```
 
+## Builder Render Customization
+
+Builder block HTML is rendered through lowercase Laravel package views such as:
+
+```text
+sarticles::render.richtext
+sarticles::render.quote
+```
+
+To customize markup, copy only the needed package view into the site override path:
+
+```text
+views/vendor/sarticles/render/richtext.blade.php
+views/vendor/sarticles/render/quote.blade.php
+```
+
+Existing articles keep materialized HTML in the `content` column. After changing render views,
+refresh stored HTML explicitly:
+
+```console
+php artisan sarticles:rerender --dry-run
+php artisan sarticles:rerender --articles=123-10000 --chunk=200
+```
+
 ## Documentation
 
 Localized documentation lives in `docs/`:
