@@ -18,8 +18,12 @@ class sArticlesServiceProvider extends ServiceProvider
     /**
      * Bootstrap package services after registration.
      *
-     * Routes, config, lowercase package views, translations, Livewire components, publishable
-     * assets, and console commands are wired here.
+     * Routes, config, lowercase package views, translations, publishable assets, and console
+     * commands are wired here.
+     *
+     * Livewire component registration is deferred until the application is fully booted. This
+     * keeps composer/package discovery safe on fresh installs where sArticles can boot before
+     * Livewire has registered its internal services such as `livewire.finder`.
      */
     public function boot()
     {
@@ -55,7 +59,9 @@ class sArticlesServiceProvider extends ServiceProvider
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/tvparams/table.php', 'sarticles.tvparams.table');
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/settings/form.php', 'evo-ui.forms.sarticles.settings');
             app(EvoUI::class)->registerFormField('types', 'sarticles::evo-ui.form.types-config-map');
-            Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
+            $this->app->booted(function () {
+                Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
+            });
 
             // For use config
             $this->publishes([
