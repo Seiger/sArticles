@@ -86,7 +86,23 @@ s_articles_group('package', function () use ($root): void {
         s_articles_assert(($composer['type'] ?? null) === 'evolution-cms-module', 'sArticles must stay an Evolution CMS module.');
         s_articles_assert(isset($composer['require']['evolution-cms/evo-ui']), 'sArticles must require evolution-cms/evo-ui.');
         s_articles_assert(($composer['extra']['laravel']['providers'][0] ?? null) === 'Seiger\\sArticles\\sArticlesServiceProvider', 'Service provider must stay registered.');
+        s_articles_assert(!isset($composer['extra']['laravel']['aliases']), 'Facade alias must be registered by the service provider, not generated as a custom alias file.');
         s_articles_assert(($composer['scripts']['test'] ?? null) === 'php tests/run.php', 'Composer test script must run the compatibility suite.');
+    });
+
+    s_articles_test('service provider registers sArticles facade alias at runtime', function (): void {
+        $provider = s_articles_read('src/sArticlesServiceProvider.php');
+
+        foreach ([
+            'use EvolutionCMS\\AliasLoader;',
+            'AliasLoader::getInstance()->alias(\'sArticles\', sArticlesFacade::class);',
+            'function registerPublicApi(): void',
+            '$this->app->alias(sArticles::class, \'sArticles\');',
+        ] as $marker) {
+            s_articles_assert_contains($marker, $provider, 'Missing runtime facade alias marker: ' . $marker);
+        }
+
+        s_articles_assert(!is_file(s_articles_path('config/sArticlesAlias.php')), 'Legacy published alias file should not remain in the package.');
     });
 });
 
