@@ -24,10 +24,7 @@
     "laravel": {
       "providers": [
         "Seiger\\sArticles\\sArticlesServiceProvider"
-      ],
-      "aliases": {
-        "sArticles": "Seiger\\sArticles\\Facades\\sArticles"
-      }
+      ]
     }
   },
   "scripts": {

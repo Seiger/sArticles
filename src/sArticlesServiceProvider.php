@@ -1,10 +1,12 @@
 <?php namespace Seiger\sArticles;
 
 use EvolutionCMS\ServiceProvider;
+use EvolutionCMS\AliasLoader;
 use EvoUI\EvoUI;
 use Event;
 use Livewire\Livewire;
 use Seiger\sArticles\Console\RerenderArticlesCommand;
+use Seiger\sArticles\Facades\sArticles as sArticlesFacade;
 use Seiger\sArticles\Support\BuilderRenderer;
 
 /**
@@ -65,7 +67,6 @@ class sArticlesServiceProvider extends ServiceProvider
 
             // For use config
             $this->publishes([
-                dirname(__DIR__) . '/config/sArticlesAlias.php' => config_path('app/aliases/sArticles.php', true),
                 dirname(__DIR__) . '/config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php', true),
                 dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png'),
                 dirname(__DIR__) . '/images/seigerit-blue.svg' => public_path('assets/site/seigerit-blue.svg'),
@@ -74,8 +75,6 @@ class sArticlesServiceProvider extends ServiceProvider
             ], 'sarticles');
         }
 
-        $this->app->singleton(sArticles::class);
-        $this->app->alias(sArticles::class, 'sArticles');
     }
 
     /**
@@ -89,6 +88,7 @@ class sArticlesServiceProvider extends ServiceProvider
         // Add plugins to Evo
         $this->loadPluginsFrom(dirname(__DIR__) . '/plugins/');
         $this->app->singleton(BuilderRenderer::class);
+        $this->registerPublicApi();
 
         // Only Manager
         if (defined('IN_MANAGER_MODE') && IN_MANAGER_MODE) {
@@ -112,5 +112,26 @@ class sArticlesServiceProvider extends ServiceProvider
                 $lang['module_icon'] ?? $lang['articles_icon']
             );
         }
+    }
+
+    /**
+     * Register the package public API for container and facade-style access.
+     *
+     * The package intentionally supports `sArticles::...` in snippets, chunks, Blade templates,
+     * and project code. Registering the facade alias at runtime keeps that public API available
+     * without requiring `core/custom/config/app/aliases/sArticles.php` to be copied into every
+     * installation.
+     *
+     * The container alias remains available for code that resolves the service through
+     * `app('sArticles')` instead of using the facade.
+     *
+     * @since 2.1.0
+     */
+    protected function registerPublicApi(): void
+    {
+        $this->app->singleton(sArticles::class);
+        $this->app->alias(sArticles::class, 'sArticles');
+
+        AliasLoader::getInstance()->alias('sArticles', sArticlesFacade::class);
     }
 }
