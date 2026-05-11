@@ -131,10 +131,6 @@ Useful facade methods:
 - `sArticles::publishArticle()`
 - `sArticles::config($key, $default = null)`
 
-The `sArticles::` facade is registered by the package service provider at runtime. Projects do
-not need to publish a custom `core/custom/config/app/aliases/sArticles.php` file to use this
-public API.
-
 ## Native Integrations
 
 ### EvoUI + Livewire
