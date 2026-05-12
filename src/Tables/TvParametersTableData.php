@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Models\sArticle;
+use Seiger\sArticles\Support\LikeSearch;
 
 /**
  * TvParametersTableData package component.
@@ -431,7 +432,7 @@ class TvParametersTableData
             return;
         }
 
-        $like = '%' . addcslashes(mb_strtolower($search), '\\%_') . '%';
+        $like = LikeSearch::needle(mb_strtolower($search));
 
         $query->where(function ($where) use ($query, $like, $search) {
             $where->orWhereRaw($this->likeSql($query, 'site_tmplvars.name'), [$like])
@@ -845,9 +846,11 @@ class TvParametersTableData
             ? collect(explode('.', $field))->map(fn ($part) => $query->getGrammar()->wrap($part))->implode('.')
             : $query->getGrammar()->wrap($field);
 
-        return $driver === 'pgsql'
+        $sql = $driver === 'pgsql'
             ? 'LOWER(' . $wrapped . '::text) LIKE ?'
             : 'LOWER(' . $wrapped . ') LIKE ?';
+
+        return $sql . " ESCAPE '!'";
     }
 
     /**

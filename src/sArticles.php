@@ -11,6 +11,7 @@ use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleComment;
 use Seiger\sArticles\Models\sArticlesPoll;
+use Seiger\sArticles\Support\LikeSearch;
 
 /**
  * sArticles package component.
@@ -143,8 +144,8 @@ class sArticles
             $query->whereIn('article_id', $artids);
         }
         if (request()->has('search') && trim(request()->input('search', '')) !== '') {
-            $search = '%' . addcslashes(mb_strtolower(trim(strip_tags(request()->input('search', '')))), '\\%_') . '%';
-            $query->whereRaw("LOWER(`comment`) LIKE ? ESCAPE '\\\\'", [$search]);
+            $search = LikeSearch::needle(mb_strtolower(trim(strip_tags(request()->input('search', '')))));
+            $query->whereRaw(LikeSearch::lowerExpression($query, 'comment'), [$search]);
         }
         return $query->paginate($paginate);
     }

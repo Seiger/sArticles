@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Seiger\sArticles\Support\LikeSearch;
 
 /**
  * Eloquent model for sArticles article records.
@@ -96,16 +97,16 @@ class sArticle extends Model
 
             $select = collect([0]);
             $bindings = [];
-            $exact = '%' . addcslashes(mb_strtolower($search->implode(' ')), '\\%_') . '%';
+            $exact = LikeSearch::needle(mb_strtolower($search->implode(' ')));
 
             $fields->each(function ($field) use ($builder, $select, $exact, &$bindings) {
-                $select->push("(CASE WHEN LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\' THEN 10 ELSE 0 END)");
+                $select->push('(CASE WHEN ' . LikeSearch::lowerExpression($builder, $field) . ' THEN 10 ELSE 0 END)');
                 $bindings[] = $exact;
             }); // Generate Exact match points source
             $search->each(function ($word) use ($fields, $builder, $select, &$bindings) {
-                $like = '%' . addcslashes($word, '\\%_') . '%';
+                $like = LikeSearch::needle($word);
                 $fields->each(function ($field) use ($builder, $select, $like, &$bindings) {
-                    $select->push("(CASE WHEN LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\' THEN 1 ELSE 0 END)");
+                    $select->push('(CASE WHEN ' . LikeSearch::lowerExpression($builder, $field) . ' THEN 1 ELSE 0 END)');
                     $bindings[] = $like;
                 });
             }); // Generate Partial match points source
@@ -114,9 +115,9 @@ class sArticle extends Model
             $s->when($search->count(), function ($query) use ($search, $fields, $builder) {
                 $query->where(function ($query) use ($search, $fields, $builder) {
                     $search->each(function ($word) use ($fields, $query, $builder) {
-                        $like = '%' . addcslashes($word, '\\%_') . '%';
+                        $like = LikeSearch::needle($word);
                         $fields->each(function ($field) use ($query, $builder, $like) {
-                            $query->orWhereRaw("LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\'", [$like]);
+                            $query->orWhereRaw(LikeSearch::lowerExpression($builder, $field), [$like]);
                         });
                     });
                 });

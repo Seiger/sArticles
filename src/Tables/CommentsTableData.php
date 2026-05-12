@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleComment;
+use Seiger\sArticles\Support\LikeSearch;
 
 /**
  * CommentsTableData package component.
@@ -367,7 +368,7 @@ class CommentsTableData
             return;
         }
 
-        $like = '%' . addcslashes(mb_strtolower($search), '\\%_') . '%';
+        $like = LikeSearch::needle(mb_strtolower($search));
         $articleIds = $this->articleIdsByTitle($like);
         $userIds = $this->userIdsByName($like);
 
@@ -591,10 +592,9 @@ class CommentsTableData
     protected function articleIdsByTitle(string $like): array
     {
         $grammar = DB::connection()->getQueryGrammar();
-        $escape = DB::connection()->getDriverName() === 'sqlite' ? '' : " ESCAPE '\\\\'";
 
         return DB::table('s_article_translates')
-            ->whereRaw('LOWER(' . $grammar->wrap('pagetitle') . ') LIKE ?' . $escape, [$like])
+            ->whereRaw(LikeSearch::expressionForGrammar($grammar, 'pagetitle'), [$like])
             ->distinct()
             ->pluck('article')
             ->map(fn ($id) => (int) $id)
@@ -616,10 +616,9 @@ class CommentsTableData
     protected function userIdsByName(string $like): array
     {
         $grammar = DB::connection()->getQueryGrammar();
-        $escape = DB::connection()->getDriverName() === 'sqlite' ? '' : " ESCAPE '\\\\'";
 
         return UserAttribute::query()
-            ->whereRaw('LOWER(' . $grammar->wrap('fullname') . ') LIKE ?' . $escape, [$like])
+            ->whereRaw(LikeSearch::expressionForGrammar($grammar, 'fullname'), [$like])
             ->pluck('internalKey')
             ->map(fn ($id) => (int) $id)
             ->filter()
@@ -688,9 +687,7 @@ class CommentsTableData
      */
     protected function likeSql(Builder $query, string $field): string
     {
-        $sql = 'LOWER(' . $query->getGrammar()->wrap($field) . ') LIKE ?';
-
-        return DB::connection()->getDriverName() === 'sqlite' ? $sql : $sql . " ESCAPE '\\\\'";
+        return LikeSearch::lowerExpression($query, $field);
     }
 
     /**
