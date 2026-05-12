@@ -4,7 +4,6 @@ use EvolutionCMS\Models\SiteTemplate;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Query\Expression;
 
 /**
  * CreateSArticlesTable package component.
@@ -46,9 +45,9 @@ class CreateSArticlesTable extends Migration
             $table->string('lang', 4)->default('base');
             $table->string('pagetitle', 100)->default('');
             $table->string('longtitle', 255)->default('');
-            $table->mediumText('introtext')->default('');
-            $table->mediumText('description')->default('');
-            $table->longText('content')->default('');
+            $table->mediumText('introtext')->nullable();
+            $table->mediumText('description')->nullable();
+            $table->longText('content')->nullable();
             $table->string('seotitle', 100)->default('');
             $table->string('seodescription', 255)->default('');
             $table->enum('seorobots', ['index,follow', 'noindex,nofollow'])->default('index,follow');
@@ -77,7 +76,7 @@ class CreateSArticlesTable extends Migration
             $table->integer('position')->default(0);
             $table->string('alias', 255)->index();
             $table->string('base', 255)->default('');
-            $table->mediumText('base_content')->default('');
+            $table->mediumText('base_content')->nullable();
             $table->timestamps();
         });
 
@@ -92,7 +91,7 @@ class CreateSArticlesTable extends Migration
             $table->string('alias', 255)->index();
             $table->string('cover', 255)->default('');
             $table->string('base', 255)->default('');
-            $table->mediumText('base_content')->default('');
+            $table->mediumText('base_content')->nullable();
             $table->timestamps();
         });
 
@@ -118,7 +117,7 @@ class CreateSArticlesTable extends Migration
             $table->integer('user_id')->default(0)->index();
             $table->integer('approved')->default(0)->index();
             $table->string('lang', 4)->default('base');
-            $table->mediumText('comment')->default('');
+            $table->mediumText('comment')->nullable();
             $table->timestamps();
         });
 
