@@ -17,6 +17,7 @@ use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticleTranslate;
 use Seiger\sArticles\Support\BuilderRenderer;
 use Seiger\sArticles\Support\LangIntegration;
+use Seiger\sArticles\Support\LikeSearch;
 use Seiger\sArticles\Support\SeoIntegration;
 
 /**
@@ -2239,13 +2240,7 @@ class ArticlesTableData
      */
     protected function likeSql(Builder $query, string $field): string
     {
-        $wrapped = $query->getGrammar()->wrap($field);
-
-        if (DB::connection()->getDriverName() === 'sqlite') {
-            return $wrapped . ' LIKE ?';
-        }
-
-        return 'LOWER(' . $wrapped . ") LIKE ? ESCAPE '\\\\'";
+        return LikeSearch::expression($query, $field, DB::connection()->getDriverName() !== 'sqlite');
     }
 
     /**
@@ -2275,7 +2270,7 @@ class ArticlesTableData
             ->map(fn ($variant) => trim((string) $variant))
             ->filter(fn ($variant) => $variant !== '')
             ->unique()
-            ->map(fn ($variant) => '%' . addcslashes($variant, '\\%_') . '%')
+            ->map(fn ($variant) => LikeSearch::needle($variant))
             ->values()
             ->all();
     }

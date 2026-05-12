@@ -5,6 +5,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticlesFeature;
+use Seiger\sArticles\Support\LikeSearch;
 use Seiger\sArticles\Tables\Concerns\HandlesLanguageFields;
 
 /**
@@ -450,7 +451,7 @@ class FeaturesTableData
             return;
         }
 
-        $like = '%' . addcslashes(mb_strtolower($search), '\\%_') . '%';
+        $like = LikeSearch::needle(mb_strtolower($search));
         $language = $this->defaultLanguage();
 
         $query->where(function ($where) use ($query, $like, $language) {
@@ -641,9 +642,7 @@ class FeaturesTableData
      */
     protected function likeSql(Builder $query, string $field): string
     {
-        $sql = 'LOWER(' . $query->getGrammar()->wrap($field) . ') LIKE ?';
-
-        return DB::connection()->getDriverName() === 'sqlite' ? $sql : $sql . " ESCAPE '\\\\'";
+        return LikeSearch::lowerExpression($query, $field);
     }
 
     /**
