@@ -38,7 +38,7 @@ The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. I
 
 - PHP `^8.4`
 - Evolution CMS `^3.5.7`
-- `evolution-cms/evo-ui` `^1.0`
+- `evolution-cms/evo-ui` `^1.0.1`
 - Livewire, as provided by the Evolution CMS/EvoUI runtime
 
 Optional packages:

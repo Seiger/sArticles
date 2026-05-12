@@ -21,7 +21,7 @@ sArticles використовує EvoUI + Livewire як менеджерськ�
 ```json
 {
   "require": {
-    "evolution-cms/evo-ui": "^1.0",
+    "evolution-cms/evo-ui": "^1.0.1",
     "seiger/sarticles": "^1.2"
   }
 }
