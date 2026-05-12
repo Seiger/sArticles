@@ -18,6 +18,22 @@ Extras-Umgebung:
 php artisan extras extras "sArticles"
 ```
 
+## Upgrade von 1.x auf 2.x
+
+Die offentliche API `sArticles::` bleibt verfugbar, aber 2.x registriert den Alias direkt in
+`Seiger\sArticles\sArticlesServiceProvider`.
+
+Entfernen Sie nach dem Upgrade von 1.x die alte generierte Alias-Datei, falls sie im Projekt
+vorhanden ist:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+Fugen Sie fur sArticles keinen `extra.laravel.aliases` Eintrag in `composer.json` hinzu.
+Provider Discovery bleibt in `extra.laravel.providers`; `extra.laravel.priority` sollte nur bei
+einer echten Provider-Load-Order-Anforderung gesetzt werden.
+
 ## Konfiguration
 
 Runtime-Datei:

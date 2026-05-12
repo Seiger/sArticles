@@ -69,6 +69,22 @@ After publishing, review:
 core/custom/config/seiger/settings/sArticles.php
 ```
 
+## Upgrading From 1.x To 2.x
+
+sArticles 2.x keeps the public `sArticles::` facade API, but the alias is now registered by
+`Seiger\sArticles\sArticlesServiceProvider` at runtime.
+
+If an older 1.x installation has the generated alias file below, remove it after upgrading:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+The package no longer needs an `extra.laravel.aliases` entry in `composer.json`, and the alias file
+should not be copied or published manually. Provider discovery is still handled by
+`extra.laravel.providers`; use `extra.laravel.priority` only when a concrete provider load-order
+requirement appears.
+
 ## Builder Render Customization
 
 Builder block HTML is rendered through lowercase Laravel package views such as:

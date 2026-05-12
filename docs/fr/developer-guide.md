@@ -18,6 +18,22 @@ En environnement Extras:
 php artisan extras extras "sArticles"
 ```
 
+## Mise a niveau de 1.x vers 2.x
+
+L'API publique `sArticles::` reste disponible, mais en 2.x l'alias est enregistre directement dans
+`Seiger\sArticles\sArticlesServiceProvider`.
+
+Apres la mise a niveau depuis 1.x, supprimez l'ancien fichier d'alias genere s'il existe dans le
+projet:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+N'ajoutez pas `extra.laravel.aliases` pour sArticles dans `composer.json`. La decouverte du
+provider reste dans `extra.laravel.providers`; ajoutez `extra.laravel.priority` uniquement si une
+contrainte reelle d'ordre de chargement apparait.
+
 ## Configuration
 
 Fichier runtime:
