@@ -27,6 +27,21 @@ php artisan migrate
 php artisan extras extras "sArticles"
 ```
 
+## Оновлення з 1.x на 2.x
+
+Публічний API `sArticles::` залишається доступним, але у 2.x alias реєструється всередині
+`Seiger\sArticles\sArticlesServiceProvider`.
+
+Після оновлення з 1.x видаліть старий згенерований alias-файл, якщо він є в проєкті:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+Не додавайте `extra.laravel.aliases` для sArticles у `composer.json`. Discovery провайдера
+залишається в `extra.laravel.providers`; `extra.laravel.priority` додавайте тільки якщо з'явиться
+реальна вимога до порядку завантаження провайдерів.
+
 ## Конфіги
 
 Робочі налаштування:

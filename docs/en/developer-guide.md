@@ -27,6 +27,21 @@ For Extras-based local environments:
 php artisan extras extras "sArticles"
 ```
 
+## Upgrading From 1.x To 2.x
+
+The `sArticles::` facade remains part of the public API, but 2.x registers the alias inside
+`Seiger\sArticles\sArticlesServiceProvider`.
+
+Remove the old generated alias file after upgrading from 1.x:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+Do not add `extra.laravel.aliases` for sArticles in `composer.json`. Keep provider discovery in
+`extra.laravel.providers`; add `extra.laravel.priority` only if a real provider load-order
+constraint appears.
+
 ## Configuration Files
 
 Runtime settings are stored in:
