@@ -21,7 +21,7 @@ sArticles використовує EvoUI + Livewire як менеджерськ�
 ```json
 {
   "require": {
-    "evolution-cms/evo-ui": "^1.0.1",
+    "evolution-cms/evo-ui": "^1.0.2",
     "seiger/sarticles": "^1.2"
   }
 }
@@ -32,6 +32,17 @@ sArticles використовує EvoUI + Livewire як менеджерськ�
 Панель Livewire відкривається через стандартний module entrypoint Evolution CMS. Старі iframe-flow гілки не мають керувати основним UI, але можуть лишатися тільки як чітко ізольований compatibility layer.
 
 ## Оновлення з 1.x на 2.x
+
+Після оновлення залежностей опублікуйте runtime-асети EvoUI окремо від
+sArticles:
+
+```console
+php artisan vendor:publish --tag=evo-ui --force
+```
+
+Починаючи з EvoUI `1.0.2`, CSS і JavaScript публікуються через symlink-aware
+механізм Evolution CMS. sArticles має підключати `evo::partials.assets` і не
+повинен дублювати EvoUI partials або відкривати URL напряму з `core/vendor`.
 
 Публічний API `sArticles::` залишається доступним, але у 2.x alias реєструється всередині
 `Seiger\sArticles\sArticlesServiceProvider`.
