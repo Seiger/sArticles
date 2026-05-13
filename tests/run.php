@@ -238,6 +238,27 @@ s_articles_group('provider-hooks', function (): void {
             s_articles_assert_contains($marker, $provider, 'Missing ArticlesTableData provider marker: ' . $marker);
         }
     });
+
+    s_articles_test('article duplicate title suffix uses package-local translations', function (): void {
+        $provider = s_articles_read('src/Tables/ArticlesTableData.php');
+
+        s_articles_assert_contains("__('sArticles::global.duplicate_suffix')", $provider, 'Article duplicate titles must use the package-local noun suffix.');
+        s_articles_assert(!str_contains($provider, "__('global.duplicate')"), 'Article duplicate titles must not reuse the manager action label.');
+
+        $expected = [
+            'de' => 'Kopie',
+            'en' => 'copy',
+            'fr' => 'copie',
+            'pl' => 'kopia',
+            'ru' => 'копия',
+            'uk' => 'копія',
+        ];
+
+        foreach ($expected as $locale => $suffix) {
+            $translations = require s_articles_path("lang/{$locale}/global.php");
+            s_articles_assert(($translations['duplicate_suffix'] ?? null) === $suffix, "Duplicate suffix must be localized for {$locale}.");
+        }
+    });
 });
 
 s_articles_group('builder', function (): void {

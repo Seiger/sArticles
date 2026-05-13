@@ -84,6 +84,7 @@
     'cover_title' => 'Tytuł obrazu',
     'deleted' => 'Rekord został usunięty.',
     'description' => 'pozwala zarządzać tworzeniem i publikacją materiałów na stronie.',
+    'duplicate_suffix' => 'kopia',
     'edit_alias' => 'Edytuj pseudonim',
     'edit_article' => 'Edytuj publikację',
     'edit_comment' => 'Edytuj komentarz',

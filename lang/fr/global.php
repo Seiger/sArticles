@@ -84,6 +84,7 @@
     'cover_title' => 'Titre image',
     'deleted' => 'Enregistrement supprimé.',
     'description' => 'permet de gérer la rédaction et la publication de contenus sur le site.',
+    'duplicate_suffix' => 'copie',
     'edit_alias' => 'Modifier l’alias',
     'edit_article' => 'Modifier la publication',
     'edit_comment' => 'Modifier le commentaire',
