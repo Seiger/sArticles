@@ -105,6 +105,27 @@ s_articles_group('package', function () use ($root): void {
 
         s_articles_assert(!is_file(s_articles_path('config/sArticlesAlias.php')), 'Legacy published alias file should not remain in the package.');
     });
+
+    s_articles_test('settings use vendor defaults with optional project overrides', function (): void {
+        $provider = s_articles_read('src/sArticlesServiceProvider.php');
+        $controller = s_articles_read('src/Controllers/sArticlesController.php');
+
+        foreach ([
+            'function mergeSettingsConfig(): void',
+            "require dirname(__DIR__) . '/config/sArticlesSettings.php'",
+            "config('seiger.settings.sArticles', [])",
+            'array_replace_recursive($defaults, $settings)',
+            "'/resources/publish/seiger/settings/.gitkeep'",
+            "config_path('seiger/settings/.gitkeep', true)",
+        ] as $marker) {
+            s_articles_assert_contains($marker, $provider, 'Missing settings merge/publish marker: ' . $marker);
+        }
+
+        s_articles_assert(!str_contains($provider, "config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php'"), 'Settings publish must not copy the full package defaults.');
+        s_articles_assert(is_file(s_articles_path('resources/publish/seiger/settings/.gitkeep')), 'Settings publish placeholder must exist.');
+        s_articles_assert_contains('mkdir($directory, 0775, true)', $controller, 'Settings save must create the custom settings directory on first change.');
+        s_articles_assert_contains('file_put_contents($path, $string, LOCK_EX)', $controller, 'Settings save must write the project override atomically.');
+    });
 });
 
 s_articles_group('module-shell', function (): void {

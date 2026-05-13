@@ -729,15 +729,7 @@ class TvParametersTableData
         }
 
         $this->legacyFieldsEnsured = true;
-        $settingsPath = defined('EVO_BASE_PATH')
-            ? EVO_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php'
-            : '';
-
-        if ($settingsPath === '' || !is_file($settingsPath)) {
-            return;
-        }
-
-        $settings = require $settingsPath;
+        $settings = config('seiger.settings.sArticles', []);
 
         if (!is_array($settings)) {
             return;
