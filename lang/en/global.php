@@ -89,6 +89,7 @@
     'cover_title' => 'Image title',
     'deleted' => 'Record deleted.',
     'description' => 'allows you to manage the writing and publication of materials on the site.',
+    'duplicate_suffix' => 'copy',
     'edit_alias' => 'Edit alias',
     'edit_article' => 'Edit publication',
     'edit_comment' =>  'Edit comment',

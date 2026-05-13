@@ -38,7 +38,7 @@ The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. I
 
 - PHP `^8.4`
 - Evolution CMS `^3.5.7`
-- `evolution-cms/evo-ui` `^1.0.1`
+- `evolution-cms/evo-ui` `^1.0.2`
 - Livewire, as provided by the Evolution CMS/EvoUI runtime
 
 Optional packages:
@@ -53,9 +53,15 @@ Run inside the Evolution CMS `core` directory.
 
 ```console
 php artisan package:installrequire seiger/sarticles "*"
+php artisan vendor:publish --tag=evo-ui --force
 php artisan vendor:publish --provider="Seiger\\sArticles\\sArticlesServiceProvider" --tag=sarticles
 php artisan migrate
 ```
+
+`evolution-cms/evo-ui` owns the shared manager CSS/JS runtime. With EvoUI
+`1.0.2+`, `vendor:publish --tag=evo-ui --force` publishes those files through
+Evolution CMS symlink-aware publish declarations, so sArticles does not expose
+or copy assets directly from `core/vendor`.
 
 In Extras-based development environments the package can also be installed with the Evolution Extras command used by the project:
 

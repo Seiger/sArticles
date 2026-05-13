@@ -84,6 +84,7 @@
     'cover_title' => 'Bildtitel',
     'deleted' => 'Datensatz gelöscht.',
     'description' => 'ermöglicht das Verwalten des Schreibens und Veröffentlichens von Materialien auf der Website.',
+    'duplicate_suffix' => 'Kopie',
     'edit_alias' => 'Alias bearbeiten',
     'edit_article' => 'Publikation bearbeiten',
     'edit_comment' => 'Kommentar bearbeiten',

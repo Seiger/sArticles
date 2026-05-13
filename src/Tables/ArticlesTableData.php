@@ -2605,7 +2605,7 @@ class ArticlesTableData
                 unset($data['tid']);
 
                 $data['article'] = $copyId;
-                $data['pagetitle'] = trim((string) ($data['pagetitle'] ?? '')) . ' ' . __('global.duplicate');
+                $data['pagetitle'] = trim((string) ($data['pagetitle'] ?? '')) . ' ' . __('sArticles::global.duplicate_suffix');
                 $data['created_at'] = now();
                 $data['updated_at'] = now();
 
