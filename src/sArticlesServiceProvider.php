@@ -32,7 +32,7 @@ class sArticlesServiceProvider extends ServiceProvider
         // Add custom routes for package
         include(__DIR__ . '/Http/routes.php');
 
-        $this->mergeConfigFrom(dirname(__DIR__) . '/config/sArticlesSettings.php', 'seiger.settings.sArticles');
+        $this->mergeSettingsConfig();
         $this->loadViewsFrom(dirname(__DIR__) . '/views', 'sarticles');
 
         if ($this->app->runningInConsole()) {
@@ -67,7 +67,7 @@ class sArticlesServiceProvider extends ServiceProvider
 
             // For use config
             $this->publishes([
-                dirname(__DIR__) . '/config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php', true),
+                dirname(__DIR__) . '/resources/publish/seiger/settings/.gitkeep' => config_path('seiger/settings/.gitkeep', true),
                 dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png'),
                 dirname(__DIR__) . '/images/seigerit-blue.svg' => public_path('assets/site/seigerit-blue.svg'),
                 dirname(__DIR__) . '/views/s_articles_article.blade.php' => public_path('views/s_articles_article.blade.php'),
@@ -75,6 +75,29 @@ class sArticlesServiceProvider extends ServiceProvider
             ], 'sarticles');
         }
 
+    }
+
+    /**
+     * Merge package defaults with optional project-level settings.
+     *
+     * sArticles should work immediately from the vendor defaults, while projects that save or
+     * publish local settings may override only the values they need. A recursive merge keeps new
+     * default keys available after package updates instead of letting an older custom settings file
+     * shadow entire nested sections.
+     *
+     * @return void No value is returned; the application config repository is updated in place.
+     * @since 2.1.0
+     */
+    protected function mergeSettingsConfig(): void
+    {
+        $defaults = require dirname(__DIR__) . '/config/sArticlesSettings.php';
+        $settings = config('seiger.settings.sArticles', []);
+
+        if (!is_array($settings)) {
+            $settings = [];
+        }
+
+        $this->app['config']->set('seiger.settings.sArticles', array_replace_recursive($defaults, $settings));
     }
 
     /**

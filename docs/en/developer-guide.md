@@ -50,6 +50,11 @@ Runtime settings are stored in:
 core/custom/config/seiger/settings/sArticles.php
 ```
 
+Fresh installations do not need this file. The package reads defaults from
+`config/sArticlesSettings.php` and creates the project-level settings file only after an
+administrator changes settings in the manager. The `sarticles` publish tag only prepares the
+settings directory placeholder, so package updates can continue to deliver new default keys.
+
 Package defaults live in:
 
 ```text

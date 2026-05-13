@@ -58,25 +58,28 @@ class sArticlesController
     }
 
     /**
-     * Update file configs for the records manager flow.
+     * Persist project-level sArticles settings after the manager form is changed.
      *
-     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
-     * consumes it.
+     * Fresh installations run from the package defaults and do not need a copied config file.
+     * The custom settings file is created only when an administrator changes settings, keeping
+     * vendor defaults upgradeable while preserving the site's explicit overrides.
      *
-     * @param mixed $settings Settings value.
-     * @return bool True when the condition is met, false otherwise.
+     * @param mixed $settings Settings payload collected from the manager settings form.
+     * @return bool True when the settings file was written successfully.
      */
     public function updateFileConfigs($settings): bool
     {
         // Preparation of deadlines with data
         $string = '<?php return ' . $this->dataToString($settings) . ';';
+        $path = EVO_CORE_PATH . 'custom/config/seiger/settings/sArticles.php';
+        $directory = dirname($path);
+
+        if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
+            return false;
+        }
 
         // Save the config
-        $handle = fopen(EVO_CORE_PATH . 'custom/config/seiger/settings/sArticles.php', "w");
-        fwrite($handle, $string);
-        fclose($handle);
-
-        return true;
+        return file_put_contents($path, $string, LOCK_EX) !== false;
     }
 
     /**

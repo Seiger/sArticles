@@ -22,7 +22,7 @@ The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. I
 - Authors, tags, tag texts, topics, features, comments, polls, and TV parameter management.
 - Native optional integrations with `sSeo`, `sLang`, `eTinyMCE`, and `dTui.editor`.
 - Publication comments, rating, poll votes, view tracking, aliases, and frontend helper API.
-- Configurable module settings stored in `core/custom/config/seiger/settings/sArticles.php`.
+- Configurable module settings use package defaults and save project overrides only after changes.
 
 ## Screenshots
 
@@ -63,13 +63,17 @@ php artisan migrate
 Evolution CMS symlink-aware publish declarations, so sArticles does not expose
 or copy assets directly from `core/vendor`.
 
+The `sarticles` publish tag prepares package assets and the local settings directory placeholder.
+It does not copy the full settings file by default. sArticles reads defaults from the package and
+creates the project override only after settings are changed in the manager.
+
 In Extras-based development environments the package can also be installed with the Evolution Extras command used by the project:
 
 ```console
 php artisan extras extras "sArticles"
 ```
 
-After publishing, review:
+After changing settings in the manager, project overrides are saved to:
 
 ```text
 core/custom/config/seiger/settings/sArticles.php

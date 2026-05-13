@@ -309,7 +309,7 @@ switch ($data['get']) {
 
         $constructor = data_is_json($content->constructor ?? '', true);
         $data['constructor'] = $constructor;
-        $settings = require EVO_BASE_PATH . 'core/custom/config/seiger/settings/sArticles.php';
+        $settings = config('seiger.settings.sArticles', []);
         if (is_array($settings)) {
             foreach ($settings as $key => $setting) {
                 if (!in_array($key, ['general', 'types'])) {
