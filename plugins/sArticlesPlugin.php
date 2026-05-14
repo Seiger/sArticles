@@ -15,7 +15,7 @@ Event::listen('evolution.OnPageNotFound', function($params) {
     $article = sArticles::resolveArticleByUri(request()->segments());
     if ($article && (($article->published ?? 0) == 1 || evo()->getLoginUserID('mgr'))) {
         if (!sArticles::isLegacyMode()) {
-            evo()->setPlaceholder('article', (int)$article->id);
+            evo()->setPlaceholder('article', (int) $article->id);
         }
         $goTo = true;
     }
@@ -28,13 +28,13 @@ Event::listen('evolution.OnPageNotFound', function($params) {
     $find = Arr::last($aliasArr);
     $check = implode('/', $aliasArr);
     if ($check == 'sarticles/rating/'.$find && sArticles::config('general.rating_on', evo()->getConfig('sart_rating_on', 1)) == 1) {
-        die(sArticles::ratingVotes((int)$find));
+        die(sArticles::ratingVotes((int) $find));
     }
     if ($check == 'sarticles/poll/'.$find && sArticles::config('general.polls_on', evo()->getConfig('sart_polls_on', 1)) == 1) {
-        die(sArticles::showPoll((int)$find));
+        die(sArticles::showPoll((int) $find));
     }
     if ($check == 'sarticles/comment/'.$find && sArticles::config('general.comments_on', evo()->getConfig('sart_comments_on', 1)) == 1) {
-        die(sArticles::setComment((int)$find));
+        die(sArticles::setComment((int) $find));
     }
     if ($check == 'sarticles/comment-approve' && sArticles::config('general.comments_on', evo()->getConfig('sart_comments_on', 1)) == 1) {
         die(sArticles::approveComment());
@@ -49,7 +49,7 @@ Event::listen('evolution.OnBeforeLoadDocumentObject', function($params) {
         return;
     }
 
-    $requestId = (int)evo()->getPlaceholder('article');
+    $requestId = (int) evo()->getPlaceholder('article');
     if ($requestId) {
         $article = sArticles::getArticle($requestId);
         if (!($article->id ?? 0)) {
@@ -110,14 +110,29 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
 });
 
 /**
- * Add Menu item
+ * Add the sArticles shortcut to the Evolution CMS manager top menu.
+ *
+ * The native manager menu renders Tabler icons as inline SVG, while older package
+ * shortcuts often inject icon names into an `<i>` class. Keeping the same SVG
+ * markup here makes the optional "main menu" entry visually match system items
+ * such as Elements and Modules.
  */
 Event::listen('evolution.OnManagerMenuPrerender', function($params) {
     if (sArticles::config('general.in_main_menu', evo()->getConfig('sart_in_main_menu', 0)) == 1) {
+        $icon = __('sArticles::global.articles_icon');
+        $iconHtml = '<i class="' . $icon . '"></i>';
+        if (strpos($icon, 'tabler-') === 0 && function_exists('svg')) {
+            $iconHtml = svg($icon, '', [
+                'aria-hidden' => 'true',
+                'focusable' => 'false',
+                'style' => 'flex:0 0 auto;display:block;',
+            ])->toHtml();
+        }
+
         $menu['sarticles'] = [
             'sarticles',
             'main',
-            '<i class="' . __('sArticles::global.articles_icon') . '"></i>' . __('sArticles::global.articles'),
+            $iconHtml . '<span class="menu-item-text">' . __('sArticles::global.articles') . '</span>',
             sArticles::moduleUrl(),
             __('sArticles::global.articles'),
             "",

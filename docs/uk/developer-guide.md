@@ -21,7 +21,7 @@ sArticles використовує EvoUI + Livewire як менеджерськ�
 ```json
 {
   "require": {
-    "evolution-cms/evo-ui": "^1.0",
+    "evolution-cms/evo-ui": "^1.0.2",
     "seiger/sarticles": "^1.2"
   }
 }
@@ -30,6 +30,44 @@ sArticles використовує EvoUI + Livewire як менеджерськ�
 ## Реєстрація панелі
 
 Панель Livewire відкривається через стандартний module entrypoint Evolution CMS. Старі iframe-flow гілки не мають керувати основним UI, але можуть лишатися тільки як чітко ізольований compatibility layer.
+
+## Оновлення з 1.x на 2.x
+
+Після оновлення залежностей опублікуйте runtime-асети EvoUI окремо від
+sArticles:
+
+```console
+php artisan vendor:publish --tag=evo-ui --force
+```
+
+Починаючи з EvoUI `1.0.2`, CSS і JavaScript публікуються через symlink-aware
+механізм Evolution CMS. sArticles має підключати `evo::partials.assets` і не
+повинен дублювати EvoUI partials або відкривати URL напряму з `core/vendor`.
+
+Публічний API `sArticles::` залишається доступним, але у 2.x alias реєструється всередині
+`Seiger\sArticles\sArticlesServiceProvider`.
+
+Після оновлення з 1.x видаліть старий згенерований alias-файл, якщо він є в проєкті:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+Не додавайте `extra.laravel.aliases` для sArticles у `composer.json`. Discovery провайдера
+залишається в `extra.laravel.providers`; `extra.laravel.priority` додавайте тільки якщо з'явиться
+реальна вимога до порядку завантаження провайдерів.
+
+## Налаштування пакета
+
+Нова інсталяція працює з дефолтами з пакета і не потребує попереднього копіювання повного
+конфіга. `vendor:publish --tag=sarticles` лише готує директорію
+`core/custom/config/seiger/settings` з `.gitkeep`, а файл
+`core/custom/config/seiger/settings/sArticles.php` створюється тільки після зміни налаштувань у
+менеджері.
+
+Під час завантаження sArticles накладає локальні налаштування поверх дефолтів з
+`config/sArticlesSettings.php`, тому нові ключі з оновлень пакета не губляться через старий
+опублікований файл.
 
 ## Конфіги таблиць
 
@@ -68,6 +106,37 @@ return [
 Контент публікації зберігається як впорядкований набір блоків. Кожен блок має тип, позицію і payload. Вкладені блоки, наприклад Slider або Accordion, мають власні елементи та не дозволяють видалити останній внутрішній елемент.
 
 При додаванні нового блоку UI прокручує форму до створеного блоку, щоб менеджер одразу бачив результат дії.
+
+Структура builder у 2.x:
+
+```text
+builder/<block>/config.php
+builder/<block>/template.blade.php
+views/render/<block>.blade.php
+```
+
+`template.blade.php` відповідає за manager UI, а frontend HTML рендериться через Laravel package
+view:
+
+```text
+sarticles::render.<block>
+```
+
+Для кастомізації не потрібно запускати `vendor:publish` для всіх render-шаблонів. Скопіюйте тільки
+потрібний файл у кореневий override:
+
+```text
+views/vendor/sarticles/render/<block>.blade.php
+```
+
+`builder` JSON є джерелом правди, а поле `content` зберігає materialized HTML. Якщо render view
+змінено, оновіть вже збережений HTML явно:
+
+```console
+php artisan sarticles:rerender --dry-run
+php artisan sarticles:rerender --articles=123-10000 --chunk=200
+php artisan sarticles:rerender --articles=123,124,200 --lang=uk
+```
 
 ## sSeo
 

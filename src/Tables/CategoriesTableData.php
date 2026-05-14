@@ -1,14 +1,19 @@
-<?php
-
-namespace Seiger\sArticles\Tables;
+<?php namespace Seiger\sArticles\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticlesCategory;
+use Seiger\sArticles\Support\LikeSearch;
 use Seiger\sArticles\Tables\Concerns\HandlesLanguageFields;
 
+/**
+ * CategoriesTableData package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class CategoriesTableData
 {
     use HandlesLanguageFields;
@@ -16,6 +21,17 @@ class CategoriesTableData
     protected string $moduleUrl;
     protected sArticlesController $controller;
 
+    /**
+     * Initialize CategoriesTableData with evo-ui table context.
+     *
+     * Stores manager context, table state, and configuration so row loading, modal
+     * building, and persistence helpers operate against the same request snapshot.
+     *
+     * @param array<string, mixed> $context Runtime context passed by the manager module.
+     * @param array<string, mixed> $state Current table state, including filters and sorting.
+     * @param array<string, mixed> $config Resolved table or modal configuration.
+     * @since 2.0.0
+     */
     public function __construct(
         protected array $context = [],
         protected array $state = [],
@@ -26,11 +42,31 @@ class CategoriesTableData
         $this->controller->setModifyTables('categories');
     }
 
+    /**
+     * Total for CategoriesTableData.
+     *
+     * This method keeps the total responsibility inside CategoriesTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function total(): int
     {
         return (clone $this->categoriesQuery())->toBase()->getCountForPagination();
     }
 
+    /**
+     * Rows for CategoriesTableData.
+     *
+     * This method keeps the rows responsibility inside CategoriesTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function rows(int $page, int $perPage): array
     {
         return $this->categoryRows(
@@ -40,16 +76,46 @@ class CategoriesTableData
         );
     }
 
+    /**
+     * Filter groups for CategoriesTableData.
+     *
+     * This method keeps the filter groups responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function filterGroups(): array
     {
         return [];
     }
 
+    /**
+     * Delete name data from the manager flow.
+     *
+     * This method keeps the delete name responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function deleteName(int $categoryId): string
     {
         return $this->categoryNameById($categoryId);
     }
 
+    /**
+     * Modal defaults for CategoriesTableData.
+     *
+     * This method keeps the modal defaults responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalDefaults(): array
     {
         $defaults = [
@@ -65,6 +131,16 @@ class CategoriesTableData
         return $defaults;
     }
 
+    /**
+     * Modal data for CategoriesTableData.
+     *
+     * This method keeps the modal data responsibility inside CategoriesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalData(int $categoryId): array
     {
         $category = sArticlesCategory::find($categoryId);
@@ -89,6 +165,16 @@ class CategoriesTableData
         return $data;
     }
 
+    /**
+     * Modal fields for CategoriesTableData.
+     *
+     * This method keeps the modal fields responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalFields(array $fields, array $data = [], ?int $categoryId = null, string $mode = 'create'): array
     {
         if (!$this->hasLanguageFields()) {
@@ -123,10 +209,25 @@ class CategoriesTableData
         return $dynamicFields;
     }
 
+    /**
+     * Persist topic modal data from the manager.
+     *
+     * Topics share the same single-language versus multilingual modal split as tags. In the common
+     * single-language manager UI the editable value is the top-level `name` field, while
+     * multilingual installs submit language-scoped `translations.*.name` fields. Reading from the
+     * active shape keeps stale hidden Livewire state from overwriting the value the editor saved.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param int|null $categoryId Existing topic ID or null when creating a new topic.
+     * @param string $mode Modal mode supplied by evo-ui (`create` or `edit`).
+     * @return int Saved topic identifier.
+     * @since 2.0.0
+     */
     public function saveModal(array $data, ?int $categoryId = null, string $mode = 'create'): int
     {
+        $usesLanguageFields = $this->hasLanguageFields();
         $language = $this->defaultLanguage();
-        $name = trim((string) data_get($data, 'translations.' . $language . '.name', data_get($data, 'name', '')));
+        $name = $this->modalCategoryTextValue($data, $language, $usesLanguageFields);
 
         if ($name === '') {
             $name = __('sArticles::global.new_category');
@@ -151,7 +252,7 @@ class CategoriesTableData
         $category->cover = $this->normalizeImagePath((string) data_get($data, 'cover', ''));
 
         foreach ($this->languageCodes() as $lang) {
-            $value = trim((string) data_get($data, 'translations.' . $lang . '.name', ''));
+            $value = $this->modalCategoryTextValue($data, $lang, $usesLanguageFields);
             $category->{$this->languageTextField($lang)} = $value;
 
             if ($lang === $this->controller->langDefault() || $lang === 'base') {
@@ -169,6 +270,39 @@ class CategoriesTableData
         return (int) $category->catid;
     }
 
+    /**
+     * Resolve an editable topic name from modal payload.
+     *
+     * Single-language installs expose a simple `name` input and still may carry older nested
+     * translation data in the component state. This helper makes the visible field authoritative
+     * for the default/base language while preserving translation-specific reads when multilingual
+     * fields are actually rendered.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param string $language Language code currently being persisted.
+     * @param bool $usesLanguageFields True when multilingual fields are visible in the modal.
+     * @return string Trimmed topic name ready for storage.
+     * @since 2.0.0
+     */
+    protected function modalCategoryTextValue(array $data, string $language, bool $usesLanguageFields): string
+    {
+        if (!$usesLanguageFields && ($language === $this->defaultLanguage() || $language === 'base')) {
+            return trim((string) data_get($data, 'name', ''));
+        }
+
+        return trim((string) data_get($data, 'translations.' . $language . '.name', ''));
+    }
+
+    /**
+     * Delete row data from the manager flow.
+     *
+     * This method keeps the delete row responsibility inside CategoriesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function deleteRow(int $categoryId): void
     {
         DB::table('s_article_categories')->where('category', $categoryId)->delete();
@@ -176,6 +310,16 @@ class CategoriesTableData
         $this->normalizePositions();
     }
 
+    /**
+     * Move row for CategoriesTableData.
+     *
+     * This method keeps the move row responsibility inside CategoriesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function moveRow(int $categoryId, string $direction = 'up'): void
     {
         $ordered = $this->orderedIds();
@@ -195,6 +339,16 @@ class CategoriesTableData
         $this->applyOrder($ordered);
     }
 
+    /**
+     * Reorder row for CategoriesTableData.
+     *
+     * This method keeps the reorder row responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function reorderRow(int $categoryId, int $targetId, string $placement = 'before'): void
     {
         if ($categoryId === $targetId) {
@@ -216,6 +370,16 @@ class CategoriesTableData
         $this->applyOrder($ordered);
     }
 
+    /**
+     * Categories query for CategoriesTableData.
+     *
+     * This method keeps the categories query responsibility inside CategoriesTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return Builder Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function categoriesQuery(): Builder
     {
         $query = sArticlesCategory::query();
@@ -229,6 +393,16 @@ class CategoriesTableData
         return $query;
     }
 
+    /**
+     * Category rows for CategoriesTableData.
+     *
+     * This method keeps the category rows responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function categoryRows(Collection $categories): array
     {
         return $categories
@@ -256,6 +430,16 @@ class CategoriesTableData
             ->all();
     }
 
+    /**
+     * Apply search rules to the current workflow.
+     *
+     * This method keeps the apply search responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applySearch(Builder $query): void
     {
         $search = trim((string) $this->state('search', ''));
@@ -264,7 +448,7 @@ class CategoriesTableData
             return;
         }
 
-        $like = '%' . addcslashes(mb_strtolower($search), '\\%_') . '%';
+        $like = LikeSearch::needle(mb_strtolower($search));
         $language = $this->defaultLanguage();
 
         $query->where(function ($where) use ($query, $like, $language) {
@@ -281,6 +465,16 @@ class CategoriesTableData
         });
     }
 
+    /**
+     * Apply sort rules to the current workflow.
+     *
+     * This method keeps the apply sort responsibility inside CategoriesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     protected function applySort(Builder $query): bool
     {
         $key = (string) $this->state('sort', '');
@@ -312,6 +506,16 @@ class CategoriesTableData
         return true;
     }
 
+    /**
+     * Category name by id for CategoriesTableData.
+     *
+     * This method keeps the category name by id responsibility inside CategoriesTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function categoryNameById(int $categoryId): string
     {
         $category = sArticlesCategory::find($categoryId);
@@ -319,6 +523,16 @@ class CategoriesTableData
         return $category ? $this->categoryName($category) : '';
     }
 
+    /**
+     * Existing category for CategoriesTableData.
+     *
+     * This method keeps the existing category responsibility inside CategoriesTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return ?sArticlesCategory Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function existingCategory(string $name): ?sArticlesCategory
     {
         $language = $this->defaultLanguage();
@@ -329,6 +543,16 @@ class CategoriesTableData
             ->first();
     }
 
+    /**
+     * Category name for CategoriesTableData.
+     *
+     * This method keeps the category name responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function categoryName(sArticlesCategory $category): string
     {
         $language = $this->defaultLanguage();
@@ -338,6 +562,16 @@ class CategoriesTableData
         return $name !== '' ? $name : ($fallback !== '' ? $fallback : __('sArticles::global.no_text'));
     }
 
+    /**
+     * Image src for CategoriesTableData.
+     *
+     * This method keeps the image src responsibility inside CategoriesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function imageSrc(string $image): string
     {
         $image = trim($image);
@@ -353,6 +587,16 @@ class CategoriesTableData
         return EVO_SITE_URL . ltrim($image, '/');
     }
 
+    /**
+     * Normalize image path for package-safe usage.
+     *
+     * This method keeps the normalize image path responsibility inside CategoriesTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeImagePath(string $image): string
     {
         $image = trim($image);
@@ -374,6 +618,16 @@ class CategoriesTableData
         return $image;
     }
 
+    /**
+     * Ordered ids for CategoriesTableData.
+     *
+     * This method keeps the ordered ids responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function orderedIds(): array
     {
         return sArticlesCategory::query()
@@ -385,6 +639,16 @@ class CategoriesTableData
             ->all();
     }
 
+    /**
+     * Apply order rules to the current workflow.
+     *
+     * This method keeps the apply order responsibility inside CategoriesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applyOrder(array $ids): void
     {
         foreach (array_values($ids) as $position => $id) {
@@ -392,21 +656,61 @@ class CategoriesTableData
         }
     }
 
+    /**
+     * Normalize positions for package-safe usage.
+     *
+     * This method keeps the normalize positions responsibility inside CategoriesTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function normalizePositions(): void
     {
         $this->applyOrder($this->orderedIds());
     }
 
+    /**
+     * Delete url data from the manager flow.
+     *
+     * This method keeps the delete url responsibility inside CategoriesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function deleteUrl(int $categoryId): string
     {
         return $this->moduleUrl . '&get=сategoryDelete&i=' . $categoryId;
     }
 
+    /**
+     * Default language for CategoriesTableData.
+     *
+     * This method keeps the default language responsibility inside CategoriesTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function defaultLanguage(): string
     {
         return $this->controller->langDefault();
     }
 
+    /**
+     * Name sort field for CategoriesTableData.
+     *
+     * This method keeps the name sort field responsibility inside CategoriesTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function nameSortField(): string
     {
         $language = $this->defaultLanguage();
@@ -414,13 +718,31 @@ class CategoriesTableData
         return $language !== 'base' ? $language : 'base';
     }
 
+    /**
+     * Like sql for CategoriesTableData.
+     *
+     * This method keeps the like sql responsibility inside CategoriesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function likeSql(Builder $query, string $field): string
     {
-        $sql = 'LOWER(' . $query->getGrammar()->wrap($field) . ') LIKE ?';
-
-        return DB::connection()->getDriverName() === 'sqlite' ? $sql : $sql . " ESCAPE '\\\\'";
+        return LikeSearch::lowerExpression($query, $field);
     }
 
+    /**
+     * State for CategoriesTableData.
+     *
+     * This method keeps the state responsibility inside CategoriesTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function state(?string $key = null, mixed $default = null): mixed
     {
         return $key ? data_get($this->state, $key, $default) : $this->state;

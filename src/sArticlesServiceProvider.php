@@ -1,30 +1,50 @@
 <?php namespace Seiger\sArticles;
 
 use EvolutionCMS\ServiceProvider;
+use EvolutionCMS\AliasLoader;
+use EvoUI\EvoUI;
 use Event;
 use Livewire\Livewire;
+use Seiger\sArticles\Console\RerenderArticlesCommand;
+use Seiger\sArticles\Facades\sArticles as sArticlesFacade;
+use Seiger\sArticles\Support\BuilderRenderer;
 
+/**
+ * sArticlesServiceProvider package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class sArticlesServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * Bootstrap package services after registration.
      *
-     * @return void
+     * Routes, config, lowercase package views, translations, publishable assets, and console
+     * commands are wired here.
+     *
+     * Livewire component registration is deferred until the application is fully booted. This
+     * keeps composer/package discovery safe on fresh installs where sArticles can boot before
+     * Livewire has registered its internal services such as `livewire.finder`.
      */
     public function boot()
     {
         // Add custom routes for package
         include(__DIR__ . '/Http/routes.php');
 
-        $this->mergeConfigFrom(dirname(__DIR__) . '/config/sArticlesSettings.php', 'seiger.settings.sArticles');
+        $this->mergeSettingsConfig();
+        $this->loadViewsFrom(dirname(__DIR__) . '/views', 'sarticles');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                RerenderArticlesCommand::class,
+            ]);
+        }
 
         // Only Manager
-        if (IN_MANAGER_MODE) {
+        if (defined('IN_MANAGER_MODE') && IN_MANAGER_MODE) {
             // Migration for create tables
             $this->loadMigrationsFrom(dirname(__DIR__) . '/database/migrations');
-
-            // Views
-            $this->loadViewsFrom(dirname(__DIR__) . '/views', 'sArticles');
 
             // MultiLang
             $this->loadTranslationsFrom(dirname(__DIR__) . '/lang', 'sArticles');
@@ -40,68 +60,61 @@ class sArticlesServiceProvider extends ServiceProvider
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/polls/table.php', 'sarticles.polls.table');
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/tvparams/table.php', 'sarticles.tvparams.table');
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/settings/form.php', 'evo-ui.forms.sarticles.settings');
-            Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
+            app(EvoUI::class)->registerFormField('types', 'sarticles::evo-ui.form.types-config-map');
+            $this->app->booted(function () {
+                Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
+            });
 
             // For use config
             $this->publishes([
-                dirname(__DIR__) . '/config/sArticlesAlias.php' => config_path('app/aliases/sArticles.php', true),
-                dirname(__DIR__) . '/config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php', true),
+                dirname(__DIR__) . '/resources/publish/seiger/settings/.gitkeep' => config_path('seiger/settings/.gitkeep', true),
                 dirname(__DIR__) . '/images/noimage.png' => public_path('assets/images/noimage.png'),
                 dirname(__DIR__) . '/images/seigerit-blue.svg' => public_path('assets/site/seigerit-blue.svg'),
                 dirname(__DIR__) . '/views/s_articles_article.blade.php' => public_path('views/s_articles_article.blade.php'),
-                dirname(__DIR__) . '/builder/accordion/config.php' => public_path('assets/modules/sarticles/builder/accordion/config.php'),
-                dirname(__DIR__) . '/builder/accordion/render.blade.php' => public_path('assets/modules/sarticles/builder/accordion/render.blade.php'),
-                dirname(__DIR__) . '/builder/accordion/template.blade.php' => public_path('assets/modules/sarticles/builder/accordion/template.blade.php'),
-                dirname(__DIR__) . '/builder/articlepreview/config.php' => public_path('assets/modules/sarticles/builder/articlepreview/config.php'),
-                dirname(__DIR__) . '/builder/articlepreview/render.blade.php' => public_path('assets/modules/sarticles/builder/articlepreview/render.blade.php'),
-                dirname(__DIR__) . '/builder/articlepreview/template.blade.php' => public_path('assets/modules/sarticles/builder/articlepreview/template.blade.php'),
-                dirname(__DIR__) . '/builder/file/config.php' => public_path('assets/modules/sarticles/builder/file/config.php'),
-                dirname(__DIR__) . '/builder/file/render.blade.php' => public_path('assets/modules/sarticles/builder/file/render.blade.php'),
-                dirname(__DIR__) . '/builder/file/template.blade.php' => public_path('assets/modules/sarticles/builder/file/template.blade.php'),
-                dirname(__DIR__) . '/builder/framevideo/config.php' => public_path('assets/modules/sarticles/builder/framevideo/config.php'),
-                dirname(__DIR__) . '/builder/framevideo/render.blade.php' => public_path('assets/modules/sarticles/builder/framevideo/render.blade.php'),
-                dirname(__DIR__) . '/builder/framevideo/template.blade.php' => public_path('assets/modules/sarticles/builder/framevideo/template.blade.php'),
-                dirname(__DIR__) . '/builder/imgandtext/config.php' => public_path('assets/modules/sarticles/builder/imgandtext/config.php'),
-                dirname(__DIR__) . '/builder/imgandtext/render.blade.php' => public_path('assets/modules/sarticles/builder/imgandtext/render.blade.php'),
-                dirname(__DIR__) . '/builder/imgandtext/template.blade.php' => public_path('assets/modules/sarticles/builder/imgandtext/template.blade.php'),
-                dirname(__DIR__) . '/builder/note/config.php' => public_path('assets/modules/sarticles/builder/note/config.php'),
-                dirname(__DIR__) . '/builder/note/render.blade.php' => public_path('assets/modules/sarticles/builder/note/render.blade.php'),
-                dirname(__DIR__) . '/builder/note/template.blade.php' => public_path('assets/modules/sarticles/builder/note/template.blade.php'),
-                dirname(__DIR__) . '/builder/note/icon-note.svg' => public_path('assets/modules/sarticles/builder/note/icon-note.svg'),
-                dirname(__DIR__) . '/builder/poll/config.php' => public_path('assets/modules/sarticles/builder/poll/config.php'),
-                dirname(__DIR__) . '/builder/poll/render.blade.php' => public_path('assets/modules/sarticles/builder/poll/render.blade.php'),
-                dirname(__DIR__) . '/builder/poll/template.blade.php' => public_path('assets/modules/sarticles/builder/poll/template.blade.php'),
-                dirname(__DIR__) . '/builder/quote/config.php' => public_path('assets/modules/sarticles/builder/quote/config.php'),
-                dirname(__DIR__) . '/builder/quote/render.blade.php' => public_path('assets/modules/sarticles/builder/quote/render.blade.php'),
-                dirname(__DIR__) . '/builder/quote/template.blade.php' => public_path('assets/modules/sarticles/builder/quote/template.blade.php'),
-                dirname(__DIR__) . '/builder/richtext/config.php' => public_path('assets/modules/sarticles/builder/richtext/config.php'),
-                dirname(__DIR__) . '/builder/richtext/render.blade.php' => public_path('assets/modules/sarticles/builder/richtext/render.blade.php'),
-                dirname(__DIR__) . '/builder/richtext/template.blade.php' => public_path('assets/modules/sarticles/builder/richtext/template.blade.php'),
-                dirname(__DIR__) . '/builder/singleimg/config.php' => public_path('assets/modules/sarticles/builder/singleimg/config.php'),
-                dirname(__DIR__) . '/builder/singleimg/render.blade.php' => public_path('assets/modules/sarticles/builder/singleimg/render.blade.php'),
-                dirname(__DIR__) . '/builder/singleimg/template.blade.php' => public_path('assets/modules/sarticles/builder/singleimg/template.blade.php'),
-                dirname(__DIR__) . '/builder/slider/config.php' => public_path('assets/modules/sarticles/builder/slider/config.php'),
-                dirname(__DIR__) . '/builder/slider/render.blade.php' => public_path('assets/modules/sarticles/builder/slider/render.blade.php'),
-                dirname(__DIR__) . '/builder/slider/template.blade.php' => public_path('assets/modules/sarticles/builder/slider/template.blade.php'),
+                dirname(__DIR__) . '/builder/note/icon-note.svg' => public_path('assets/images/sarticles/icon-note.svg'),
             ], 'sarticles');
         }
 
-        $this->app->singleton(sArticles::class);
-        $this->app->alias(sArticles::class, 'sArticles');
     }
 
     /**
-     * Register the service provider.
+     * Merge package defaults with optional project-level settings.
      *
-     * @return void
+     * sArticles should work immediately from the vendor defaults, while projects that save or
+     * publish local settings may override only the values they need. A recursive merge keeps new
+     * default keys available after package updates instead of letting an older custom settings file
+     * shadow entire nested sections.
+     *
+     * @return void No value is returned; the application config repository is updated in place.
+     * @since 2.1.0
+     */
+    protected function mergeSettingsConfig(): void
+    {
+        $defaults = require dirname(__DIR__) . '/config/sArticlesSettings.php';
+        $settings = config('seiger.settings.sArticles', []);
+
+        if (!is_array($settings)) {
+            $settings = [];
+        }
+
+        $this->app['config']->set('seiger.settings.sArticles', array_replace_recursive($defaults, $settings));
+    }
+
+    /**
+     * Register package services with Evolution CMS.
+     *
+     * The provider adds plugins, manager module metadata, singleton bindings, and aliases used
+     * by facade access.
      */
     public function register()
     {
         // Add plugins to Evo
         $this->loadPluginsFrom(dirname(__DIR__) . '/plugins/');
+        $this->app->singleton(BuilderRenderer::class);
+        $this->registerPublicApi();
 
         // Only Manager
-        if (IN_MANAGER_MODE) {
+        if (defined('IN_MANAGER_MODE') && IN_MANAGER_MODE) {
             // Add module to Evo. Module ID is md5('sOfferModule').
             $lang = 'en';
             if (isset($_SESSION['mgrUsrConfigSet']['manager_language'])) {
@@ -122,5 +135,26 @@ class sArticlesServiceProvider extends ServiceProvider
                 $lang['module_icon'] ?? $lang['articles_icon']
             );
         }
+    }
+
+    /**
+     * Register the package public API for container and facade-style access.
+     *
+     * The package intentionally supports `sArticles::...` in snippets, chunks, Blade templates,
+     * and project code. Registering the facade alias at runtime keeps that public API available
+     * without requiring `core/custom/config/app/aliases/sArticles.php` to be copied into every
+     * installation.
+     *
+     * The container alias remains available for code that resolves the service through
+     * `app('sArticles')` instead of using the facade.
+     *
+     * @since 2.1.0
+     */
+    protected function registerPublicApi(): void
+    {
+        $this->app->singleton(sArticles::class);
+        $this->app->alias(sArticles::class, 'sArticles');
+
+        AliasLoader::getInstance()->alias('sArticles', sArticlesFacade::class);
     }
 }

@@ -1,6 +1,4 @@
-<?php
-
-return [
+<?php return [
     'key' => 'sarticles.categories',
     'provider' => \Seiger\sArticles\Tables\CategoriesTableData::class,
     'wire_target' => 'search,perPage,setSort,switchView,openCreateModal,openEditModal,saveModal,closeModal,openDeleteModal,closeDeleteModal,deleteConfirmed,moveRow,reorderRow,goToPage,firstPage,previousPage,nextPage,goLastPage',

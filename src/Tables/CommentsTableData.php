@@ -1,6 +1,4 @@
-<?php
-
-namespace Seiger\sArticles\Tables;
+<?php namespace Seiger\sArticles\Tables;
 
 use Carbon\Carbon;
 use EvolutionCMS\Models\UserAttribute;
@@ -10,12 +8,30 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleComment;
+use Seiger\sArticles\Support\LikeSearch;
 
+/**
+ * CommentsTableData package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class CommentsTableData
 {
     protected string $moduleUrl;
     protected string $type;
 
+    /**
+     * Initialize CommentsTableData with evo-ui table context.
+     *
+     * Stores manager context, table state, and configuration so row loading, modal
+     * building, and persistence helpers operate against the same request snapshot.
+     *
+     * @param array<string, mixed> $context Runtime context passed by the manager module.
+     * @param array<string, mixed> $state Current table state, including filters and sorting.
+     * @param array<string, mixed> $config Resolved table or modal configuration.
+     * @since 2.0.0
+     */
     public function __construct(
         protected array $context = [],
         protected array $state = [],
@@ -25,11 +41,31 @@ class CommentsTableData
         $this->type = (string) ($context['type'] ?? 'article') ?: 'article';
     }
 
+    /**
+     * Total for CommentsTableData.
+     *
+     * This method keeps the total responsibility inside CommentsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function total(): int
     {
         return (clone $this->commentsQuery())->toBase()->getCountForPagination();
     }
 
+    /**
+     * Rows for CommentsTableData.
+     *
+     * This method keeps the rows responsibility inside CommentsTableData, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function rows(int $page, int $perPage): array
     {
         $comments = $this->commentsQuery()
@@ -43,6 +79,16 @@ class CommentsTableData
         );
     }
 
+    /**
+     * Filter groups for CommentsTableData.
+     *
+     * This method keeps the filter groups responsibility inside CommentsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function filterGroups(): array
     {
         $query = $this->commentsScope();
@@ -83,11 +129,31 @@ class CommentsTableData
         ];
     }
 
+    /**
+     * Delete name data from the manager flow.
+     *
+     * This method keeps the delete name responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function deleteName(int $commentId): string
     {
         return $this->commentName($commentId);
     }
 
+    /**
+     * Delete row data from the manager flow.
+     *
+     * This method keeps the delete row responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function deleteRow(int $commentId): void
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -97,6 +163,16 @@ class CommentsTableData
         sArticleComment::where('comid', $commentId)->delete();
     }
 
+    /**
+     * Modal defaults for CommentsTableData.
+     *
+     * This method keeps the modal defaults responsibility inside CommentsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalDefaults(): array
     {
         return [
@@ -105,6 +181,16 @@ class CommentsTableData
         ];
     }
 
+    /**
+     * Modal data for CommentsTableData.
+     *
+     * This method keeps the modal data responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalData(int $commentId): array
     {
         $comment = sArticleComment::find($commentId);
@@ -119,6 +205,16 @@ class CommentsTableData
         ];
     }
 
+    /**
+     * Persist modal data.
+     *
+     * This method keeps the save modal responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function saveModal(array $data, ?int $commentId = null, string $mode = 'edit'): int
     {
         if (!isset($_SESSION['mgrValidated']) || !$commentId) {
@@ -139,6 +235,16 @@ class CommentsTableData
         return (int) $comment->comid;
     }
 
+    /**
+     * Toggle published from a manager action.
+     *
+     * This method keeps the toggle published responsibility inside CommentsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function togglePublished(int $commentId): void
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -155,6 +261,16 @@ class CommentsTableData
         $comment->save();
     }
 
+    /**
+     * Comments query for CommentsTableData.
+     *
+     * This method keeps the comments query responsibility inside CommentsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return Builder Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function commentsQuery(): Builder
     {
         $query = $this->commentsScope();
@@ -172,6 +288,16 @@ class CommentsTableData
         return $query->orderBy('s_article_comments.comid', 'desc');
     }
 
+    /**
+     * Comments scope for CommentsTableData.
+     *
+     * This method keeps the comments scope responsibility inside CommentsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return Builder Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function commentsScope(): Builder
     {
         return sArticleComment::query()
@@ -184,6 +310,16 @@ class CommentsTableData
             );
     }
 
+    /**
+     * Comment rows for CommentsTableData.
+     *
+     * This method keeps the comment rows responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function commentRows(Collection $comments, array $articleTitles, array $userNames): array
     {
         return $comments
@@ -214,6 +350,16 @@ class CommentsTableData
             ->all();
     }
 
+    /**
+     * Apply search rules to the current workflow.
+     *
+     * This method keeps the apply search responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applySearch(Builder $query): void
     {
         $search = trim(strip_tags((string) $this->state('search', '')));
@@ -222,7 +368,7 @@ class CommentsTableData
             return;
         }
 
-        $like = '%' . addcslashes(mb_strtolower($search), '\\%_') . '%';
+        $like = LikeSearch::needle(mb_strtolower($search));
         $articleIds = $this->articleIdsByTitle($like);
         $userIds = $this->userIdsByName($like);
 
@@ -245,6 +391,16 @@ class CommentsTableData
         });
     }
 
+    /**
+     * Apply availability rules to the current workflow.
+     *
+     * This method keeps the apply availability responsibility inside CommentsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applyAvailability(Builder $query): void
     {
         $availability = (string) $this->filterState('availability', 'all');
@@ -256,6 +412,16 @@ class CommentsTableData
         }
     }
 
+    /**
+     * Apply article filter rules to the current workflow.
+     *
+     * This method keeps the apply article filter responsibility inside CommentsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applyArticleFilter(Builder $query): void
     {
         $selected = $this->filterIds('article');
@@ -265,6 +431,16 @@ class CommentsTableData
         }
     }
 
+    /**
+     * Apply author filter rules to the current workflow.
+     *
+     * This method keeps the apply author filter responsibility inside CommentsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applyAuthorFilter(Builder $query): void
     {
         $selected = $this->filterIds('author');
@@ -274,6 +450,16 @@ class CommentsTableData
         }
     }
 
+    /**
+     * Apply created date filter rules to the current workflow.
+     *
+     * This method keeps the apply created date filter responsibility inside CommentsTableData,
+     * so callers can rely on a stable package boundary while the manager UI, frontend runtime,
+     * or legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applyCreatedDateFilter(Builder $query): void
     {
         $value = (array) $this->filterState('created_at', []);
@@ -289,6 +475,16 @@ class CommentsTableData
         }
     }
 
+    /**
+     * Apply sort rules to the current workflow.
+     *
+     * This method keeps the apply sort responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     protected function applySort(Builder $query): bool
     {
         $key = (string) $this->state('sort', '');
@@ -322,6 +518,16 @@ class CommentsTableData
         return true;
     }
 
+    /**
+     * Article titles for CommentsTableData.
+     *
+     * This method keeps the article titles responsibility inside CommentsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function articleTitles(Collection $ids): array
     {
         $ids = $ids->map(fn ($id) => (int) $id)->filter()->unique()->values();
@@ -346,6 +552,16 @@ class CommentsTableData
             ->all();
     }
 
+    /**
+     * User names for CommentsTableData.
+     *
+     * This method keeps the user names responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function userNames(Collection $ids): array
     {
         $ids = $ids->map(fn ($id) => (int) $id)->filter()->unique()->values();
@@ -363,13 +579,22 @@ class CommentsTableData
             ->all();
     }
 
+    /**
+     * Article ids by title for CommentsTableData.
+     *
+     * This method keeps the article ids by title responsibility inside CommentsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function articleIdsByTitle(string $like): array
     {
         $grammar = DB::connection()->getQueryGrammar();
-        $escape = DB::connection()->getDriverName() === 'sqlite' ? '' : " ESCAPE '\\\\'";
 
         return DB::table('s_article_translates')
-            ->whereRaw('LOWER(' . $grammar->wrap('pagetitle') . ') LIKE ?' . $escape, [$like])
+            ->whereRaw(LikeSearch::expressionForGrammar($grammar, 'pagetitle'), [$like])
             ->distinct()
             ->pluck('article')
             ->map(fn ($id) => (int) $id)
@@ -378,13 +603,22 @@ class CommentsTableData
             ->all();
     }
 
+    /**
+     * User ids by name for CommentsTableData.
+     *
+     * This method keeps the user ids by name responsibility inside CommentsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function userIdsByName(string $like): array
     {
         $grammar = DB::connection()->getQueryGrammar();
-        $escape = DB::connection()->getDriverName() === 'sqlite' ? '' : " ESCAPE '\\\\'";
 
         return UserAttribute::query()
-            ->whereRaw('LOWER(' . $grammar->wrap('fullname') . ') LIKE ?' . $escape, [$like])
+            ->whereRaw(LikeSearch::expressionForGrammar($grammar, 'fullname'), [$like])
             ->pluck('internalKey')
             ->map(fn ($id) => (int) $id)
             ->filter()
@@ -392,6 +626,16 @@ class CommentsTableData
             ->all();
     }
 
+    /**
+     * Comment name for CommentsTableData.
+     *
+     * This method keeps the comment name responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function commentName(int $commentId): string
     {
         $comment = sArticleComment::find($commentId);
@@ -399,6 +643,16 @@ class CommentsTableData
         return $comment ? $this->commentText((string) $comment->comment, 72) : (string) $commentId;
     }
 
+    /**
+     * Comment text for CommentsTableData.
+     *
+     * This method keeps the comment text responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function commentText(string $comment, int $limit = 180): string
     {
         $text = trim(preg_replace('/\s+/u', ' ', strip_tags($comment)) ?: '');
@@ -406,18 +660,46 @@ class CommentsTableData
         return $text !== '' ? Str::limit($text, $limit) : __('sArticles::global.no_text');
     }
 
+    /**
+     * Delete url data from the manager flow.
+     *
+     * This method keeps the delete url responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function deleteUrl(int $commentId): string
     {
         return $this->moduleUrl . '&get=commentDelete&type=' . rawurlencode($this->type) . '&i=' . $commentId;
     }
 
+    /**
+     * Like sql for CommentsTableData.
+     *
+     * This method keeps the like sql responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function likeSql(Builder $query, string $field): string
     {
-        $sql = 'LOWER(' . $query->getGrammar()->wrap($field) . ') LIKE ?';
-
-        return DB::connection()->getDriverName() === 'sqlite' ? $sql : $sql . " ESCAPE '\\\\'";
+        return LikeSearch::lowerExpression($query, $field);
     }
 
+    /**
+     * Format date for display.
+     *
+     * This method keeps the format date responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function formatDate(mixed $value): string
     {
         if (!$value) {
@@ -427,6 +709,16 @@ class CommentsTableData
         return Carbon::parse($value)->format('d.m.Y H:i');
     }
 
+    /**
+     * Normalize filter date for package-safe usage.
+     *
+     * This method keeps the normalize filter date responsibility inside CommentsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeFilterDate(string $value): string
     {
         $value = trim($value);
@@ -434,6 +726,16 @@ class CommentsTableData
         return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
     }
 
+    /**
+     * Filter ids for CommentsTableData.
+     *
+     * This method keeps the filter ids responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function filterIds(string $key): array
     {
         return collect((array) $this->filterState($key, []))
@@ -444,11 +746,31 @@ class CommentsTableData
             ->all();
     }
 
+    /**
+     * State for CommentsTableData.
+     *
+     * This method keeps the state responsibility inside CommentsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function state(?string $key = null, mixed $default = null): mixed
     {
         return $key ? data_get($this->state, $key, $default) : $this->state;
     }
 
+    /**
+     * Filter state for CommentsTableData.
+     *
+     * This method keeps the filter state responsibility inside CommentsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function filterState(string $key, mixed $default = null): mixed
     {
         return data_get($this->state('filters', []), $key, $default);

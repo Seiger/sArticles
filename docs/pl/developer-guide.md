@@ -18,6 +18,21 @@ W srodowisku Extras:
 php artisan extras extras "sArticles"
 ```
 
+## Aktualizacja z 1.x do 2.x
+
+Publiczne API `sArticles::` pozostaje dostepne, ale w 2.x alias jest rejestrowany bezposrednio w
+`Seiger\sArticles\sArticlesServiceProvider`.
+
+Po aktualizacji z 1.x usun stary wygenerowany plik aliasu, jesli istnieje w projekcie:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+Nie dodawaj `extra.laravel.aliases` dla sArticles w `composer.json`. Provider discovery pozostaje
+w `extra.laravel.providers`; `extra.laravel.priority` dodawaj tylko wtedy, gdy pojawi sie realne
+wymaganie dotyczace kolejnosci ladowania providerow.
+
 ## Konfiguracja
 
 Plik runtime:

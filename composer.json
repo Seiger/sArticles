@@ -1,39 +1,36 @@
 {
-    "name": "seiger/sarticles",
-    "license": "GPL-3.0-or-later",
-    "type": "evolution-cms-module",
-    "description": "Blog News and Articles Management Module for Evolution CMS admin panel.",
-    "keywords": ["evocms", "evolution-cms"],
-    "authors": [
-        {
-            "name": "Serhii Korneliuk",
-            "email": "info@seigerit.com"
-        }
-    ],
-    "require": {
-        "php": "^8.3",
-        "evolution-cms/evolution": "^3.5.7",
-        "evolution-cms/evo-ui": "*"
-    },
-    "autoload": {
-        "psr-4": {
-            "Seiger\\sArticles\\": "src/"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Seiger\\sArticles\\sArticlesServiceProvider"
-            ],
-            "aliases": {
-                "sArticles": "Seiger\\sArticles\\Facades\\sArticles"
-            }
-        }
-    },
-    "scripts": {
-        "test": "php tests/run.php",
-        "post-autoload-dump": [
-            "php artisan migrate"
-        ]
+  "name": "seiger/sarticles",
+  "license": "GPL-3.0-or-later",
+  "type": "evolution-cms-module",
+  "description": "Blog News and Articles Management Module for Evolution CMS admin panel.",
+  "keywords": ["evocms", "evolution-cms"],
+  "authors": [
+    {
+      "name": "Serhii Korneliuk",
+      "email": "info@seigerit.com"
     }
+  ],
+  "require": {
+    "php": "^8.4",
+    "evolution-cms/evolution": "^3.5.7",
+    "evolution-cms/evo-ui": "^1.0.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Seiger\\sArticles\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Seiger\\sArticles\\sArticlesServiceProvider"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "php tests/run.php",
+    "post-autoload-dump": [
+      "php artisan migrate"
+    ]
+  }
 }

@@ -1,14 +1,19 @@
-<?php
-
-namespace Seiger\sArticles\Tables;
+<?php namespace Seiger\sArticles\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticlesFeature;
+use Seiger\sArticles\Support\LikeSearch;
 use Seiger\sArticles\Tables\Concerns\HandlesLanguageFields;
 
+/**
+ * FeaturesTableData package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class FeaturesTableData
 {
     use HandlesLanguageFields;
@@ -16,6 +21,17 @@ class FeaturesTableData
     protected string $moduleUrl;
     protected sArticlesController $controller;
 
+    /**
+     * Initialize FeaturesTableData with evo-ui table context.
+     *
+     * Stores manager context, table state, and configuration so row loading, modal
+     * building, and persistence helpers operate against the same request snapshot.
+     *
+     * @param array<string, mixed> $context Runtime context passed by the manager module.
+     * @param array<string, mixed> $state Current table state, including filters and sorting.
+     * @param array<string, mixed> $config Resolved table or modal configuration.
+     * @since 2.0.0
+     */
     public function __construct(
         protected array $context = [],
         protected array $state = [],
@@ -26,11 +42,31 @@ class FeaturesTableData
         $this->controller->setModifyTables('features');
     }
 
+    /**
+     * Total for FeaturesTableData.
+     *
+     * This method keeps the total responsibility inside FeaturesTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function total(): int
     {
         return (clone $this->featuresQuery())->toBase()->getCountForPagination();
     }
 
+    /**
+     * Rows for FeaturesTableData.
+     *
+     * This method keeps the rows responsibility inside FeaturesTableData, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function rows(int $page, int $perPage): array
     {
         return $this->featureRows(
@@ -40,11 +76,31 @@ class FeaturesTableData
         );
     }
 
+    /**
+     * Filter groups for FeaturesTableData.
+     *
+     * This method keeps the filter groups responsibility inside FeaturesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function filterGroups(): array
     {
         return [];
     }
 
+    /**
+     * Delete name data from the manager flow.
+     *
+     * This method keeps the delete name responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function deleteName(int $featureId): string
     {
         $feature = sArticlesFeature::find($featureId);
@@ -52,6 +108,16 @@ class FeaturesTableData
         return $feature ? $this->featureName($feature) : (string) $featureId;
     }
 
+    /**
+     * Modal defaults for FeaturesTableData.
+     *
+     * This method keeps the modal defaults responsibility inside FeaturesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalDefaults(): array
     {
         $defaults = [
@@ -68,6 +134,16 @@ class FeaturesTableData
         return $defaults;
     }
 
+    /**
+     * Modal data for FeaturesTableData.
+     *
+     * This method keeps the modal data responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalData(int $featureId): array
     {
         $feature = sArticlesFeature::find($featureId);
@@ -93,6 +169,16 @@ class FeaturesTableData
         return $data;
     }
 
+    /**
+     * Modal fields for FeaturesTableData.
+     *
+     * This method keeps the modal fields responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalFields(array $fields, array $data = [], ?int $featureId = null, string $mode = 'create'): array
     {
         if (!$this->hasLanguageFields()) {
@@ -125,15 +211,40 @@ class FeaturesTableData
             ->all());
     }
 
+    /**
+     * Modal alias for FeaturesTableData.
+     *
+     * This method keeps the modal alias responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function modalAlias(string $source, ?int $featureId = null): string
     {
         return $this->controller->validateAlias($source, (int) $featureId, 'feature');
     }
 
+    /**
+     * Persist feature modal data from the manager.
+     *
+     * Feature records use the same evo-ui modal shape split as tags and topics. Single-language
+     * installs submit the visible editable name as top-level `name`, while multilingual installs
+     * submit one `translations.*.name` value per language. The save path must respect the active
+     * shape so old hidden translation state cannot make a successful save appear ignored.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param int|null $featureId Existing feature ID or null when creating a new feature.
+     * @param string $mode Modal mode supplied by evo-ui (`create` or `edit`).
+     * @return int Saved feature identifier.
+     * @since 2.0.0
+     */
     public function saveModal(array $data, ?int $featureId = null, string $mode = 'create'): int
     {
+        $usesLanguageFields = $this->hasLanguageFields();
         $language = $this->defaultLanguage();
-        $name = trim((string) data_get($data, 'translations.' . $language . '.name', data_get($data, 'name', '')));
+        $name = $this->modalFeatureTextValue($data, $language, $usesLanguageFields);
 
         if ($name === '') {
             $name = __('sArticles::global.feature_item');
@@ -153,7 +264,7 @@ class FeaturesTableData
         $feature->badge = trim((string) data_get($data, 'badge', ''));
 
         foreach ($this->languageCodes() as $lang) {
-            $value = trim((string) data_get($data, 'translations.' . $lang . '.name', ''));
+            $value = $this->modalFeatureTextValue($data, $lang, $usesLanguageFields);
             $feature->{$this->languageTextField($lang)} = $value;
 
             if ($lang === $this->controller->langDefault() || $lang === 'base') {
@@ -171,6 +282,39 @@ class FeaturesTableData
         return (int) $feature->fid;
     }
 
+    /**
+     * Resolve an editable feature name from modal payload.
+     *
+     * In the default single-language manager UI the top-level `name` field is the only visible
+     * source of truth. Multilingual mode renders translation-specific inputs instead. This helper
+     * keeps those two payload contracts explicit and prevents hidden component state from
+     * overriding the value the editor actually changed.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param string $language Language code currently being persisted.
+     * @param bool $usesLanguageFields True when multilingual fields are visible in the modal.
+     * @return string Trimmed feature name ready for storage.
+     * @since 2.0.0
+     */
+    protected function modalFeatureTextValue(array $data, string $language, bool $usesLanguageFields): string
+    {
+        if (!$usesLanguageFields && ($language === $this->defaultLanguage() || $language === 'base')) {
+            return trim((string) data_get($data, 'name', ''));
+        }
+
+        return trim((string) data_get($data, 'translations.' . $language . '.name', ''));
+    }
+
+    /**
+     * Move row for FeaturesTableData.
+     *
+     * This method keeps the move row responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function moveRow(int $featureId, string $direction = 'up'): void
     {
         $ordered = $this->orderedIds();
@@ -190,6 +334,16 @@ class FeaturesTableData
         $this->applyOrder($ordered);
     }
 
+    /**
+     * Reorder row for FeaturesTableData.
+     *
+     * This method keeps the reorder row responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function reorderRow(int $featureId, int $targetId, string $placement = 'before'): void
     {
         if ($featureId === $targetId) {
@@ -211,6 +365,16 @@ class FeaturesTableData
         $this->applyOrder($ordered);
     }
 
+    /**
+     * Delete row data from the manager flow.
+     *
+     * This method keeps the delete row responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function deleteRow(int $featureId): void
     {
         DB::table('s_article_features')->where('feature', $featureId)->delete();
@@ -218,6 +382,16 @@ class FeaturesTableData
         $this->normalizePositions();
     }
 
+    /**
+     * Features query for FeaturesTableData.
+     *
+     * This method keeps the features query responsibility inside FeaturesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return Builder Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function featuresQuery(): Builder
     {
         $query = sArticlesFeature::query();
@@ -231,6 +405,16 @@ class FeaturesTableData
         return $query;
     }
 
+    /**
+     * Feature rows for FeaturesTableData.
+     *
+     * This method keeps the feature rows responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function featureRows(Collection $features): array
     {
         return $features
@@ -249,6 +433,16 @@ class FeaturesTableData
             ->all();
     }
 
+    /**
+     * Apply search rules to the current workflow.
+     *
+     * This method keeps the apply search responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applySearch(Builder $query): void
     {
         $search = trim((string) $this->state('search', ''));
@@ -257,7 +451,7 @@ class FeaturesTableData
             return;
         }
 
-        $like = '%' . addcslashes(mb_strtolower($search), '\\%_') . '%';
+        $like = LikeSearch::needle(mb_strtolower($search));
         $language = $this->defaultLanguage();
 
         $query->where(function ($where) use ($query, $like, $language) {
@@ -276,6 +470,16 @@ class FeaturesTableData
         });
     }
 
+    /**
+     * Apply sort rules to the current workflow.
+     *
+     * This method keeps the apply sort responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     protected function applySort(Builder $query): bool
     {
         $key = (string) $this->state('sort', '');
@@ -307,6 +511,16 @@ class FeaturesTableData
         return true;
     }
 
+    /**
+     * Feature name for FeaturesTableData.
+     *
+     * This method keeps the feature name responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function featureName(sArticlesFeature $feature): string
     {
         $language = $this->defaultLanguage();
@@ -316,6 +530,16 @@ class FeaturesTableData
         return $name !== '' ? $name : ($fallback !== '' ? $fallback : __('sArticles::global.no_text'));
     }
 
+    /**
+     * Ordered ids for FeaturesTableData.
+     *
+     * This method keeps the ordered ids responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function orderedIds(): array
     {
         return sArticlesFeature::query()
@@ -327,6 +551,16 @@ class FeaturesTableData
             ->all();
     }
 
+    /**
+     * Apply order rules to the current workflow.
+     *
+     * This method keeps the apply order responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applyOrder(array $ids): void
     {
         foreach (array_values($ids) as $position => $id) {
@@ -334,21 +568,61 @@ class FeaturesTableData
         }
     }
 
+    /**
+     * Normalize positions for package-safe usage.
+     *
+     * This method keeps the normalize positions responsibility inside FeaturesTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function normalizePositions(): void
     {
         $this->applyOrder($this->orderedIds());
     }
 
+    /**
+     * Delete url data from the manager flow.
+     *
+     * This method keeps the delete url responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function deleteUrl(int $featureId): string
     {
         return $this->moduleUrl . '&get=featureDelete&i=' . $featureId;
     }
 
+    /**
+     * Default language for FeaturesTableData.
+     *
+     * This method keeps the default language responsibility inside FeaturesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function defaultLanguage(): string
     {
         return $this->controller->langDefault();
     }
 
+    /**
+     * Name sort field for FeaturesTableData.
+     *
+     * This method keeps the name sort field responsibility inside FeaturesTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function nameSortField(): string
     {
         $language = $this->defaultLanguage();
@@ -356,13 +630,31 @@ class FeaturesTableData
         return $language !== 'base' ? $language : 'base';
     }
 
+    /**
+     * Like sql for FeaturesTableData.
+     *
+     * This method keeps the like sql responsibility inside FeaturesTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function likeSql(Builder $query, string $field): string
     {
-        $sql = 'LOWER(' . $query->getGrammar()->wrap($field) . ') LIKE ?';
-
-        return DB::connection()->getDriverName() === 'sqlite' ? $sql : $sql . " ESCAPE '\\\\'";
+        return LikeSearch::lowerExpression($query, $field);
     }
 
+    /**
+     * State for FeaturesTableData.
+     *
+     * This method keeps the state responsibility inside FeaturesTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function state(?string $key = null, mixed $default = null): mixed
     {
         return $key ? data_get($this->state, $key, $default) : $this->state;

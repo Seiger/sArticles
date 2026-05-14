@@ -85,14 +85,53 @@ s_articles_group('package', function () use ($root): void {
 
         s_articles_assert(($composer['type'] ?? null) === 'evolution-cms-module', 'sArticles must stay an Evolution CMS module.');
         s_articles_assert(isset($composer['require']['evolution-cms/evo-ui']), 'sArticles must require evolution-cms/evo-ui.');
+        s_articles_assert(($composer['require']['evolution-cms/evo-ui'] ?? null) === '^1.0.2', 'sArticles must require the EvoUI release with symlink-published runtime assets.');
         s_articles_assert(($composer['extra']['laravel']['providers'][0] ?? null) === 'Seiger\\sArticles\\sArticlesServiceProvider', 'Service provider must stay registered.');
+        s_articles_assert(!isset($composer['extra']['laravel']['aliases']), 'Facade alias must be registered by the service provider, not generated as a custom alias file.');
         s_articles_assert(($composer['scripts']['test'] ?? null) === 'php tests/run.php', 'Composer test script must run the compatibility suite.');
+    });
+
+    s_articles_test('service provider registers sArticles facade alias at runtime', function (): void {
+        $provider = s_articles_read('src/sArticlesServiceProvider.php');
+
+        foreach ([
+            'use EvolutionCMS\\AliasLoader;',
+            'AliasLoader::getInstance()->alias(\'sArticles\', sArticlesFacade::class);',
+            'function registerPublicApi(): void',
+            '$this->app->alias(sArticles::class, \'sArticles\');',
+        ] as $marker) {
+            s_articles_assert_contains($marker, $provider, 'Missing runtime facade alias marker: ' . $marker);
+        }
+
+        s_articles_assert(!is_file(s_articles_path('config/sArticlesAlias.php')), 'Legacy published alias file should not remain in the package.');
+    });
+
+    s_articles_test('settings use vendor defaults with optional project overrides', function (): void {
+        $provider = s_articles_read('src/sArticlesServiceProvider.php');
+        $controller = s_articles_read('src/Controllers/sArticlesController.php');
+
+        foreach ([
+            'function mergeSettingsConfig(): void',
+            "require dirname(__DIR__) . '/config/sArticlesSettings.php'",
+            "config('seiger.settings.sArticles', [])",
+            'array_replace_recursive($defaults, $settings)',
+            "'/resources/publish/seiger/settings/.gitkeep'",
+            "config_path('seiger/settings/.gitkeep', true)",
+        ] as $marker) {
+            s_articles_assert_contains($marker, $provider, 'Missing settings merge/publish marker: ' . $marker);
+        }
+
+        s_articles_assert(!str_contains($provider, "config/sArticlesSettings.php' => config_path('seiger/settings/sArticles.php'"), 'Settings publish must not copy the full package defaults.');
+        s_articles_assert(is_file(s_articles_path('resources/publish/seiger/settings/.gitkeep')), 'Settings publish placeholder must exist.');
+        s_articles_assert_contains('mkdir($directory, 0775, true)', $controller, 'Settings save must create the custom settings directory on first change.');
+        s_articles_assert_contains('file_put_contents($path, $string, LOCK_EX)', $controller, 'Settings save must write the project override atomically.');
     });
 });
 
 s_articles_group('module-shell', function (): void {
     s_articles_test('module panel uses evo-ui form/table shell and dirty navigation guard', function (): void {
         $panel = s_articles_read('views/livewire/module-panel.blade.php');
+        $shell = s_articles_read('views/articles/shell.blade.php');
 
         foreach ([
             '<livewire:evo-ui.form',
@@ -105,6 +144,10 @@ s_articles_group('module-shell', function (): void {
         ] as $marker) {
             s_articles_assert_contains($marker, $panel, 'Missing evo-ui module panel marker: ' . $marker);
         }
+
+        s_articles_assert_contains("@include('evo::partials.assets')", $shell, 'sArticles shell must load EvoUI through the shared EvoUI asset partial.');
+        s_articles_assert(!is_file(s_articles_path('views/partials/evo-ui-assets.blade.php')), 'sArticles must not duplicate EvoUI asset publishing or direct vendor asset URLs.');
+        s_articles_assert(!str_contains($shell, 'core/vendor/evolution-cms/evo-ui/resources/'), 'The manager shell must not expose vendor asset URLs.');
     });
 });
 
@@ -216,6 +259,27 @@ s_articles_group('provider-hooks', function (): void {
             s_articles_assert_contains($marker, $provider, 'Missing ArticlesTableData provider marker: ' . $marker);
         }
     });
+
+    s_articles_test('article duplicate title suffix uses package-local translations', function (): void {
+        $provider = s_articles_read('src/Tables/ArticlesTableData.php');
+
+        s_articles_assert_contains("__('sArticles::global.duplicate_suffix')", $provider, 'Article duplicate titles must use the package-local noun suffix.');
+        s_articles_assert(!str_contains($provider, "__('global.duplicate')"), 'Article duplicate titles must not reuse the manager action label.');
+
+        $expected = [
+            'de' => 'Kopie',
+            'en' => 'copy',
+            'fr' => 'copie',
+            'pl' => 'kopia',
+            'ru' => 'копия',
+            'uk' => 'копія',
+        ];
+
+        foreach ($expected as $locale => $suffix) {
+            $translations = require s_articles_path("lang/{$locale}/global.php");
+            s_articles_assert(($translations['duplicate_suffix'] ?? null) === $suffix, "Duplicate suffix must be localized for {$locale}.");
+        }
+    });
 });
 
 s_articles_group('builder', function (): void {
@@ -242,6 +306,32 @@ s_articles_group('builder', function (): void {
             'BrowseFileServer',
         ] as $marker) {
             s_articles_assert_contains($marker, $surface, 'Missing builder compatibility marker: ' . $marker);
+        }
+    });
+
+    s_articles_test('builder render views use Laravel vendor override conventions', function (): void {
+        $provider = s_articles_read('src/sArticlesServiceProvider.php');
+        $renderer = s_articles_read('src/Support/BuilderRenderer.php');
+        $command = s_articles_read('src/Console/RerenderArticlesCommand.php');
+
+        foreach ([
+            "loadViewsFrom(dirname(__DIR__) . '/views', 'sarticles')",
+            "view('sarticles::render.' . \$view",
+            "views/vendor/sarticles/render",
+            'sarticles:rerender',
+            '{--articles=',
+            '{--chunk=200',
+            'chunkById',
+        ] as $marker) {
+            s_articles_assert_contains($marker, $provider . "\n" . $renderer . "\n" . $command, 'Missing builder render marker: ' . $marker);
+        }
+
+        foreach (glob(s_articles_path('views/render/*.blade.php')) ?: [] as $renderView) {
+            s_articles_assert(is_file($renderView), 'Render view must exist: ' . $renderView);
+        }
+
+        foreach (glob(s_articles_path('builder/*/render.blade.php')) ?: [] as $legacyRender) {
+            s_articles_assert(false, 'Legacy asset render file should not remain: ' . $legacyRender);
         }
     });
 });

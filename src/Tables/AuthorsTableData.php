@@ -1,6 +1,4 @@
-<?php
-
-namespace Seiger\sArticles\Tables;
+<?php namespace Seiger\sArticles\Tables;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -8,8 +6,15 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticlesAuthor;
+use Seiger\sArticles\Support\LikeSearch;
 use Seiger\sArticles\Tables\Concerns\HandlesLanguageFields;
 
+/**
+ * AuthorsTableData package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class AuthorsTableData
 {
     use HandlesLanguageFields;
@@ -17,6 +22,17 @@ class AuthorsTableData
     protected string $moduleUrl;
     protected sArticlesController $controller;
 
+    /**
+     * Initialize AuthorsTableData with evo-ui table context.
+     *
+     * Stores manager context, table state, and configuration so row loading, modal
+     * building, and persistence helpers operate against the same request snapshot.
+     *
+     * @param array<string, mixed> $context Runtime context passed by the manager module.
+     * @param array<string, mixed> $state Current table state, including filters and sorting.
+     * @param array<string, mixed> $config Resolved table or modal configuration.
+     * @since 2.0.0
+     */
     public function __construct(
         protected array $context = [],
         protected array $state = [],
@@ -27,11 +43,31 @@ class AuthorsTableData
         $this->controller->setModifyTables('authors');
     }
 
+    /**
+     * Total for AuthorsTableData.
+     *
+     * This method keeps the total responsibility inside AuthorsTableData, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return int Count, identifier, position, or status value for the package workflow.
+     * @since 2.0.0
+     */
     public function total(): int
     {
         return (clone $this->authorsQuery())->toBase()->getCountForPagination();
     }
 
+    /**
+     * Rows for AuthorsTableData.
+     *
+     * This method keeps the rows responsibility inside AuthorsTableData, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function rows(int $page, int $perPage): array
     {
         return $this->authorRows(
@@ -41,6 +77,16 @@ class AuthorsTableData
         );
     }
 
+    /**
+     * Filter groups for AuthorsTableData.
+     *
+     * This method keeps the filter groups responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function filterGroups(): array
     {
         return [
@@ -62,6 +108,16 @@ class AuthorsTableData
         ];
     }
 
+    /**
+     * Delete name data from the manager flow.
+     *
+     * This method keeps the delete name responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function deleteName(int $authorId): string
     {
         $name = $this->authorName($authorId);
@@ -69,6 +125,16 @@ class AuthorsTableData
         return $name !== '' ? $name : (string) $authorId;
     }
 
+    /**
+     * Delete row data from the manager flow.
+     *
+     * This method keeps the delete row responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     public function deleteRow(int $authorId): void
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -78,6 +144,16 @@ class AuthorsTableData
         sArticlesAuthor::where('autid', $authorId)->delete();
     }
 
+    /**
+     * Modal defaults for AuthorsTableData.
+     *
+     * This method keeps the modal defaults responsibility inside AuthorsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalDefaults(): array
     {
         $defaults = [
@@ -100,6 +176,16 @@ class AuthorsTableData
         return $defaults;
     }
 
+    /**
+     * Modal data for AuthorsTableData.
+     *
+     * This method keeps the modal data responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalData(int $authorId): array
     {
         $author = sArticlesAuthor::find($authorId);
@@ -129,6 +215,16 @@ class AuthorsTableData
         return $data;
     }
 
+    /**
+     * Modal fields for AuthorsTableData.
+     *
+     * This method keeps the modal fields responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     public function modalFields(array $fields, array $data = [], ?int $authorId = null, string $mode = 'create'): array
     {
         if (!$this->hasLanguageFields()) {
@@ -180,11 +276,35 @@ class AuthorsTableData
             ->all();
     }
 
+    /**
+     * Modal alias for AuthorsTableData.
+     *
+     * This method keeps the modal alias responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     public function modalAlias(string $source, ?int $authorId = null): string
     {
         return $this->controller->validateAlias($source, (int) $authorId, 'author');
     }
 
+    /**
+     * Persist author modal data from the manager.
+     *
+     * Single-language installs render simple top-level fields (`name`, `lastname`, `office`), while
+     * multilingual installs render language-scoped fields under `translations.*`. The save flow must
+     * honor the fields the editor actually sees; otherwise stale hidden translation data can win over
+     * the edited value and make a successful save look like it was ignored.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param int|null $authorId Existing author ID or null when creating a new author.
+     * @param string $mode Modal mode supplied by evo-ui (`create` or `edit`).
+     * @return int Saved author identifier.
+     * @since 2.0.0
+     */
     public function saveModal(array $data, ?int $authorId = null, string $mode = 'create'): int
     {
         $author = $authorId ? sArticlesAuthor::find($authorId) : null;
@@ -193,10 +313,11 @@ class AuthorsTableData
             $author = new sArticlesAuthor();
         }
 
+        $usesLanguageFields = $this->hasLanguageFields();
         $language = $this->defaultLanguage();
-        $name = trim((string) data_get($data, 'translations.' . $language . '.name', data_get($data, 'name', '')));
-        $lastname = trim((string) data_get($data, 'translations.' . $language . '.lastname', data_get($data, 'lastname', '')));
-        $office = trim((string) data_get($data, 'translations.' . $language . '.office', data_get($data, 'office', '')));
+        $name = $this->modalAuthorTextValue($data, $language, 'name', $usesLanguageFields);
+        $lastname = $this->modalAuthorTextValue($data, $language, 'lastname', $usesLanguageFields);
+        $office = $this->modalAuthorTextValue($data, $language, 'office', $usesLanguageFields);
         $alias = trim((string) data_get($data, 'alias', ''));
 
         $author->image = $this->normalizeImagePath((string) data_get($data, 'image', ''));
@@ -205,9 +326,9 @@ class AuthorsTableData
 
         foreach ($this->languageCodes() as $lang) {
             $values = [
-                'name' => trim((string) data_get($data, 'translations.' . $lang . '.name', '')),
-                'lastname' => trim((string) data_get($data, 'translations.' . $lang . '.lastname', '')),
-                'office' => trim((string) data_get($data, 'translations.' . $lang . '.office', '')),
+                'name' => $this->modalAuthorTextValue($data, $lang, 'name', $usesLanguageFields),
+                'lastname' => $this->modalAuthorTextValue($data, $lang, 'lastname', $usesLanguageFields),
+                'office' => $this->modalAuthorTextValue($data, $lang, 'office', $usesLanguageFields),
             ];
 
             foreach ($values as $field => $value) {
@@ -232,6 +353,39 @@ class AuthorsTableData
         return (int) $author->autid;
     }
 
+    /**
+     * Resolve an editable author text value from modal payload.
+     *
+     * In multilingual mode values are read from `translations.{lang}.{field}`. In the default
+     * single-language mode evo-ui shows top-level fields only, so those fields must override any
+     * stale translation payload that may still be present in Livewire state.
+     *
+     * @param array<string, mixed> $data Submitted evo-ui modal payload.
+     * @param string $language Language code currently being persisted.
+     * @param string $field Author text field (`name`, `lastname`, or `office`).
+     * @param bool $usesLanguageFields True when multilingual fields are visible in the modal.
+     * @return string Trimmed value ready for author storage.
+     * @since 2.0.0
+     */
+    protected function modalAuthorTextValue(array $data, string $language, string $field, bool $usesLanguageFields): string
+    {
+        if (!$usesLanguageFields && ($language === $this->defaultLanguage() || $language === 'base')) {
+            return trim((string) data_get($data, $field, ''));
+        }
+
+        return trim((string) data_get($data, 'translations.' . $language . '.' . $field, ''));
+    }
+
+    /**
+     * Authors query for AuthorsTableData.
+     *
+     * This method keeps the authors query responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return Builder Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function authorsQuery(): Builder
     {
         $query = sArticlesAuthor::query();
@@ -246,6 +400,16 @@ class AuthorsTableData
         return $query->orderBy('autid');
     }
 
+    /**
+     * Author rows for AuthorsTableData.
+     *
+     * This method keeps the author rows responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function authorRows(Collection $authors): array
     {
         return $authors
@@ -280,6 +444,16 @@ class AuthorsTableData
             ->all();
     }
 
+    /**
+     * Apply search rules to the current workflow.
+     *
+     * This method keeps the apply search responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applySearch(Builder $query): void
     {
         $search = trim((string) $this->state('search', ''));
@@ -288,7 +462,7 @@ class AuthorsTableData
             return;
         }
 
-        $like = '%' . addcslashes(mb_strtolower($search), '\\%_') . '%';
+        $like = LikeSearch::needle(mb_strtolower($search));
 
         $query->where(function ($where) use ($query, $like) {
             foreach (array_unique([
@@ -310,6 +484,16 @@ class AuthorsTableData
         });
     }
 
+    /**
+     * Apply office filter rules to the current workflow.
+     *
+     * This method keeps the apply office filter responsibility inside AuthorsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return void No value is returned; the method updates package state, storage, or output.
+     * @since 2.0.0
+     */
     protected function applyOfficeFilter(Builder $query): void
     {
         $selected = $this->filterIds('office');
@@ -329,6 +513,16 @@ class AuthorsTableData
         }
     }
 
+    /**
+     * Apply sort rules to the current workflow.
+     *
+     * This method keeps the apply sort responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return bool True when the package condition is met, false otherwise.
+     * @since 2.0.0
+     */
     protected function applySort(Builder $query): bool
     {
         $key = (string) $this->state('sort', '');
@@ -363,13 +557,31 @@ class AuthorsTableData
         return true;
     }
 
+    /**
+     * Like sql for AuthorsTableData.
+     *
+     * This method keeps the like sql responsibility inside AuthorsTableData, so callers can rely
+     * on a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function likeSql(Builder $query, string $field): string
     {
-        $sql = 'LOWER(' . $query->getGrammar()->wrap($field) . ') LIKE ?';
-
-        return DB::connection()->getDriverName() === 'sqlite' ? $sql : $sql . " ESCAPE '\\\\'";
+        return LikeSearch::lowerExpression($query, $field);
     }
 
+    /**
+     * Filter ids for AuthorsTableData.
+     *
+     * This method keeps the filter ids responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function filterIds(string $key): array
     {
         return collect((array) $this->filterState($key, []))
@@ -380,16 +592,46 @@ class AuthorsTableData
             ->all();
     }
 
+    /**
+     * State for AuthorsTableData.
+     *
+     * This method keeps the state responsibility inside AuthorsTableData, so callers can rely on
+     * a stable package boundary while the manager UI, frontend runtime, or legacy storage
+     * details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function state(?string $key = null, mixed $default = null): mixed
     {
         return $key ? data_get($this->state, $key, $default) : $this->state;
     }
 
+    /**
+     * Filter state for AuthorsTableData.
+     *
+     * This method keeps the filter state responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return mixed Resolved value used by the package workflow.
+     * @since 2.0.0
+     */
     protected function filterState(string $key, mixed $default = null): mixed
     {
         return data_get($this->state('filters', []), $key, $default);
     }
 
+    /**
+     * Author name for AuthorsTableData.
+     *
+     * This method keeps the author name responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function authorName(int $authorId): string
     {
         $author = sArticlesAuthor::find($authorId);
@@ -401,11 +643,31 @@ class AuthorsTableData
         return trim($this->authorField($author, 'name') . ' ' . $this->authorField($author, 'lastname'));
     }
 
+    /**
+     * Delete url data from the manager flow.
+     *
+     * This method keeps the delete url responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function deleteUrl(int $authorId): string
     {
         return $this->moduleUrl . '&get=authorDelete&i=' . $authorId;
     }
 
+    /**
+     * Image src for AuthorsTableData.
+     *
+     * This method keeps the image src responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function imageSrc(string $image): string
     {
         $image = trim($image);
@@ -421,6 +683,16 @@ class AuthorsTableData
         return EVO_SITE_URL . ltrim($image, '/');
     }
 
+    /**
+     * Gender label for AuthorsTableData.
+     *
+     * This method keeps the gender label responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function genderLabel(string $gender): string
     {
         $gender = mb_strtolower(trim($gender));
@@ -432,6 +704,16 @@ class AuthorsTableData
         };
     }
 
+    /**
+     * Gender icon for AuthorsTableData.
+     *
+     * This method keeps the gender icon responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return array<string, mixed> Normalized payload for the related manager or package workflow.
+     * @since 2.0.0
+     */
     protected function genderIcon(string $gender): array
     {
         $gender = $this->normalizeGender($gender);
@@ -451,6 +733,16 @@ class AuthorsTableData
         ];
     }
 
+    /**
+     * Normalize gender for package-safe usage.
+     *
+     * This method keeps the normalize gender responsibility inside AuthorsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeGender(string $gender): string
     {
         return match (mb_strtolower(trim($gender))) {
@@ -459,6 +751,16 @@ class AuthorsTableData
         };
     }
 
+    /**
+     * Normalize image path for package-safe usage.
+     *
+     * This method keeps the normalize image path responsibility inside AuthorsTableData, so
+     * callers can rely on a stable package boundary while the manager UI, frontend runtime, or
+     * legacy storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function normalizeImagePath(string $image): string
     {
         $image = trim($image);
@@ -480,11 +782,31 @@ class AuthorsTableData
         return $image;
     }
 
+    /**
+     * Default language for AuthorsTableData.
+     *
+     * This method keeps the default language responsibility inside AuthorsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function defaultLanguage(): string
     {
         return $this->controller->langDefault();
     }
 
+    /**
+     * Author field for AuthorsTableData.
+     *
+     * This method keeps the author field responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function authorField(sArticlesAuthor $author, string $field): string
     {
         $language = $this->defaultLanguage();
@@ -494,6 +816,16 @@ class AuthorsTableData
         return $value !== '' ? $value : $fallback;
     }
 
+    /**
+     * Author sort field for AuthorsTableData.
+     *
+     * This method keeps the author sort field responsibility inside AuthorsTableData, so callers
+     * can rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function authorSortField(string $field): string
     {
         $language = $this->defaultLanguage();
@@ -501,6 +833,16 @@ class AuthorsTableData
         return $this->languageAuthorField($language, $field);
     }
 
+    /**
+     * Format date for display.
+     *
+     * This method keeps the format date responsibility inside AuthorsTableData, so callers can
+     * rely on a stable package boundary while the manager UI, frontend runtime, or legacy
+     * storage details evolve.
+     *
+     * @return string Resolved text value for manager display, storage, or frontend output.
+     * @since 2.0.0
+     */
     protected function formatDate(mixed $value): string
     {
         if (!$value) {

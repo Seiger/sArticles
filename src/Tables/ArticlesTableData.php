@@ -1,6 +1,4 @@
-<?php
-
-namespace Seiger\sArticles\Tables;
+<?php namespace Seiger\sArticles\Tables;
 
 use EvolutionCMS\Facades\UrlProcessor;
 use EvolutionCMS\Models\SiteContent;
@@ -8,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Seiger\sArticles\Controllers\sArticlesController;
 use Seiger\sArticles\Models\sArticle;
@@ -18,14 +15,34 @@ use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesPoll;
 use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticleTranslate;
+use Seiger\sArticles\Support\BuilderRenderer;
 use Seiger\sArticles\Support\LangIntegration;
+use Seiger\sArticles\Support\LikeSearch;
 use Seiger\sArticles\Support\SeoIntegration;
 
+/**
+ * Articles manager table data provider.
+ *
+ * Builds row payloads, filter definitions, modal schemas, and persistence bridges used by
+ * the sArticles evo-ui manager. The class keeps UI-specific data shaping away from Eloquent
+ * models while preserving compatibility with legacy article content rows.
+ */
 class ArticlesTableData
 {
     protected string $moduleUrl;
     protected string $type;
 
+    /**
+     * Initialize the article table data provider.
+     *
+     * Stores module URL, active type, table state, and resolved configuration so later row, modal,
+     * and query methods can operate from a consistent manager context.
+     *
+     * @param array<string, mixed> $context Runtime context passed by the manager module or evo-ui table.
+     * @param array<string, mixed> $state Current evo-ui table state, including filters, sorting, and pagination context.
+     * @param array<string, mixed> $config Resolved table or form configuration for the current manager section.
+     * @since 2.0.0
+     */
     public function __construct(
         protected array $context = [],
         protected array $state = [],
@@ -35,11 +52,31 @@ class ArticlesTableData
         $this->type = (string) ($context['type'] ?? 'article') ?: 'article';
     }
 
+    /**
+     * Count rows for the current article table state.
+     *
+     * The count uses the same filtered query as row loading, which keeps evo-ui pagination aligned
+     * with search terms, taxonomy filters, publication state, and selected article type.
+     *
+     * @return int Integer identifier or count used by the manager workflow.
+     * @since 2.0.0
+     */
     public function total(): int
     {
         return (clone $this->articlesQuery())->toBase()->getCountForPagination();
     }
 
+    /**
+     * Build one page of article rows for evo-ui.
+     *
+     * Loads the requested page, resolves parent resource labels, and returns normalized row arrays
+     * so the manager table does not depend on raw Eloquent model details.
+     *
+     * @param int $page One-based page number requested by evo-ui.
+     * @param int $perPage Number of rows requested for the current page.
+     * @return array<int, array<string, mixed>> Row payload consumed by the manager table.
+     * @since 2.0.0
+     */
     public function rows(int $page, int $perPage): array
     {
         $articles = $this->articlesQuery()->forPage(max(1, $page), max(1, $perPage))->get();
@@ -52,6 +89,15 @@ class ArticlesTableData
         return $this->articleRows($articles, $parents);
     }
 
+    /**
+     * Resolve the create button label for the active article type.
+     *
+     * Type-specific text is read from package configuration and combined with the global add label,
+     * letting custom content types use more natural manager wording.
+     *
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     public function addArticleLabel(): string
     {
         $text = \sArticles::config('types.' . $this->activeType() . '.add_button_text', __('sArticles::global.add_article'));
@@ -59,6 +105,16 @@ class ArticlesTableData
         return __('global.add') . ' ' . $text;
     }
 
+    /**
+     * Resolve the delete confirmation label for an article.
+     *
+     * A translated title is preferred because destructive confirmations should show a human-readable
+     * name. The numeric ID remains a safe fallback for incomplete records.
+     *
+     * @param int $articleId Internal article identifier.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     public function deleteName(int $articleId): string
     {
         $name = $this->articleTitle($articleId);
@@ -66,6 +122,16 @@ class ArticlesTableData
         return $name !== '' ? $name : (string) $articleId;
     }
 
+    /**
+     * Delete an article and its package-owned relations.
+     *
+     * The method is guarded by the manager session and removes translation, taxonomy, feature, tag,
+     * and comment rows before refreshing the generated article listing.
+     *
+     * @param int $articleId Internal article identifier.
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
     public function deleteRow(int $articleId): void
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -82,6 +148,16 @@ class ArticlesTableData
         (new sArticlesController())->setArticlesListing();
     }
 
+    /**
+     * Toggle publication state from a manager row action.
+     *
+     * Only validated manager sessions may flip the state. Missing article IDs are ignored so stale
+     * table actions do not trigger exceptions.
+     *
+     * @param int $articleId Internal article identifier.
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
     public function togglePublished(int $articleId): void
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -98,6 +174,16 @@ class ArticlesTableData
         $article->save();
     }
 
+    /**
+     * Create an unpublished copy of an article.
+     *
+     * The copied record keeps relations and translations but resets mutable values such as
+     * publication state, views, timestamps, and alias so editors can safely prepare a new article.
+     *
+     * @param int $articleId Internal article identifier.
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
     public function duplicate(int $articleId): void
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -126,6 +212,15 @@ class ArticlesTableData
         (new sArticlesController())->setArticlesListing();
     }
 
+    /**
+     * Build default data for the article create modal.
+     *
+     * The payload includes base article fields, relation placeholders, a starter builder block, and
+     * optional language or SEO integration defaults in the same shape used by edit mode.
+     *
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     public function modalDefaults(): array
     {
         $type = $this->activeType();
@@ -178,6 +273,16 @@ class ArticlesTableData
         return $data;
     }
 
+    /**
+     * Load existing article data for the edit modal.
+     *
+     * Stored article fields, relations, translations, SEO data, and builder content are normalized
+     * into the modal payload so create and edit flows can share the same evo-ui schema.
+     *
+     * @param int $articleId Internal article identifier.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     public function modalData(int $articleId): array
     {
         $article = sArticle::withoutGlobalScope('translate')->find($articleId);
@@ -237,6 +342,19 @@ class ArticlesTableData
         return $data;
     }
 
+    /**
+     * Adjust modal tabs and option metadata for integrations.
+     *
+     * When language integration is enabled, the modal receives language-specific main and content
+     * tabs. Otherwise a standalone SEO tab is appended when the sSeo integration requires it.
+     *
+     * @param array $modal Modal configuration being adjusted before rendering.
+     * @param array $data Submitted or hydrated modal payload.
+     * @param ?int $articleId Internal article identifier.
+     * @param string $mode Current modal mode, usually create or edit.
+     * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
+     * @since 2.0.0
+     */
     public function modalOptions(array $modal, array $data = [], ?int $articleId = null, string $mode = 'create'): array
     {
         if ($this->lang()->enabled()) {
@@ -284,6 +402,18 @@ class ArticlesTableData
         return $modal;
     }
 
+    /**
+     * Resolve the title displayed by an article modal.
+     *
+     * The title combines the create/edit verb with the active content type label, using submitted
+     * data or the stored article type when available.
+     *
+     * @param array $data Submitted or hydrated modal payload.
+     * @param ?int $articleId Internal article identifier.
+     * @param string $mode Current modal mode, usually create or edit.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     public function modalTitle(array $data = [], ?int $articleId = null, string $mode = 'create'): string
     {
         $type = trim((string) data_get($data, 'type', ''));
@@ -300,6 +430,18 @@ class ArticlesTableData
         return trim($verb . ' ' . $this->typeLabel($type));
     }
 
+    /**
+     * Build read-only metadata for the article modal header.
+     *
+     * Header metadata gives editors quick context such as record ID, article type, and view count
+     * without adding those values as editable form fields.
+     *
+     * @param array $data Submitted or hydrated modal payload.
+     * @param ?int $articleId Internal article identifier.
+     * @param string $mode Current modal mode, usually create or edit.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     public function modalHeaderMeta(array $data = [], ?int $articleId = null, string $mode = 'create'): array
     {
         $type = trim((string) data_get($data, 'type', '')) ?: $this->activeType();
@@ -336,6 +478,19 @@ class ArticlesTableData
         ]);
     }
 
+    /**
+     * Filter and enrich article modal field definitions.
+     *
+     * The schema is adapted to package settings, active type configuration, language mode, visual
+     * editor choices, and standalone SEO integration before evo-ui renders it.
+     *
+     * @param array $fields Field definitions being prepared for evo-ui.
+     * @param array $data Submitted or hydrated modal payload.
+     * @param ?int $articleId Internal article identifier.
+     * @param string $mode Current modal mode, usually create or edit.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     public function modalFields(array $fields, array $data = [], ?int $articleId = null, string $mode = 'create'): array
     {
         $type = (string) data_get($data, 'type', $this->activeType());
@@ -391,6 +546,19 @@ class ArticlesTableData
         return $fields;
     }
 
+    /**
+     * Build option lists for article modal controls.
+     *
+     * The method routes field names to parent resources, authors, taxonomies, related articles, SEO
+     * enum values, or type choices so field definitions can stay declarative.
+     *
+     * @param array $field Single field definition or column descriptor.
+     * @param array $data Submitted or hydrated modal payload.
+     * @param ?int $articleId Internal article identifier.
+     * @param string $mode Current modal mode, usually create or edit.
+     * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
+     * @since 2.0.0
+     */
     public function articleModalOptions(array $field, array $data = [], ?int $articleId = null, string $mode = 'create'): array
     {
         $name = (string) ($field['name'] ?? '');
@@ -436,16 +604,47 @@ class ArticlesTableData
         };
     }
 
+    /**
+     * Build the main tab key for a language.
+     *
+     * Language-specific tab names keep multilingual fields grouped consistently while avoiding
+     * collisions with the shared article relation fields.
+     *
+     * @param string $language Language code being rendered or persisted.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function languageMainTab(string $language): string
     {
         return $this->lang()->tabName($language) . '_main';
     }
 
+    /**
+     * Build the content tab key for a language.
+     *
+     * The separate content tab gives the visual builder enough space while still keeping it tied to
+     * the language currently being edited.
+     *
+     * @param string $language Language code being rendered or persisted.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function languageContentTab(string $language): string
     {
         return $this->lang()->tabName($language) . '_content';
     }
 
+    /**
+     * Build modal fields for multilingual editing.
+     *
+     * For each configured language the method creates main fields, content builder fields, shared
+     * relation fields, and SEO fields in the tab layout expected by evo-ui.
+     *
+     * @param array $commonFields Shared field definitions available to every language tab.
+     * @param string $type Article type or builder block identifier.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function multilingualModalFields(array $commonFields, string $type): array
     {
         $fields = [];
@@ -472,6 +671,19 @@ class ArticlesTableData
         return $fields;
     }
 
+    /**
+     * Build the main editable fields for one language.
+     *
+     * The field list combines localized article text, shared article fields, optional package
+     * settings, and language-aware validation for default and secondary languages.
+     *
+     * @param string $type Article type or builder block identifier.
+     * @param string $language Language code being rendered or persisted.
+     * @param string $tab Target evo-ui tab key.
+     * @param Collection $common Shared field definitions keyed by field name.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function languageMainFields(string $type, string $language, string $tab, Collection $common): array
     {
         $fields = [];
@@ -563,6 +775,19 @@ class ArticlesTableData
         return $fields;
     }
 
+    /**
+     * Clone a shared field into a language tab.
+     *
+     * Shared fields keep their original configuration while receiving language-specific tab,
+     * section, suffix, and alias source metadata needed by evo-ui.
+     *
+     * @param array $field Single field definition or column descriptor.
+     * @param string $language Language code being rendered or persisted.
+     * @param string $tab Target evo-ui tab key.
+     * @param string $section Target evo-ui section key.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function languageCommonField(array $field, string $language, string $tab, string $section): array
     {
         $field['tab'] = $tab;
@@ -576,6 +801,17 @@ class ArticlesTableData
         return $field;
     }
 
+    /**
+     * Build SEO fields for one language tab.
+     *
+     * When sSeo is unavailable, legacy SEO fields are rendered directly from article translations.
+     * When sSeo is enabled, the package delegates to the integration field schema.
+     *
+     * @param string $language Language code being rendered or persisted.
+     * @param string $tab Target evo-ui tab key.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function languageSeoFields(string $language, string $tab): array
     {
         if (!$this->seo()->enabled()) {
@@ -615,6 +851,18 @@ class ArticlesTableData
         return $this->seoModalFields('seo.' . $language . '.', $tab, 'relations');
     }
 
+    /**
+     * Build reusable sSeo modal field definitions.
+     *
+     * The returned schema covers robots, meta tags, canonical URL, sitemap exclusion, priority, and
+     * change frequency using the prefix, tab, and section supplied by the caller.
+     *
+     * @param string $prefix Field name prefix used for nested SEO payloads.
+     * @param string $tab Target evo-ui tab key.
+     * @param string $section Target evo-ui section key.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function seoModalFields(string $prefix = 'seo.', string $tab = 'seo', string $section = ''): array
     {
         return [
@@ -702,6 +950,19 @@ class ArticlesTableData
         ];
     }
 
+    /**
+     * Build available content builder block definitions.
+     *
+     * Active builder configs are discovered, sorted, expanded into evo-ui block definitions, and
+     * filtered so the modal only exposes usable blocks with fields.
+     *
+     * @param array $field Single field definition or column descriptor.
+     * @param array $data Submitted or hydrated modal payload.
+     * @param ?int $articleId Internal article identifier.
+     * @param string $mode Current modal mode, usually create or edit.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     public function articleBuilderBlocks(array $field, array $data = [], ?int $articleId = null, string $mode = 'create'): array
     {
         $configured = collect($this->builderConfigs())
@@ -727,6 +988,18 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Persist article modal data from evo-ui.
+     *
+     * The method normalizes article fields, relations, translated content, SEO payloads, and builder
+     * output before refreshing the generated listing used on the frontend.
+     *
+     * @param array $data Submitted or hydrated modal payload.
+     * @param ?int $articleId Internal article identifier.
+     * @param string $mode Current modal mode, usually create or edit.
+     * @return int Integer identifier or count used by the manager workflow.
+     * @since 2.0.0
+     */
     public function saveModal(array $data, ?int $articleId = null, string $mode = 'create'): int
     {
         if (!isset($_SESSION['mgrValidated'])) {
@@ -799,6 +1072,16 @@ class ArticlesTableData
         return (int) $article->id;
     }
 
+    /**
+     * Prepare table filter definitions for articles.
+     *
+     * The configured filters are adapted to the active package settings, including an optional
+     * article type selector when multiple content types are available.
+     *
+     * @param array $filters Filters value used by this manager flow.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     public function filters(array $filters): array
     {
         $filters = collect($filters)
@@ -824,6 +1107,15 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Build grouped filter options for the article table.
+     *
+     * Groups are derived from articles of the active type and expose only sections, categories,
+     * tags, and features that are actually present in the current content set.
+     *
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     public function filterGroups(): array
     {
         $type = $this->activeType();
@@ -891,16 +1183,44 @@ class ArticlesTableData
         return $groups;
     }
 
+    /**
+     * Resolve the SEO integration service.
+     *
+     * Using the container keeps this table provider decoupled from the concrete integration
+     * implementation while still allowing modal and save flows to share one service.
+     *
+     * @return SeoIntegration SEO integration service resolved from the container.
+     * @since 2.0.0
+     */
     protected function seo(): SeoIntegration
     {
         return app(SeoIntegration::class);
     }
 
+    /**
+     * Resolve the language integration service.
+     *
+     * The language service owns package multilingual rules, available languages, labels, and tab
+     * names used throughout modal construction and persistence.
+     *
+     * @return LangIntegration Language integration service resolved from the container.
+     * @since 2.0.0
+     */
     protected function lang(): LangIntegration
     {
         return app(LangIntegration::class);
     }
 
+    /**
+     * Build the article listing query for the current table state.
+     *
+     * The query is the single source for row loading and pagination counts. It applies active type,
+     * search, availability, taxonomy, publication date, and sorting rules before the table consumes
+     * it.
+     *
+     * @return Builder<sArticle> Filtered article query ready for pagination or counting.
+     * @since 2.0.0
+     */
     protected function articlesQuery(): Builder
     {
         $query = sArticle::query()
@@ -919,6 +1239,17 @@ class ArticlesTableData
         return $query->orderBy('s_articles.id', 'desc');
     }
 
+    /**
+     * Resolve editable content for a single-language article flow.
+     *
+     * Existing content is loaded for the current content language with a base fallback for legacy
+     * records. If no row exists, an unsaved translation model is prepared with empty builder
+     * metadata.
+     *
+     * @param int $articleId Internal article identifier.
+     * @return sArticleTranslate Translation content model used by article editing flows.
+     * @since 2.0.0
+     */
     protected function articleContent(int $articleId): sArticleTranslate
     {
         $language = $this->contentLanguage();
@@ -939,6 +1270,18 @@ class ArticlesTableData
         return $content;
     }
 
+    /**
+     * Resolve content for a specific article language.
+     *
+     * Multilingual modals need a stable content object for every configured language. This helper
+     * can reuse legacy base content for the default language or prepare a new translation row.
+     *
+     * @param int $articleId Internal article identifier.
+     * @param string $language Language code being rendered or persisted.
+     * @param bool $allowDefaultFallback Whether the default language may reuse legacy base content.
+     * @return sArticleTranslate Translation content model used by article editing flows.
+     * @since 2.0.0
+     */
     protected function articleTranslation(int $articleId, string $language, bool $allowDefaultFallback = false): sArticleTranslate
     {
         $language = trim($language) !== '' ? trim($language) : $this->lang()->default();
@@ -959,6 +1302,15 @@ class ArticlesTableData
         return $content;
     }
 
+    /**
+     * Build default values for a language tab.
+     *
+     * Defaults mirror the evo-ui field shape, including legacy SEO fields and a starter rich-text
+     * builder block, so every language tab begins with a complete payload.
+     *
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function translationDefaults(): array
     {
         return [
@@ -979,6 +1331,17 @@ class ArticlesTableData
         ];
     }
 
+    /**
+     * Convert stored translation content into modal data.
+     *
+     * Persisted values are overlaid onto translation defaults so older records missing optional
+     * constructor or builder fields still hydrate cleanly in the new interface.
+     *
+     * @param int $articleId Internal article identifier.
+     * @param string $language Language code being rendered or persisted.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function translationData(int $articleId, string $language): array
     {
         $content = $this->articleTranslation($articleId, $language, true);
@@ -997,6 +1360,18 @@ class ArticlesTableData
         ]);
     }
 
+    /**
+     * Persist localized article content from the multilingual modal.
+     *
+     * The method stores localized text, cover title metadata, and builder output for one language,
+     * and keeps legacy SEO fields in sync when the sSeo integration is disabled.
+     *
+     * @param sArticle $article Article model that owns the content being saved.
+     * @param string $language Language code being rendered or persisted.
+     * @param array $data Submitted or hydrated modal payload.
+     * @return sArticleTranslate Translation content model used by article editing flows.
+     * @since 2.0.0
+     */
     protected function saveTranslationContent(sArticle $article, string $language, array $data): sArticleTranslate
     {
         $content = $this->articleTranslation((int) $article->id, $language);
@@ -1027,6 +1402,16 @@ class ArticlesTableData
         return $content;
     }
 
+    /**
+     * Resolve the canonical title used while saving an article.
+     *
+     * Multilingual saves prefer the default language title because it drives aliases and listing
+     * labels. Single-language saves use the flat pagetitle field.
+     *
+     * @param array $data Submitted or hydrated modal payload.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function modalPrimaryTitle(array $data): string
     {
         if ($this->lang()->enabled()) {
@@ -1040,6 +1425,15 @@ class ArticlesTableData
         return trim((string) data_get($data, 'pagetitle', ''));
     }
 
+    /**
+     * Resolve the legacy content language for non-multilingual articles.
+     *
+     * The package keeps compatibility with installations that store content under a configured
+     * language key and falls back to base when no default can be resolved.
+     *
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function contentLanguage(): string
     {
         $language = (new sArticlesController())->langDefault();
@@ -1047,6 +1441,16 @@ class ArticlesTableData
         return trim($language) !== '' ? $language : 'base';
     }
 
+    /**
+     * Normalize an HTML datetime-local value for storage.
+     *
+     * Empty or invalid input returns an empty string so the caller can decide whether to keep an
+     * existing value or apply the current timestamp as fallback.
+     *
+     * @param string $value Raw value that needs package-specific normalization.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function modalDateTime(string $value): string
     {
         $value = trim($value);
@@ -1060,6 +1464,16 @@ class ArticlesTableData
         return $timestamp ? date('Y-m-d H:i:s', $timestamp) : '';
     }
 
+    /**
+     * Merge main and secondary tags into one relation list.
+     *
+     * The modal exposes the primary tag separately for editorial convenience, but the relation table
+     * expects one deduplicated list of positive identifiers.
+     *
+     * @param array $data Submitted or hydrated modal payload.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function normalizedTagIds(array $data): array
     {
         return collect([data_get($data, 'main_tag')])
@@ -1071,6 +1485,16 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Normalize submitted relation identifiers.
+     *
+     * Select controls may submit strings, numbers, or empty placeholders. This helper keeps only
+     * positive unique integers before relation sync calls.
+     *
+     * @param array $items Raw submitted or related items to normalize.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function integerIds(array $items): array
     {
         return collect($items)
@@ -1081,6 +1505,15 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Build parent resource options for the article modal.
+     *
+     * The site root is included as a synthetic option, followed by Evolution resources, so articles
+     * can be attached to either a root bucket or a concrete page.
+     *
+     * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
+     * @since 2.0.0
+     */
     protected function parentOptions(): array
     {
         $items = collect([
@@ -1102,6 +1535,15 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Build author options for the article modal.
+     *
+     * A blank option supports optional authors, while real authors are labelled from base name
+     * fields with an ID fallback for incomplete records.
+     *
+     * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
+     * @since 2.0.0
+     */
     protected function authorOptions(): array
     {
         return collect([['value' => '0', 'label' => '-']])
@@ -1118,6 +1560,17 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Convert taxonomy records into select options.
+     *
+     * Categories, tags, and features share the same option shape, so this helper extracts the
+     * configured identifier and localized label while dropping incomplete rows.
+     *
+     * @param Collection $items Raw submitted or related items to normalize.
+     * @param string $key State, filter, or model attribute key.
+     * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
+     * @since 2.0.0
+     */
     protected function taxonomyOptions(Collection $items, string $key): array
     {
         return $items
@@ -1130,6 +1583,16 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Build article options for relation and builder selectors.
+     *
+     * The current article can be excluded to prevent self-references, and labels prefer translated
+     * titles with an ID fallback for records without content.
+     *
+     * @param ?int $excludeId Article identifier that should not appear in the option list.
+     * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
+     * @since 2.0.0
+     */
     protected function articleOptions(?int $excludeId = null): array
     {
         return sArticle::query()
@@ -1145,6 +1608,17 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Transform article models into evo-ui table rows.
+     *
+     * Rows include display labels, links, media previews, relation chips, dates, views, and action
+     * metadata so table rendering stays independent from model internals.
+     *
+     * @param Collection $articles Article models loaded for the current table page.
+     * @param array $parents Parent resource titles keyed by resource ID.
+     * @return array<int, array<string, mixed>> Row payload consumed by the manager table.
+     * @since 2.0.0
+     */
     protected function articleRows(Collection $articles, array $parents): array
     {
         return $articles
@@ -1183,6 +1657,17 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Convert stored builder JSON into evo-ui builder blocks.
+     *
+     * Legacy articles without structured builder data are wrapped into a rich-text block so editors
+     * can continue editing old content in the new visual interface.
+     *
+     * @param string $builderJson Stored builder JSON from the translation row.
+     * @param string $content Legacy rendered content fallback.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function modalBuilderData(string $builderJson, string $content): array
     {
         $builder = data_is_json($builderJson, true);
@@ -1211,6 +1696,17 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Normalize one stored builder block for modal editing.
+     *
+     * Older block formats may use scalar values or parallel arrays. This method reshapes them into
+     * named data arrays expected by evo-ui builder fields.
+     *
+     * @param string $type Article type or builder block identifier.
+     * @param mixed $value Raw value that needs package-specific normalization.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function modalBuilderBlockData(string $type, mixed $value): array
     {
         if (in_array($type, ['richtext', 'note', 'framevideo'], true)) {
@@ -1228,6 +1724,16 @@ class ArticlesTableData
         return is_array($value) ? $value : [];
     }
 
+    /**
+     * Convert evo-ui builder blocks back to the compact storage format.
+     *
+     * The database keeps the historic one-key-per-block structure while the modal uses explicit
+     * type/data keys; this bridge preserves compatibility with existing render templates.
+     *
+     * @param array $blocks Submitted evo-ui builder blocks.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function builderDataForStorage(array $blocks): array
     {
         return collect($blocks)
@@ -1273,6 +1779,16 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Expand stored slider arrays into editable item rows.
+     *
+     * Slider blocks store source and alt values as parallel arrays. The modal needs aligned row
+     * objects and at least one empty starter row.
+     *
+     * @param array $value Raw value that needs package-specific normalization.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function sliderBuilderItems(array $value): array
     {
         $sources = array_values((array) ($value['src'] ?? []));
@@ -1288,6 +1804,16 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Expand stored accordion arrays into editable item rows.
+     *
+     * Accordion blocks store titles, icons, and rich text as parallel arrays. This method aligns
+     * them and keeps an empty starter row for new or incomplete blocks.
+     *
+     * @param array $value Raw value that needs package-specific normalization.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function accordionBuilderItems(array $value): array
     {
         $titles = array_values((array) ($value['title'] ?? []));
@@ -1305,95 +1831,63 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Render builder blocks into the legacy content field.
+     *
+     * Builder JSON remains the editable source of truth. The shared renderer materializes it into
+     * the historical `content` column through `sarticles::render.*` package views, allowing
+     * Laravel-style overrides in `views/vendor/sarticles/render`.
+     *
+     * @param array $builder Builder data in storage format.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function renderBuilderContent(array $builder): string
     {
-        $renders = collect($this->builderConfigs())
-            ->filter(fn ($config) => is_file((string) ($config['render_path'] ?? '')))
-            ->mapWithKeys(fn ($config) => [(string) ($config['id'] ?? '') => (string) ($config['template'] ?? '')])
-            ->filter(fn ($template, $id) => $id !== '' && $template !== '')
-            ->all();
-
-        if (!count($renders)) {
-            return '';
-        }
-
-        $previousPaths = method_exists(View::getFinder(), 'getPaths') ? View::getFinder()->getPaths() : [];
-        View::getFinder()->setPaths($this->builderViewRoots());
-
-        try {
-            $content = collect($builder)
-                ->map(function (array $item, int $position) use ($renders) {
-                    $id = (string) array_key_first($item);
-
-                    if ($id === '' || !isset($renders[$id])) {
-                        return '';
-                    }
-
-                    $value = $item[$id] ?? '';
-
-                    return view($renders[$id] . '.render', compact('id', 'value', 'position'))->render();
-                })
-                ->implode('');
-        } finally {
-            if (count($previousPaths)) {
-                View::getFinder()->setPaths($previousPaths);
-            }
-        }
-
-        return str_replace([chr(9), chr(10), chr(13), '  '], '', $content);
+        return $this->builderRenderer()->renderContent($builder);
     }
 
+    /**
+     * Discover available content builder block configurations.
+     *
+     * The shared renderer scans package builder configs so manager fields, modal persistence, and
+     * CLI re-rendering all agree on the same block IDs and render view names.
+     *
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function builderConfigs(): array
     {
-        $configs = [];
-
-        if (!class_exists('sArticles') && class_exists(\Seiger\sArticles\Facades\sArticles::class)) {
-            class_alias(\Seiger\sArticles\Facades\sArticles::class, 'sArticles');
-        }
-
-        foreach ($this->builderViewRoots() as $root) {
-            foreach (glob(rtrim($root, '/') . '/*/config.php') ?: [] as $path) {
-                $template = basename(dirname($path));
-                $config = require $path;
-
-                if (!is_array($config)) {
-                    continue;
-                }
-
-                $id = (string) ($config['id'] ?? $template);
-
-                if ($id === '' || isset($configs[$id])) {
-                    continue;
-                }
-
-                $configs[$id] = array_merge($config, [
-                    'id' => $id,
-                    'template' => $template,
-                    'render_path' => dirname($path) . '/render.blade.php',
-                ]);
-            }
-        }
-
-        return array_values($configs);
+        return $this->builderRenderer()->configs();
     }
 
-    protected function builderViewRoots(): array
+    /**
+     * Resolve the shared builder renderer.
+     *
+     * Keeping the renderer behind a helper lets tests instantiate this provider directly while
+     * normal Evolution runtime still receives the singleton registered by the service provider.
+     *
+     * @return BuilderRenderer Builder rendering service.
+     * @since 2.0.0
+     */
+    protected function builderRenderer(): BuilderRenderer
     {
-        $roots = [];
-
-        if (defined('EVO_BASE_PATH')) {
-            $roots[] = rtrim(EVO_BASE_PATH, '/') . '/assets/modules/sarticles/builder';
-        }
-
-        $roots[] = dirname(__DIR__, 2) . '/builder';
-
-        return collect($roots)
-            ->filter(fn ($root) => is_dir($root))
-            ->unique()
-            ->values()
-            ->all();
+        return app()->bound(BuilderRenderer::class)
+            ? app(BuilderRenderer::class)
+            : new BuilderRenderer();
     }
 
+    /**
+     * Build the evo-ui definition for a builder block type.
+     *
+     * Definitions describe labels, icons, defaults, validation rules, nested item fields, and
+     * article-aware options for blocks that reference package records.
+     *
+     * @param string $type Article type or builder block identifier.
+     * @param ?int $articleId Internal article identifier.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function builderBlockDefinition(string $type, ?int $articleId = null): array
     {
         $definition = match ($type) {
@@ -1530,6 +2024,16 @@ class ArticlesTableData
         return $this->withConfiguredEditorFields($definition);
     }
 
+    /**
+     * Apply editor configuration to all editor fields in a block.
+     *
+     * Nested item fields are handled as well, keeping complex builder blocks consistent with the
+     * package editor setting without duplicating metadata.
+     *
+     * @param array $definition Builder block definition to normalize.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function withConfiguredEditorFields(array $definition): array
     {
         if (empty($definition['fields']) || !is_array($definition['fields'])) {
@@ -1553,6 +2057,16 @@ class ArticlesTableData
         return $definition;
     }
 
+    /**
+     * Attach package editor settings to one evo-ui field.
+     *
+     * Non-editor fields are returned unchanged. Editor fields receive the resolved editor name and
+     * disable the runtime switcher for a stable authoring experience.
+     *
+     * @param array $field Single field definition or column descriptor.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function withConfiguredEditor(array $field): array
     {
         if (($field['type'] ?? '') !== 'editor') {
@@ -1565,6 +2079,15 @@ class ArticlesTableData
         return $field;
     }
 
+    /**
+     * Resolve the visual editor used by sArticles manager fields.
+     *
+     * A package-specific editor setting wins when configured. Otherwise the method falls back to
+     * Evolution CMS which_editor so the package follows the site-wide preference.
+     *
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function configuredEditor(): string
     {
         $editor = trim((string) \sArticles::config('general.editor', 'system'));
@@ -1576,6 +2099,15 @@ class ArticlesTableData
         return $editor;
     }
 
+    /**
+     * Build poll options for article builder blocks.
+     *
+     * Poll questions may be localized arrays or plain strings; labels prefer the current locale,
+     * then fallback/base values, then the poll ID.
+     *
+     * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
+     * @since 2.0.0
+     */
     protected function pollOptions(): array
     {
         $locale = app()->getLocale();
@@ -1602,6 +2134,16 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Resolve an article title for manager labels.
+     *
+     * The lookup prefers the current application locale and then base content so confirmations and
+     * duplicated rows can show a useful name.
+     *
+     * @param int $articleId Internal article identifier.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function articleTitle(int $articleId): string
     {
         return trim((string) DB::table('s_article_translates')
@@ -1613,6 +2155,16 @@ class ArticlesTableData
             ->value('pagetitle'));
     }
 
+    /**
+     * Apply weighted search constraints to the listing query.
+     *
+     * Search terms are sanitized, matched against translated title and content columns, and scored
+     * so exact phrase matches appear before looser per-word matches.
+     *
+     * @param Builder $query Article listing query being mutated.
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
     protected function applySearch(Builder $query): void
     {
         $words = Str::of((string) $this->state('search', ''))
@@ -1621,7 +2173,7 @@ class ArticlesTableData
             ->replaceMatches('/(\s){2,}/', '$1')
             ->trim()
             ->explode(' ')
-            ->map(fn ($word) => mb_strtolower($word))
+            ->map(fn ($word) => trim((string) $word))
             ->filter(fn ($word) => mb_strlen($word) > 0)
             ->values();
 
@@ -1629,44 +2181,110 @@ class ArticlesTableData
             return;
         }
 
-        $fields = collect(['sat.pagetitle', 'sat.longtitle', 'sat.introtext', 'sat.content']);
+        $fields = collect(['sat.pagetitle', 'sat.longtitle', 'sat.introtext', 'sat.description', 'sat.content']);
         $select = collect([0]);
         $bindings = [];
-        $exact = '%' . addcslashes(mb_strtolower($words->implode(' ')), '\\%_') . '%';
+        $exactNeedles = $this->searchNeedles($words->implode(' '));
 
-        $fields->each(function ($field) use ($query, $select, $exact, &$bindings) {
-            $select->push('(CASE WHEN ' . $this->likeSql($query, $field) . ' THEN 10 ELSE 0 END)');
-            $bindings[] = $exact;
+        $fields->each(function ($field) use ($query, $select, $exactNeedles, &$bindings) {
+            foreach ($exactNeedles as $exact) {
+                $select->push('(CASE WHEN ' . $this->likeSql($query, $field) . ' THEN 10 ELSE 0 END)');
+                $bindings[] = $exact;
+            }
         });
 
         $words->each(function ($word) use ($fields, $query, $select, &$bindings) {
-            $like = '%' . addcslashes($word, '\\%_') . '%';
-            $fields->each(function ($field) use ($query, $select, $like, &$bindings) {
-                $select->push('(CASE WHEN ' . $this->likeSql($query, $field) . ' THEN 1 ELSE 0 END)');
-                $bindings[] = $like;
+            $needles = $this->searchNeedles($word);
+            $fields->each(function ($field) use ($query, $select, $needles, &$bindings) {
+                foreach ($needles as $like) {
+                    $select->push('(CASE WHEN ' . $this->likeSql($query, $field) . ' THEN 1 ELSE 0 END)');
+                    $bindings[] = $like;
+                }
             });
         });
 
         $query
+            ->select([
+                's_articles.*',
+                'sat.pagetitle',
+                'sat.longtitle',
+                'sat.introtext',
+                'sat.description',
+                'sat.content',
+            ])
             ->selectRaw('(' . $select->implode(' + ') . ') as points', $bindings)
             ->where(function ($where) use ($words, $fields, $query) {
                 $words->each(function ($word) use ($fields, $where, $query) {
-                    $like = '%' . addcslashes($word, '\\%_') . '%';
-                    $fields->each(function ($field) use ($where, $query, $like) {
-                        $where->orWhereRaw($this->likeSql($query, $field), [$like]);
+                    $needles = $this->searchNeedles($word);
+                    $fields->each(function ($field) use ($where, $query, $needles) {
+                        foreach ($needles as $like) {
+                            $where->orWhereRaw($this->likeSql($query, $field), [$like]);
+                        }
                     });
                 });
             })
             ->orderByDesc('points');
     }
 
+    /**
+     * Build a database-aware lowercase LIKE expression.
+     *
+     * MySQL-compatible drivers can compare lowercased values for case-insensitive matching. SQLite
+     * lowercases ASCII only, so Cyrillic searches keep the field unchanged and rely on explicit
+     * needle variants generated by {@see searchNeedles()}.
+     *
+     * @param Builder $query Article listing query being mutated.
+     * @param string $field Single field definition or column descriptor.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function likeSql(Builder $query, string $field): string
     {
-        $sql = 'LOWER(' . $query->getGrammar()->wrap($field) . ') LIKE ?';
-
-        return DB::connection()->getDriverName() === 'sqlite' ? $sql : $sql . " ESCAPE '\\\\'";
+        return LikeSearch::expression($query, $field, DB::connection()->getDriverName() !== 'sqlite');
     }
 
+    /**
+     * Build wildcard search needles for the active database driver.
+     *
+     * Production databases can use a single lowercased needle against `LOWER(column)`. SQLite is
+     * used by the local demo and does not lowercase Ukrainian letters, so it receives a small set of
+     * original/lower/upper/title-case variants to keep manager search useful during development.
+     *
+     * @param string $value User-entered search phrase or token.
+     * @return array<int, string> LIKE-ready values with escaped wildcards.
+     * @since 2.0.0
+     */
+    protected function searchNeedles(string $value): array
+    {
+        $value = trim($value);
+
+        if ($value === '') {
+            return [];
+        }
+
+        $variants = DB::connection()->getDriverName() === 'sqlite'
+            ? [$value, mb_strtolower($value), mb_strtoupper($value), mb_convert_case($value, MB_CASE_TITLE, 'UTF-8')]
+            : [mb_strtolower($value)];
+
+        return collect($variants)
+            ->map(fn ($variant) => trim((string) $variant))
+            ->filter(fn ($variant) => $variant !== '')
+            ->unique()
+            ->map(fn ($variant) => LikeSearch::needle($variant))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Apply the published or unpublished filter.
+     *
+     * Only explicit published states constrain the query; the default all value leaves both
+     * published and unpublished articles visible.
+     *
+     * @param Builder $query Article listing query being mutated.
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
     protected function applyAvailability(Builder $query): void
     {
         $availability = (string) $this->filterState('availability', 'all');
@@ -1678,6 +2296,16 @@ class ArticlesTableData
         }
     }
 
+    /**
+     * Apply section, category, tag, and feature filters.
+     *
+     * Section filters map to Evolution parent resources while taxonomy filters use Eloquent
+     * relations, keeping table semantics aligned with visible filter groups.
+     *
+     * @param Builder $query Article listing query being mutated.
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
     protected function applyTaxonomyFilters(Builder $query): void
     {
         $sections = $this->filterIds('section');
@@ -1711,6 +2339,16 @@ class ArticlesTableData
         }
     }
 
+    /**
+     * Apply publication date range filters.
+     *
+     * Dates are accepted only in HTML date input format before they are passed to whereDate,
+     * avoiding ambiguous query input from malformed manager state.
+     *
+     * @param Builder $query Article listing query being mutated.
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
     protected function applyPublishedDateFilter(Builder $query): void
     {
         $value = (array) $this->filterState('published_at', []);
@@ -1726,6 +2364,16 @@ class ArticlesTableData
         }
     }
 
+    /**
+     * Apply a user-selected sortable column to the query.
+     *
+     * Sorting is allowed only for columns marked sortable in configuration. The boolean return tells
+     * the caller whether the default ordering is still needed.
+     *
+     * @param Builder $query Article listing query being mutated.
+     * @return bool Boolean flag used by the caller to choose the next manager-flow branch.
+     * @since 2.0.0
+     */
     protected function applySort(Builder $query): bool
     {
         $key = (string) $this->state('sort', '');
@@ -1755,11 +2403,57 @@ class ArticlesTableData
             return true;
         }
 
+        if ($field === 'section_title') {
+            $this->applySectionTitleSort($query, $direction);
+
+            return true;
+        }
+
         $query->orderBy($field, $direction);
 
         return true;
     }
 
+    /**
+     * Sort articles by the visible Evolution resource title.
+     *
+     * The table displays root-level article buckets as the configured site name and concrete
+     * section parents as their `site_content.pagetitle`. This sort mirrors that UI contract without
+     * joining `site_content` into the main select, avoiding duplicate `id` columns that would break
+     * Eloquent hydration for article rows.
+     *
+     * @param Builder $query Article listing query being mutated.
+     * @param string $direction Normalized SQL sort direction (`asc` or `desc`).
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
+    protected function applySectionTitleSort(Builder $query, string $direction): void
+    {
+        $grammar = $query->getGrammar();
+        $siteContent = $grammar->wrapTable((new SiteContent())->getTable());
+        $siteContentId = $siteContent . '.' . $grammar->wrap('id');
+        $siteContentTitle = $siteContent . '.' . $grammar->wrap('pagetitle');
+        $parent = $grammar->wrap('s_articles.parent');
+
+        $query->orderByRaw(
+            'LOWER(COALESCE(CASE WHEN ' . $parent . ' <= 1 THEN ? ELSE (SELECT ' . $siteContentTitle . ' FROM ' . $siteContent . ' WHERE ' . $siteContentId . ' = ' . $parent . ' LIMIT 1) END, ?)) ' . $direction,
+            [
+                (string) evo()->getConfig('site_name'),
+                '',
+            ]
+        );
+    }
+
+    /**
+     * Format a publication date for the manager table.
+     *
+     * Empty values become a dash to keep table cells stable, while valid date-like values use the
+     * compact day-month-year manager format.
+     *
+     * @param mixed $value Raw value that needs package-specific normalization.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function formatDate(mixed $value): string
     {
         if (!$value) {
@@ -1769,6 +2463,16 @@ class ArticlesTableData
         return Carbon::parse($value)->format('d.m.Y H:i');
     }
 
+    /**
+     * Validate a date filter value from evo-ui state.
+     *
+     * Only canonical YYYY-MM-DD values are accepted. Invalid values become empty strings so filters
+     * can skip them safely.
+     *
+     * @param string $value Raw value that needs package-specific normalization.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function normalizeFilterDate(string $value): string
     {
         $value = trim($value);
@@ -1776,6 +2480,16 @@ class ArticlesTableData
         return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
     }
 
+    /**
+     * Read and normalize integer IDs from a named filter.
+     *
+     * The table can submit filter values as strings or arrays. This helper keeps only positive
+     * unique integers before they reach query constraints.
+     *
+     * @param string $key State, filter, or model attribute key.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function filterIds(string $key): array
     {
         return collect((array) $this->filterState($key, []))
@@ -1786,6 +2500,15 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Resolve the currently active article type.
+     *
+     * The selected filter wins when valid, then the constructor type, and finally the first
+     * configured type or article keeps the manager functional.
+     *
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function activeType(): string
     {
         $types = $this->availableTypes();
@@ -1802,6 +2525,15 @@ class ArticlesTableData
         return $types[0] ?? 'article';
     }
 
+    /**
+     * List configured article type keys.
+     *
+     * Empty or invalid configuration is normalized to the historic article type so older
+     * installations continue to load without a type configuration block.
+     *
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function availableTypes(): array
     {
         $types = \sArticles::config('types', []);
@@ -1818,12 +2550,31 @@ class ArticlesTableData
             ->all() ?: ['article'];
     }
 
+    /**
+     * Determine whether the type filter should be shown.
+     *
+     * The filter is useful only when enabled in package settings and more than one article type is
+     * configured, avoiding unnecessary UI chrome.
+     *
+     * @return bool Boolean flag used by the caller to choose the next manager-flow branch.
+     * @since 2.0.0
+     */
     protected function usesTypeFilter(): bool
     {
         return (int) \sArticles::config('general.filter_types_on', 1) === 1
             && count($this->availableTypes()) > 1;
     }
 
+    /**
+     * Resolve the manager label for an article type.
+     *
+     * List-specific labels are preferred, then the configured type name, and finally the raw type
+     * key so custom types always remain identifiable.
+     *
+     * @param string $type Article type or builder block identifier.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function typeLabel(string $type): string
     {
         return (string) \sArticles::config(
@@ -1832,6 +2583,17 @@ class ArticlesTableData
         );
     }
 
+    /**
+     * Copy translation rows from one article to another.
+     *
+     * Copied rows receive the new article ID, fresh timestamps, and a duplicated-title suffix so
+     * editors can identify the clone before editing.
+     *
+     * @param int $sourceId Source article identifier.
+     * @param int $copyId Newly created article identifier.
+     * @return void No value is returned; the relevant query, model, or storage state is updated in place.
+     * @since 2.0.0
+     */
     protected function duplicateArticleTranslations(int $sourceId, int $copyId): void
     {
         DB::table('s_article_translates')
@@ -1843,7 +2605,7 @@ class ArticlesTableData
                 unset($data['tid']);
 
                 $data['article'] = $copyId;
-                $data['pagetitle'] = trim((string) ($data['pagetitle'] ?? '')) . ' ' . __('global.duplicate');
+                $data['pagetitle'] = trim((string) ($data['pagetitle'] ?? '')) . ' ' . __('sArticles::global.duplicate_suffix');
                 $data['created_at'] = now();
                 $data['updated_at'] = now();
 
@@ -1851,6 +2613,17 @@ class ArticlesTableData
             });
     }
 
+    /**
+     * Generate a unique alias for a duplicated article.
+     *
+     * The method starts with a -copy suffix and increments it until no other article uses the
+     * candidate alias, excluding the current article when needed.
+     *
+     * @param string $alias Source alias or fallback base value.
+     * @param int $articleId Internal article identifier.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function uniqueArticleAlias(string $alias, int $articleId): string
     {
         $base = trim($alias) !== '' ? $alias : 'article';
@@ -1869,11 +2642,31 @@ class ArticlesTableData
         return $candidate;
     }
 
+    /**
+     * Build a frontend URL for a parent resource.
+     *
+     * Root-level article buckets link to the configured site start resource, while concrete parent
+     * IDs link directly to that Evolution resource.
+     *
+     * @param int $id Resource or record identifier.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function resourceUrl(int $id): string
     {
         return UrlProcessor::makeUrl($id > 1 ? $id : (int) evo()->getConfig('site_start', 1));
     }
 
+    /**
+     * Extract display labels from related taxonomy models.
+     *
+     * Empty labels are removed so table chips do not render blank taxonomy badges for incomplete
+     * category, tag, or feature records.
+     *
+     * @param Collection $items Raw submitted or related items to normalize.
+     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
+     * @since 2.0.0
+     */
     protected function taxonomyLabels(Collection $items): array
     {
         return $items
@@ -1883,6 +2676,16 @@ class ArticlesTableData
             ->all();
     }
 
+    /**
+     * Resolve the best display label for a taxonomy model.
+     *
+     * The localized base column is preferred, then generic base, then alias, matching translated and
+     * legacy taxonomy records.
+     *
+     * @param object $item Item value used by this manager flow.
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function taxonomyLabel(object $item): string
     {
         $column = $this->baseColumn();
@@ -1890,16 +2693,47 @@ class ArticlesTableData
         return trim((string) ($item->{$column} ?? '')) ?: (trim((string) ($item->base ?? '')) ?: trim((string) ($item->alias ?? '')));
     }
 
+    /**
+     * Resolve the localized base column used by taxonomy records.
+     *
+     * The controller owns the default language decision, so table labels stay aligned with the
+     * package locale and stored taxonomy columns.
+     *
+     * @return string String value ready for manager display, storage, or URL generation.
+     * @since 2.0.0
+     */
     protected function baseColumn(): string
     {
         return (new sArticlesController())->langDefault();
     }
 
+    /**
+     * Read a value from the current evo-ui table state.
+     *
+     * This centralizes default handling for search, sorting, direction, and other top-level state
+     * values used while composing table queries.
+     *
+     * @param string $key State, filter, or model attribute key.
+     * @param mixed $default Value returned when the requested state key is missing.
+     * @return mixed Value read from the current table or filter state.
+     * @since 2.0.0
+     */
     protected function state(string $key, mixed $default = null): mixed
     {
         return $this->state[$key] ?? $default;
     }
 
+    /**
+     * Read a value from nested evo-ui filter state.
+     *
+     * Filters live under filters.* in table state. This helper keeps callers compact and makes
+     * missing filters resolve to explicit defaults.
+     *
+     * @param string $key State, filter, or model attribute key.
+     * @param mixed $default Value returned when the requested state key is missing.
+     * @return mixed Value read from the current table or filter state.
+     * @since 2.0.0
+     */
     protected function filterState(string $key, mixed $default = null): mixed
     {
         return data_get($this->state, 'filters.' . $key, $default);

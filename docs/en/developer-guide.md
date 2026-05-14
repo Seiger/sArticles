@@ -27,6 +27,21 @@ For Extras-based local environments:
 php artisan extras extras "sArticles"
 ```
 
+## Upgrading From 1.x To 2.x
+
+The `sArticles::` facade remains part of the public API, but 2.x registers the alias inside
+`Seiger\sArticles\sArticlesServiceProvider`.
+
+Remove the old generated alias file after upgrading from 1.x:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+Do not add `extra.laravel.aliases` for sArticles in `composer.json`. Keep provider discovery in
+`extra.laravel.providers`; add `extra.laravel.priority` only if a real provider load-order
+constraint appears.
+
 ## Configuration Files
 
 Runtime settings are stored in:
@@ -34,6 +49,11 @@ Runtime settings are stored in:
 ```text
 core/custom/config/seiger/settings/sArticles.php
 ```
+
+Fresh installations do not need this file. The package reads defaults from
+`config/sArticlesSettings.php` and creates the project-level settings file only after an
+administrator changes settings in the manager. The `sarticles` publish tag only prepares the
+settings directory placeholder, so package updates can continue to deliver new default keys.
 
 Package defaults live in:
 
@@ -93,17 +113,34 @@ Builder block source:
 
 ```text
 builder/<block>/config.php
-builder/<block>/render.blade.php
 builder/<block>/template.blade.php
+views/render/<block>.blade.php
 ```
 
-Published builder blocks can override package defaults:
+`builder/<block>/template.blade.php` is used by the manager editor. Frontend HTML is rendered
+through lowercase Laravel package views:
 
 ```text
-assets/modules/sarticles/builder/<block>
+sarticles::render.<block>
 ```
 
-The article provider reads builder configs, normalizes builder data, saves it to article content, and renders frontend HTML with builder render templates.
+To customize frontend markup, copy only the needed render file into the site-level vendor override:
+
+```text
+views/vendor/sarticles/render/<block>.blade.php
+```
+
+Do not publish or edit all render views by default. Keep package defaults in the vendor package and
+override only the blocks that need project-specific HTML.
+
+The article provider stores builder JSON as the source of truth and materializes rendered HTML into
+the legacy `content` column. After changing render views, refresh existing rows explicitly:
+
+```console
+php artisan sarticles:rerender --dry-run
+php artisan sarticles:rerender --articles=123-10000 --chunk=200
+php artisan sarticles:rerender --articles=123,124,200 --lang=uk
+```
 
 ## Rich Text Editors
 

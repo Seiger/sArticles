@@ -15,12 +15,21 @@ use Seiger\sArticles\Models\sArticlesFeature;
 use Seiger\sArticles\Models\sArticlesTag;
 use Seiger\sArticles\Models\sArticle;
 
+/**
+ * sArticlesController package component.
+ *
+ * Documents the responsibilities owned by this sArticles component so manager, frontend,
+ * and integration code can be maintained without guessing where behavior belongs.
+ */
 class sArticlesController
 {
     public $url;
 
     /**
-     * Construct
+     * Initialize this object with the runtime context it needs.
+     *
+     * For table data providers this stores evo-ui context, current state, and configuration so
+     * later row, filter, and modal methods can stay stateless from the caller perspective.
      */
     public function __construct()
     {
@@ -29,9 +38,12 @@ class sArticlesController
     }
 
     /**
-     * Show tab page with sOffer files
+     * Index for the records manager flow.
      *
-     * @return View
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @return View Value returned for the caller.
      */
     public function index(): View
     {
@@ -46,30 +58,37 @@ class sArticlesController
     }
 
     /**
-     * Update file configurations
+     * Persist project-level sArticles settings after the manager form is changed.
      *
-     * This method updates the file configurations based on the provided tabs array.
-     * It generates a PHP file with the updated settings and saves it in a specific location.
+     * Fresh installations run from the package defaults and do not need a copied config file.
+     * The custom settings file is created only when an administrator changes settings, keeping
+     * vendor defaults upgradeable while preserving the site's explicit overrides.
      *
-     * @return bool
+     * @param mixed $settings Settings payload collected from the manager settings form.
+     * @return bool True when the settings file was written successfully.
      */
     public function updateFileConfigs($settings): bool
     {
         // Preparation of deadlines with data
         $string = '<?php return ' . $this->dataToString($settings) . ';';
+        $path = EVO_CORE_PATH . 'custom/config/seiger/settings/sArticles.php';
+        $directory = dirname($path);
+
+        if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
+            return false;
+        }
 
         // Save the config
-        $handle = fopen(EVO_CORE_PATH . 'custom/config/seiger/settings/sArticles.php', "w");
-        fwrite($handle, $string);
-        fclose($handle);
-
-        return true;
+        return file_put_contents($path, $string, LOCK_EX) !== false;
     }
 
     /**
-     * Default language
+     * Lang default for the records manager flow.
      *
-     * @return string
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @return string String value ready for manager or frontend use.
      */
     public function langDefault(): string
     {
@@ -79,9 +98,12 @@ class sArticlesController
     }
 
     /**
-     * Languages list
+     * Lang list for the records manager flow.
      *
-     * @return array
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @return array<string, mixed> Structured array payload consumed by the manager UI or package runtime.
      */
     public function langList(): array
     {
@@ -101,9 +123,13 @@ class sArticlesController
     }
 
     /**
-     * Modifying table feature values for translates
+     * Set modify tables for the records manager flow.
      *
-     * @return void
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param mixed $table Table value.
+     * @return void No value is returned.
      */
     public function setModifyTables($table = ''): void
     {
@@ -140,10 +166,16 @@ class sArticlesController
     }
 
     /**
-     * Ensure multilingual columns for legacy taxonomy tables using Laravel schema APIs.
+     * Ensure language columns for the records manager flow.
      *
-     * The old manager flow used raw MySQL schema SQL. The Livewire demo can run on
-     * SQLite too, so these updates go through the framework abstraction.
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param string $tableName Table Name value.
+     * @param array<string, mixed> $languages Language codes included in the current multilingual flow.
+     * @param callable $columnsForLanguage Columns For Language value.
+     * @return void No value is returned.
+     * @since 2.0.0
      */
     protected function ensureLanguageColumns(string $tableName, array $languages, callable $columnsForLanguage): void
     {
@@ -178,9 +210,13 @@ class sArticlesController
     }
 
     /**
-     * Generate articles list aliases
+     * Set articles listing for the records manager flow.
      *
-     * @return void
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @return void No value is returned.
+     * @since 2.0.0
      */
     public function setArticlesListing(): void
     {
@@ -197,11 +233,15 @@ class sArticlesController
     }
 
     /**
-     * Get automatic Tag translation
+     * Get automatic translate tag for the records manager flow.
      *
-     * @param $source
-     * @param $target
-     * @return string
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param mixed $source Source value.
+     * @param mixed $target Target value.
+     * @return string String value ready for manager or frontend use.
+     * @since 2.0.0
      */
     public function getAutomaticTranslateTag($source, $target): string
     {
@@ -220,12 +260,16 @@ class sArticlesController
     }
 
     /**
-     * Update translation Tag
+     * Update translate tag for the records manager flow.
      *
-     * @param $source
-     * @param $target
-     * @param $value
-     * @return bool
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param mixed $source Source value.
+     * @param mixed $target Target value.
+     * @param mixed $value Submitted value to validate.
+     * @return bool True when the condition is met, false otherwise.
+     * @since 2.0.0
      */
     public function updateTranslateTag($source, $target, $value): bool
     {
@@ -243,12 +287,16 @@ class sArticlesController
     }
 
     /**
-     * Get Google Translations
+     * Google translate for the records manager flow.
      *
-     * @param $text
-     * @param string $source
-     * @param string $target
-     * @return string
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param string $text Text value.
+     * @param string $source Source value.
+     * @param string $target Target value.
+     * @return string String value ready for manager or frontend use.
+     * @since 2.0.0
      */
     public function googleTranslate(string $text, string $source = 'ru', string $target = 'uk'): string
     {
@@ -285,12 +333,16 @@ class sArticlesController
     }
 
     /**
-     * Connecting the visual editor to the required fields
+     * Text editor for the records manager flow.
      *
-     * @param string $ids List of id fields separated by commas
-     * @param string $height Window height
-     * @param string $editor Which editor to use TinyMCE5, Codemirror
-     * @return string
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param string $ids Ids value.
+     * @param string $height Height value.
+     * @param string $editor Editor value.
+     * @return string String value ready for manager or frontend use.
+     * @since 2.0.0
      */
     public function textEditor(string $ids, string $height = '500px', string $editor = ''): string
     {
@@ -329,9 +381,13 @@ class sArticlesController
     }
 
     /**
-     * Module url
+     * Build the Evolution manager module URL.
      *
-     * @return string
+     * The URL is reused by table row actions, modal actions, and links back into the package
+     * manager module.
+     *
+     * @return string String value ready for manager or frontend use.
+     * @since 2.0.0
      */
     protected function moduleUrl(): string
     {
@@ -339,10 +395,14 @@ class sArticlesController
     }
 
     /**
-     * Price validation
+     * Validate price for the records manager flow.
      *
-     * @param mixed $price
-     * @return float
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param mixed $price Price value.
+     * @return float Value returned for the caller.
+     * @since 2.0.0
      */
     public function validatePrice(mixed $price): float
     {
@@ -360,11 +420,16 @@ class sArticlesController
     }
 
     /**
-     * Alias validation
+     * Validate alias for the records manager flow.
      *
-     * @param $data
-     * @param string $table
-     * @return string
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param mixed $string String value.
+     * @param mixed $id Internal record identifier.
+     * @param mixed $key Configuration or request key to read.
+     * @return string String value ready for manager or frontend use.
+     * @since 2.0.0
      */
     public function validateAlias($string = '', $id = 0, $key = 'article'): string
     {
@@ -405,9 +470,12 @@ class sArticlesController
     }
 
     /**
-     * Get the error messages for the defined validation rules.
+     * Messages for the records manager flow.
      *
-     * @return array
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function messages()
     {
@@ -418,22 +486,31 @@ class sArticlesController
     }
 
     /**
-     * Display render
+     * View for the records manager flow.
      *
-     * @param string $tpl
-     * @param array $data
-     * @return bool
+     * Manager blade files are resolved through the lowercase Laravel package view namespace.
+     * Language lines intentionally keep the historical `sArticles::` namespace, but views now use
+     * `sarticles::` so Laravel vendor overrides match `views/vendor/sarticles`.
+     *
+     * @param string $tpl Tpl value.
+     * @param array<string, mixed> $data Data value.
+     * @return mixed Renderable manager view instance.
+     * @since 2.0.0
      */
     public function view(string $tpl, array $data = [])
     {
-        return \View::make('sArticles::'.$tpl, $data);
+        return \View::make('sarticles::'.$tpl, $data);
     }
 
     /**
-     * Convert data to a string representation.
+     * Data to string for the records manager flow.
      *
-     * @param mixed $data The data to convert.
-     * @return string The string representation of the data.
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param mixed $data Data value.
+     * @return string String value ready for manager or frontend use.
+     * @since 2.0.0
      */
     protected function dataToString(mixed $data): string
     {

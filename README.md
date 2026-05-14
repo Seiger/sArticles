@@ -11,6 +11,8 @@
 
 The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. It works as a responsive SPA-like manager module: tabs, filters, sorting, pagination, modal forms, inline actions, and content editing update through Livewire instead of full iframe reloads.
 
+![sArticles publications manager](docs/assets/articles-manager.png)
+
 ## Features
 
 - Publications with multiple configurable resource types.
@@ -20,13 +22,23 @@ The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. I
 - Authors, tags, tag texts, topics, features, comments, polls, and TV parameter management.
 - Native optional integrations with `sSeo`, `sLang`, `eTinyMCE`, and `dTui.editor`.
 - Publication comments, rating, poll votes, view tracking, aliases, and frontend helper API.
-- Configurable module settings stored in `core/custom/config/seiger/settings/sArticles.php`.
+- Configurable module settings use package defaults and save project overrides only after changes.
+
+## Screenshots
+
+### Article editor
+
+![sArticles article editor](docs/assets/article-editor.png)
+
+### Module settings
+
+![sArticles module settings](docs/assets/settings.png)
 
 ## Requirements
 
-- PHP `^8.3`
+- PHP `^8.4`
 - Evolution CMS `^3.5.7`
-- `evolution-cms/evo-ui` `^1.0`
+- `evolution-cms/evo-ui` `^1.0.2`
 - Livewire, as provided by the Evolution CMS/EvoUI runtime
 
 Optional packages:
@@ -41,9 +53,19 @@ Run inside the Evolution CMS `core` directory.
 
 ```console
 php artisan package:installrequire seiger/sarticles "*"
+php artisan vendor:publish --tag=evo-ui --force
 php artisan vendor:publish --provider="Seiger\\sArticles\\sArticlesServiceProvider" --tag=sarticles
 php artisan migrate
 ```
+
+`evolution-cms/evo-ui` owns the shared manager CSS/JS runtime. With EvoUI
+`1.0.2+`, `vendor:publish --tag=evo-ui --force` publishes those files through
+Evolution CMS symlink-aware publish declarations, so sArticles does not expose
+or copy assets directly from `core/vendor`.
+
+The `sarticles` publish tag prepares package assets and the local settings directory placeholder.
+It does not copy the full settings file by default. sArticles reads defaults from the package and
+creates the project override only after settings are changed in the manager.
 
 In Extras-based development environments the package can also be installed with the Evolution Extras command used by the project:
 
@@ -51,10 +73,50 @@ In Extras-based development environments the package can also be installed with 
 php artisan extras extras "sArticles"
 ```
 
-After publishing, review:
+After changing settings in the manager, project overrides are saved to:
 
 ```text
 core/custom/config/seiger/settings/sArticles.php
+```
+
+## Upgrading From 1.x To 2.x
+
+sArticles 2.x keeps the public `sArticles::` facade API, but the alias is now registered by
+`Seiger\sArticles\sArticlesServiceProvider` at runtime.
+
+If an older 1.x installation has the generated alias file below, remove it after upgrading:
+
+```text
+core/custom/config/app/aliases/sArticles.php
+```
+
+The package no longer needs an `extra.laravel.aliases` entry in `composer.json`, and the alias file
+should not be copied or published manually. Provider discovery is still handled by
+`extra.laravel.providers`; use `extra.laravel.priority` only when a concrete provider load-order
+requirement appears.
+
+## Builder Render Customization
+
+Builder block HTML is rendered through lowercase Laravel package views such as:
+
+```text
+sarticles::render.richtext
+sarticles::render.quote
+```
+
+To customize markup, copy only the needed package view into the site override path:
+
+```text
+views/vendor/sarticles/render/richtext.blade.php
+views/vendor/sarticles/render/quote.blade.php
+```
+
+Existing articles keep materialized HTML in the `content` column. After changing render views,
+refresh stored HTML explicitly:
+
+```console
+php artisan sarticles:rerender --dry-run
+php artisan sarticles:rerender --articles=123-10000 --chunk=200
 ```
 
 ## Documentation

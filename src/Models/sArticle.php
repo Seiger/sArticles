@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Seiger\sArticles\Support\LikeSearch;
 
 /**
- * Class sArticle
+ * Eloquent model for sArticles article records.
  *
- * Represents an article model.
- *
- * @property-read string $link The URL of the article.
+ * Adds translated content, frontend scopes, relation accessors, and generated link behavior
+ * around the core `s_articles` table.
  */
 class sArticle extends Model
 {
@@ -24,9 +24,10 @@ class sArticle extends Model
     protected $appends = ['coverSrc', 'link', 'dateObj'];
 
     /**
-     * The "booted" method of the model.
+     * Booted for the records manager flow.
      *
-     * @return void
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
      */
     protected static function booted()
     {
@@ -61,11 +62,12 @@ class sArticle extends Model
     }
 
     /**
-     * Apply search filters to the query
+     * Scope search for the records manager flow.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $builder The query builder object
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
      *
-     * @return \Illuminate\Database\Eloquent\Builder The modified query builder object
+     * @param mixed $builder Builder value.
      */
     public function scopeSearch($builder)
     {
@@ -95,16 +97,16 @@ class sArticle extends Model
 
             $select = collect([0]);
             $bindings = [];
-            $exact = '%' . addcslashes(mb_strtolower($search->implode(' ')), '\\%_') . '%';
+            $exact = LikeSearch::needle(mb_strtolower($search->implode(' ')));
 
             $fields->each(function ($field) use ($builder, $select, $exact, &$bindings) {
-                $select->push("(CASE WHEN LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\' THEN 10 ELSE 0 END)");
+                $select->push('(CASE WHEN ' . LikeSearch::lowerExpression($builder, $field) . ' THEN 10 ELSE 0 END)');
                 $bindings[] = $exact;
             }); // Generate Exact match points source
             $search->each(function ($word) use ($fields, $builder, $select, &$bindings) {
-                $like = '%' . addcslashes($word, '\\%_') . '%';
+                $like = LikeSearch::needle($word);
                 $fields->each(function ($field) use ($builder, $select, $like, &$bindings) {
-                    $select->push("(CASE WHEN LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\' THEN 1 ELSE 0 END)");
+                    $select->push('(CASE WHEN ' . LikeSearch::lowerExpression($builder, $field) . ' THEN 1 ELSE 0 END)');
                     $bindings[] = $like;
                 });
             }); // Generate Partial match points source
@@ -113,9 +115,9 @@ class sArticle extends Model
             $s->when($search->count(), function ($query) use ($search, $fields, $builder) {
                 $query->where(function ($query) use ($search, $fields, $builder) {
                     $search->each(function ($word) use ($fields, $query, $builder) {
-                        $like = '%' . addcslashes($word, '\\%_') . '%';
+                        $like = LikeSearch::needle($word);
                         $fields->each(function ($field) use ($query, $builder, $like) {
-                            $query->orWhereRaw("LOWER(" . $builder->getGrammar()->wrap($field) . ") LIKE ? ESCAPE '\\\\'", [$like]);
+                            $query->orWhereRaw(LikeSearch::lowerExpression($builder, $field), [$like]);
                         });
                     });
                 });
@@ -125,7 +127,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the author associated with the article.
+     * Author for the records manager flow.
+     *
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function author()
     {
@@ -133,7 +140,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the features for the Article.
+     * Features for the records manager flow.
+     *
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function features()
     {
@@ -143,7 +155,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the tags for the Article.
+     * Tags for the records manager flow.
+     *
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function tags()
     {
@@ -151,7 +168,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the categories for the Book.
+     * Categories for the records manager flow.
+     *
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function categories()
     {
@@ -161,10 +183,13 @@ class sArticle extends Model
     }
 
     /**
-     * Only active articles
+     * Scope active for the records manager flow.
      *
-     * @param Builder $builder
-     * @return Builder
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @param mixed $builder Builder value.
+     * @since 2.0.0
      */
     public function scopeActive($builder)
     {
@@ -172,9 +197,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the article cover src link
+     * Get cover src attribute for the records manager flow.
      *
-     * @return string cover_src
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function getCoverSrcAttribute()
     {
@@ -188,9 +216,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the article link
+     * Get link attribute for the records manager flow.
      *
-     * @return string link
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function getLinkAttribute()
     {
@@ -208,9 +239,12 @@ class sArticle extends Model
     }
 
     /**
-     * Get the article link
+     * Get date obj attribute for the records manager flow.
      *
-     * @return string link
+     * This helper keeps package-specific data shaping close to the evo-ui table or modal that
+     * consumes it.
+     *
+     * @since 2.0.0
      */
     public function getDateObjAttribute()
     {
