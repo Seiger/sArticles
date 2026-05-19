@@ -106,6 +106,21 @@ s_articles_group('package', function () use ($root): void {
         s_articles_assert(!is_file(s_articles_path('config/sArticlesAlias.php')), 'Legacy published alias file should not remain in the package.');
     });
 
+    s_articles_test('service provider protects Livewire discovery order', function (): void {
+        $provider = s_articles_read('src/sArticlesServiceProvider.php');
+
+        foreach ([
+            'use Livewire\\LivewireServiceProvider;',
+            'function ensureLivewireRuntime(): void',
+            "\$this->app->bound('livewire.finder')",
+            '$this->app->register(LivewireServiceProvider::class);',
+            '$this->ensureLivewireRuntime();',
+            "Livewire::component('sarticles.module-panel'",
+        ] as $marker) {
+            s_articles_assert_contains($marker, $provider, 'Missing Livewire discovery guard marker: ' . $marker);
+        }
+    });
+
     s_articles_test('settings use vendor defaults with optional project overrides', function (): void {
         $provider = s_articles_read('src/sArticlesServiceProvider.php');
         $controller = s_articles_read('src/Controllers/sArticlesController.php');
