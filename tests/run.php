@@ -142,6 +142,25 @@ s_articles_group('package', function () use ($root): void {
         s_articles_assert_contains('mkdir($directory, 0775, true)', $controller, 'Settings save must create the custom settings directory on first change.');
         s_articles_assert_contains('file_put_contents($path, $string, LOCK_EX)', $controller, 'Settings save must write the project override atomically.');
     });
+
+    s_articles_test('upgrade migration restores missing historical category tables', function (): void {
+        $migration = s_articles_read('database/migrations/2026_05_19_000000_restore_missing_s_articles_category_tables.php');
+
+        foreach ([
+            "Schema::hasTable('s_articles_categories')",
+            "Schema::create('s_articles_categories'",
+            "\$table->id('catid')",
+            "Schema::hasTable('s_article_categories')",
+            "Schema::create('s_article_categories'",
+            "\$table->integer('article')->index()",
+            "\$table->integer('category')->index()",
+            'function down(): void',
+        ] as $marker) {
+            s_articles_assert_contains($marker, $migration, 'Missing category repair migration marker: ' . $marker);
+        }
+
+        s_articles_assert(!str_contains($migration, 'dropIfExists'), 'Category repair migration must not drop production tables.');
+    });
 });
 
 s_articles_group('module-shell', function (): void {
