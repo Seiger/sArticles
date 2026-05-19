@@ -5,7 +5,6 @@ use EvolutionCMS\AliasLoader;
 use EvoUI\EvoUI;
 use Event;
 use Livewire\Livewire;
-use Livewire\LivewireServiceProvider;
 use Seiger\sArticles\Console\RerenderArticlesCommand;
 use Seiger\sArticles\Facades\sArticles as sArticlesFacade;
 use Seiger\sArticles\Support\BuilderRenderer;
@@ -63,8 +62,7 @@ class sArticlesServiceProvider extends ServiceProvider
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/settings/form.php', 'evo-ui.forms.sarticles.settings');
             app(EvoUI::class)->registerFormField('types', 'sarticles::evo-ui.form.types-config-map');
             $this->app->booted(function () {
-                $this->ensureLivewireRuntime();
-                Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
+                $this->registerLivewireModulePanel();
             });
 
             // For use config
@@ -103,22 +101,26 @@ class sArticlesServiceProvider extends ServiceProvider
     }
 
     /**
-     * Ensure Livewire internals are registered before adding package components.
+     * Register the manager Livewire component when the EvoUI runtime is ready.
      *
-     * Composer package discovery can boot sArticles while EvoUI and Livewire are still settling
-     * their provider order. In that state the `livewire` manager may be resolvable, but the
-     * `livewire.finder` binding used by `Livewire::component()` is still missing. Registering the
-     * Livewire provider on demand makes `php artisan package:discover` safe on fresh updates and
-     * remains a no-op once another provider has already registered the runtime.
+     * sArticles must not boot Livewire directly because Evolution CMS needs EvoUI to provide the
+     * Laravel bridge bindings used by Livewire v4. If package discovery boots providers in a
+     * different order, the method waits until `livewire.finder` is resolved by EvoUI and registers
+     * the package component at that point.
      *
-     * @return void No value is returned; missing Livewire container bindings are registered.
+     * @return void No value is returned; the Livewire component is registered now or deferred.
      * @since 2.1.0
      */
-    protected function ensureLivewireRuntime(): void
+    protected function registerLivewireModulePanel(): void
     {
-        if (!$this->app->bound('livewire.finder')) {
-            $this->app->register(LivewireServiceProvider::class);
+        if ($this->app->bound('livewire.finder')) {
+            Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
+            return;
         }
+
+        $this->app->afterResolving('livewire.finder', function () {
+            Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
+        });
     }
 
     /**

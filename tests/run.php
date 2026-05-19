@@ -110,15 +110,16 @@ s_articles_group('package', function () use ($root): void {
         $provider = s_articles_read('src/sArticlesServiceProvider.php');
 
         foreach ([
-            'use Livewire\\LivewireServiceProvider;',
-            'function ensureLivewireRuntime(): void',
+            'function registerLivewireModulePanel(): void',
             "\$this->app->bound('livewire.finder')",
-            '$this->app->register(LivewireServiceProvider::class);',
-            '$this->ensureLivewireRuntime();',
+            "\$this->app->afterResolving('livewire.finder'",
+            '$this->registerLivewireModulePanel();',
             "Livewire::component('sarticles.module-panel'",
         ] as $marker) {
             s_articles_assert_contains($marker, $provider, 'Missing Livewire discovery guard marker: ' . $marker);
         }
+
+        s_articles_assert(!str_contains($provider, 'LivewireServiceProvider::class'), 'sArticles must not boot Livewire directly without the EvoUI bridge.');
     });
 
     s_articles_test('settings use vendor defaults with optional project overrides', function (): void {
