@@ -5,6 +5,7 @@ use EvolutionCMS\AliasLoader;
 use EvoUI\EvoUI;
 use Event;
 use Livewire\Livewire;
+use Livewire\LivewireServiceProvider;
 use Seiger\sArticles\Console\RerenderArticlesCommand;
 use Seiger\sArticles\Facades\sArticles as sArticlesFacade;
 use Seiger\sArticles\Support\BuilderRenderer;
@@ -62,6 +63,7 @@ class sArticlesServiceProvider extends ServiceProvider
             $this->mergeConfigFrom(dirname(__DIR__) . '/config/settings/form.php', 'evo-ui.forms.sarticles.settings');
             app(EvoUI::class)->registerFormField('types', 'sarticles::evo-ui.form.types-config-map');
             $this->app->booted(function () {
+                $this->ensureLivewireRuntime();
                 Livewire::component('sarticles.module-panel', \Seiger\sArticles\Livewire\ModulePanel::class);
             });
 
@@ -98,6 +100,25 @@ class sArticlesServiceProvider extends ServiceProvider
         }
 
         $this->app['config']->set('seiger.settings.sArticles', array_replace_recursive($defaults, $settings));
+    }
+
+    /**
+     * Ensure Livewire internals are registered before adding package components.
+     *
+     * Composer package discovery can boot sArticles while EvoUI and Livewire are still settling
+     * their provider order. In that state the `livewire` manager may be resolvable, but the
+     * `livewire.finder` binding used by `Livewire::component()` is still missing. Registering the
+     * Livewire provider on demand makes `php artisan package:discover` safe on fresh updates and
+     * remains a no-op once another provider has already registered the runtime.
+     *
+     * @return void No value is returned; missing Livewire container bindings are registered.
+     * @since 2.1.0
+     */
+    protected function ensureLivewireRuntime(): void
+    {
+        if (!$this->app->bound('livewire.finder')) {
+            $this->app->register(LivewireServiceProvider::class);
+        }
     }
 
     /**
