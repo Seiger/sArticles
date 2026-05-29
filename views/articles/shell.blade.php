@@ -129,5 +129,6 @@
             :context="['moduleUrl' => $url, 'type' => $checkType]"
         />
     </div>
+    <script>window.parent?.evo?.moduleViewport?.requestHiddenTree(window);</script>
 </body>
 </html>
