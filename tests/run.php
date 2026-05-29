@@ -240,6 +240,7 @@ s_articles_group('settings-form', function (): void {
         foreach ([
             "'type' => 'rich_text_editors'",
             "'type' => 'config-map'",
+            "'name' => 'general.tvparams_on'",
             "'delete_guard'",
             "'table' => 's_articles'",
             "'column' => 'type'",

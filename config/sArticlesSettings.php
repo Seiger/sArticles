@@ -13,6 +13,7 @@
         "tag_texts_on" => 1,
         "tags_on" => 1,
         "tinymce5_theme" => "custom",
+        "tvparams_on" => 1,
     ],
     "types" => [
         "article" => [

@@ -101,6 +101,14 @@ return [
                     'help' => 'sArticles::global.polls_on_off_help',
                 ],
                 [
+                    'name' => 'general.tvparams_on',
+                    'label' => 'sArticles::global.tvs',
+                    'type' => 'checkbox',
+                    'default' => 1,
+                    'rules' => $boolean,
+                    'help' => 'sArticles::global.tvs_on_off_help',
+                ],
+                [
                     'name' => 'general.filter_types_on',
                     'label' => 'sArticles::global.show_filter_types',
                     'type' => 'checkbox',

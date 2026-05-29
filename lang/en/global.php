@@ -223,6 +223,7 @@
     'to_list' => 'To the list of',
     'total_votes' => 'Total number of votes',
     'tvs_icon' => 'fab fa-modx',
+    'tvs_on_off_help' => 'Shows the Options (TV) tab.',
     'tvs' => 'Options (TV)',
     'tv_caption' => 'Parameter name',
     'tv_default_value' => 'Default value',

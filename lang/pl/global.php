@@ -212,6 +212,7 @@
     'to_list_publications' => 'Do listy wszystkich publikacji',
     'to_list' => 'Do listy',
     'total_votes' => 'Łączna liczba głosów',
+    'tvs_on_off_help' => 'Wyświetla zakładkę parametrów TV.',
     'tvs' => 'Parametry (TV)',
     'tv_caption' => 'Nazwa parametru',
     'tv_default_value' => 'Wartość domyślna',

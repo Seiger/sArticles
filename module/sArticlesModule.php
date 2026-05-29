@@ -46,6 +46,7 @@ evo()->setConfig('sart_tag_texts_on', sArticles::config('general.tag_texts_on', 
 evo()->setConfig('sart_in_main_menu', sArticles::config('general.in_main_menu', evo()->getConfig('sart_in_main_menu', 0)));
 evo()->setConfig('sart_main_menu_order', sArticles::config('general.main_menu_order', evo()->getConfig('sart_main_menu_order', 11)));
 evo()->setConfig('sart_tinymce5_theme', sArticles::config('general.tinymce5_theme', evo()->getConfig('sart_tinymce5_theme', 'custom')));
+evo()->setConfig('sart_tvparams_on', sArticles::config('general.tvparams_on', evo()->getConfig('sart_tvparams_on', 1)));
 
 switch ($data['get']) {
     default:
@@ -70,7 +71,9 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
-            $data['tabs'][] = 'tvparams';
+            if (evo()->getConfig('sart_tvparams_on', 1) == 1) {
+                $data['tabs'][] = 'tvparams';
+            }
             $data['tabs'][] = 'settings';
         }
         $data['checkType'] = $checkType;
@@ -98,7 +101,9 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
-            $data['tabs'][] = 'tvparams';
+            if (evo()->getConfig('sart_tvparams_on', 1) == 1) {
+                $data['tabs'][] = 'tvparams';
+            }
             $data['tabs'][] = 'settings';
         }
         $_SESSION['itemaction'] = 'Viewing a list of comments';
@@ -396,7 +401,9 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
-            $data['tabs'][] = 'tvparams';
+            if (evo()->getConfig('sart_tvparams_on', 1) == 1) {
+                $data['tabs'][] = 'tvparams';
+            }
             $data['tabs'][] = 'settings';
         }
         $data['authors'] = sArticlesAuthor::orderBy('base_name')->get();
@@ -622,7 +629,9 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
-            $data['tabs'][] = 'tvparams';
+            if (evo()->getConfig('sart_tvparams_on', 1) == 1) {
+                $data['tabs'][] = 'tvparams';
+            }
             $data['tabs'][] = 'settings';
         }
         $data['categories'] = sArticlesCategory::orderBy('position')->get();
@@ -714,7 +723,9 @@ switch ($data['get']) {
         }
         if (evo()->hasPermission('settings')) {
             $data['tabs'][] = 'features';
-            $data['tabs'][] = 'tvparams';
+            if (evo()->getConfig('sart_tvparams_on', 1) == 1) {
+                $data['tabs'][] = 'tvparams';
+            }
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
@@ -793,7 +804,9 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
-            $data['tabs'][] = 'tvparams';
+            if (evo()->getConfig('sart_tvparams_on', 1) == 1) {
+                $data['tabs'][] = 'tvparams';
+            }
             $data['tabs'][] = 'settings';
         } else {
             $back = request()->back ?? '&get=articles';
@@ -909,7 +922,9 @@ switch ($data['get']) {
             if (sArticles::config('general.features_on', 1) == 1) {
                 $data['tabs'][] = 'features';
             }
-            $data['tabs'][] = 'tvparams';
+            if (evo()->getConfig('sart_tvparams_on', 1) == 1) {
+                $data['tabs'][] = 'tvparams';
+            }
             $data['tabs'][] = 'settings';
         }
         $data['tags'] = sArticlesTag::orderBy($defaultLng)->get();

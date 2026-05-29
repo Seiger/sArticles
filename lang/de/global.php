@@ -212,6 +212,7 @@
     'to_list_publications' => 'Zur Liste aller Publikationen',
     'to_list' => 'Zur Liste',
     'total_votes' => 'Gesamtzahl der Stimmen',
+    'tvs_on_off_help' => 'Zeigt die Registerkarte TV-Parameter an.',
     'tvs' => 'Parameter (TV)',
     'tv_caption' => 'Parametername',
     'tv_default_value' => 'Standardwert',
