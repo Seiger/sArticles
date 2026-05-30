@@ -10,6 +10,8 @@ sArticles тепер працює як конфігураційний EvoUI + Li
 - `Seiger\sArticles\Livewire\ModulePanel` рендерить оболонку модуля і перемикає вкладки без iframe reload.
 - EvoUI відповідає за таблиці, фільтри, choices, форми, модалки, builder, delete dialogs і session state.
 - `src/Tables/*TableData.php` відповідають за дані, опції, збереження, видалення, фільтрацію і дії.
+- sArticles дає події для опціональних інтеграцій. Пакет, який інтегрується, сам відповідає за
+  свої поля, дефолти, рендеринг і збереження.
 
 ## Встановлення
 
@@ -17,6 +19,7 @@ sArticles тепер працює як конфігураційний EvoUI + Li
 
 ```console
 php artisan package:installrequire seiger/sarticles "*"
+php artisan vendor:publish --tag=evo-ui --force
 php artisan vendor:publish --provider="Seiger\\sArticles\\sArticlesServiceProvider" --tag=sarticles
 php artisan migrate
 ```
@@ -117,13 +120,28 @@ sArticles::config('general.editor', 'system')
 
 ## Інтеграції
 
-`SeoIntegration`:
+sSeo не зашитий у sArticles напряму. sArticles надає hook-и, через які sSeo може додати вкладку,
+поля, дефолти, options, frontend document data і збереження.
 
-- працює якщо `check_sSeo` true і класи sSeo доступні;
 - resource type: `article`;
-- domain key: `default`;
+- domain key визначається за сайтом, якому належить стаття в multisite-проєктах;
 - без sLang зберігає base SEO;
 - з sLang зберігає SEO по мовах.
+
+Основні події інтеграцій:
+
+```php
+evo()->invokeEvent('sArticlesManagerModalDefaultsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalDataEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalTabsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalFieldsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalOptionsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesOnBeforeLoadDocumentObject', [
+    'article' => $article,
+    'documentObject' => $documentObject,
+]);
+```
 
 `LangIntegration`:
 

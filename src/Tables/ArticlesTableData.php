@@ -18,7 +18,6 @@ use Seiger\sArticles\Models\sArticleTranslate;
 use Seiger\sArticles\Support\BuilderRenderer;
 use Seiger\sArticles\Support\LangIntegration;
 use Seiger\sArticles\Support\LikeSearch;
-use Seiger\sArticles\Support\SeoIntegration;
 
 /**
  * Articles manager table data provider.
@@ -258,17 +257,12 @@ class ArticlesTableData
                 ->all();
 
             $data['translations'] = $translations;
-
-            if ($this->seo()->enabled()) {
-                $data['seo'] = collect(array_keys($translations))
-                    ->mapWithKeys(fn (string $language) => [$language => $this->seo()->defaults()])
-                    ->all();
-            }
         }
 
-        if ($this->seo()->standaloneTabEnabled()) {
-            $data['seo'] = $this->seo()->defaults();
-        }
+        $data = array_merge($data, $this->managerEventPayload('sArticlesManagerModalDefaultsEvent', [
+            'data' => $data,
+            'languages' => $this->lang()->enabled() ? $this->lang()->languages() : [],
+        ]));
 
         return $data;
     }
@@ -315,11 +309,12 @@ class ArticlesTableData
                 ->mapWithKeys(fn (string $language) => [$language => $this->translationData($articleId, $language)])
                 ->all();
 
-            if ($this->seo()->enabled()) {
-                $data['seo'] = collect($languages)
-                    ->mapWithKeys(fn (string $language) => [$language => $this->seo()->articleData($articleId, $language)])
-                    ->all();
-            }
+            $data = array_merge($data, $this->managerEventPayload('sArticlesManagerModalDataEvent', [
+                'article' => $article,
+                'articleId' => $articleId,
+                'data' => $data,
+                'languages' => $languages,
+            ]));
 
             return $data;
         }
@@ -335,9 +330,12 @@ class ArticlesTableData
             'content_builder' => $this->modalBuilderData((string) ($content->builder ?? ''), (string) ($content->content ?? '')),
         ]);
 
-        if ($this->seo()->standaloneTabEnabled()) {
-            $data['seo'] = $this->seo()->articleData($articleId);
-        }
+        $data = array_merge($data, $this->managerEventPayload('sArticlesManagerModalDataEvent', [
+            'article' => $article,
+            'articleId' => $articleId,
+            'data' => $data,
+            'languages' => [],
+        ]));
 
         return $data;
     }
@@ -383,18 +381,18 @@ class ArticlesTableData
             return $modal;
         }
 
-        if (!$this->seo()->standaloneTabEnabled()) {
-            return $modal;
-        }
-
         $tabs = collect((array) ($modal['tabs'] ?? []));
-
-        if (!$tabs->contains(fn ($tab) => is_array($tab) && ($tab['name'] ?? '') === 'seo')) {
-            $tabs->push([
-                'name' => 'seo',
-                'label' => 'sSeo::global.title',
-                'icon' => 'chart-line',
-            ]);
+        foreach ($this->managerEventList('sArticlesManagerModalTabsEvent', [
+            'modal' => $modal,
+            'data' => $data,
+            'articleId' => $articleId,
+            'mode' => $mode,
+            'multilingual' => $this->lang()->enabled(),
+            'languages' => $this->lang()->enabled() ? $this->lang()->languages() : [],
+        ]) as $tab) {
+            if (is_array($tab) && !$tabs->contains(fn ($item) => is_array($item) && ($item['name'] ?? '') === ($tab['name'] ?? null))) {
+                $tabs->push($tab);
+            }
         }
 
         $modal['tabs'] = $tabs->values()->all();
@@ -539,9 +537,15 @@ class ArticlesTableData
             return $this->multilingualModalFields($fields, $type);
         }
 
-        if ($this->seo()->standaloneTabEnabled()) {
-            $fields = array_merge($fields, $this->seoModalFields());
-        }
+        $fields = array_merge($fields, $this->managerEventList('sArticlesManagerModalFieldsEvent', [
+            'fields' => $fields,
+            'data' => $data,
+            'articleId' => $articleId,
+            'mode' => $mode,
+            'type' => $type,
+            'multilingual' => false,
+            'languages' => [],
+        ]));
 
         return $fields;
     }
@@ -563,16 +567,15 @@ class ArticlesTableData
     {
         $name = (string) ($field['name'] ?? '');
 
-        if (Str::endsWith($name, '.robots')) {
-            return $this->seo()->robotsOptions();
-        }
-
-        if (Str::endsWith($name, '.priority')) {
-            return $this->seo()->priorityOptions();
-        }
-
-        if (Str::endsWith($name, '.changefreq')) {
-            return $this->seo()->changeFrequencyOptions();
+        foreach ($this->managerEventList('sArticlesManagerModalOptionsEvent', [
+            'field' => $field,
+            'data' => $data,
+            'articleId' => $articleId,
+            'mode' => $mode,
+        ]) as $options) {
+            if (is_array($options) && $options !== []) {
+                return $options;
+            }
         }
 
         if (Str::endsWith($name, '.seorobots')) {
@@ -597,9 +600,6 @@ class ArticlesTableData
             'tags' => $this->taxonomyOptions(sArticlesTag::query()->orderBy($this->baseColumn())->get(), 'tagid'),
             'features' => $this->taxonomyOptions(sArticlesFeature::query()->orderBy($this->baseColumn())->get(), 'fid'),
             'relevants' => $this->articleOptions($articleId),
-            'seo.robots' => $this->seo()->robotsOptions(),
-            'seo.priority' => $this->seo()->priorityOptions(),
-            'seo.changefreq' => $this->seo()->changeFrequencyOptions(),
             default => [],
         };
     }
@@ -814,7 +814,12 @@ class ArticlesTableData
      */
     protected function languageSeoFields(string $language, string $tab): array
     {
-        if (!$this->seo()->enabled()) {
+        if (!$this->managerEventList('sArticlesManagerModalFieldsEvent', [
+            'language' => $language,
+            'tab' => $tab,
+            'multilingual' => true,
+            'languages' => $this->lang()->languages(),
+        ])) {
             return [
                 [
                     'name' => 'translations.' . $language . '.seotitle',
@@ -848,106 +853,14 @@ class ArticlesTableData
             ];
         }
 
-        return $this->seoModalFields('seo.' . $language . '.', $tab, 'relations');
-    }
-
-    /**
-     * Build reusable sSeo modal field definitions.
-     *
-     * The returned schema covers robots, meta tags, canonical URL, sitemap exclusion, priority, and
-     * change frequency using the prefix, tab, and section supplied by the caller.
-     *
-     * @param string $prefix Field name prefix used for nested SEO payloads.
-     * @param string $tab Target evo-ui tab key.
-     * @param string $section Target evo-ui section key.
-     * @return array<string, mixed> Structured payload consumed by evo-ui or the package runtime.
-     * @since 2.0.0
-     */
-    protected function seoModalFields(string $prefix = 'seo.', string $tab = 'seo', string $section = ''): array
-    {
-        return [
-            [
-                'name' => $prefix . 'robots',
-                'type' => 'select',
-                'label' => 'sSeo::global.robots',
-                'help' => 'sSeo::global.robots_help',
-                'tab' => $tab,
-                'section' => $section,
-                'span' => 'full',
-                'options_provider' => 'articleModalOptions',
-                'rules' => ['nullable', 'string'],
-            ],
-            [
-                'name' => $prefix . 'meta_title',
-                'type' => 'text',
-                'label' => 'sSeo::global.meta_title',
-                'help' => 'sSeo::global.meta_title_help',
-                'tab' => $tab,
-                'section' => $section,
-                'span' => 'full',
-                'rules' => ['nullable', 'string', 'max:255'],
-            ],
-            [
-                'name' => $prefix . 'meta_description',
-                'type' => 'textarea',
-                'label' => 'sSeo::global.meta_description',
-                'help' => 'sSeo::global.meta_description_help',
-                'tab' => $tab,
-                'section' => $section,
-                'span' => 'full',
-                'rows' => 3,
-                'rules' => ['nullable', 'string'],
-            ],
-            [
-                'name' => $prefix . 'meta_keywords',
-                'type' => 'text',
-                'label' => 'sSeo::global.meta_keywords',
-                'help' => 'sSeo::global.meta_keywords_help',
-                'tab' => $tab,
-                'section' => $section,
-                'span' => 'full',
-                'rules' => ['nullable', 'string'],
-            ],
-            [
-                'name' => $prefix . 'canonical_url',
-                'type' => 'text',
-                'label' => 'sSeo::global.canonical',
-                'help' => 'sSeo::global.canonical_help',
-                'tab' => $tab,
-                'section' => $section,
-                'span' => 'full',
-                'rules' => ['nullable', 'string', 'max:255'],
-            ],
-            [
-                'name' => $prefix . 'exclude_from_sitemap',
-                'type' => 'checkbox',
-                'label' => 'sSeo::global.exclude_from_sitemap',
-                'help' => 'sSeo::global.exclude_from_sitemap_help',
-                'tab' => $tab,
-                'section' => $section,
-                'rules' => ['boolean'],
-            ],
-            [
-                'name' => $prefix . 'priority',
-                'type' => 'select',
-                'label' => 'sSeo::global.priority',
-                'help' => 'sSeo::global.priority_help',
-                'tab' => $tab,
-                'section' => $section,
-                'options_provider' => 'articleModalOptions',
-                'rules' => ['nullable', 'string'],
-            ],
-            [
-                'name' => $prefix . 'changefreq',
-                'type' => 'select',
-                'label' => 'sSeo::global.change_frequency',
-                'help' => 'sSeo::global.change_frequency_help',
-                'tab' => $tab,
-                'section' => $section,
-                'options_provider' => 'articleModalOptions',
-                'rules' => ['nullable', 'string'],
-            ],
-        ];
+        return $this->managerEventList('sArticlesManagerModalFieldsEvent', [
+            'language' => $language,
+            'tab' => $tab,
+            'section' => 'relations',
+            'prefix' => 'seo.' . $language . '.',
+            'multilingual' => true,
+            'languages' => $this->lang()->languages(),
+        ]);
     }
 
     /**
@@ -1039,10 +952,9 @@ class ArticlesTableData
             foreach ($this->lang()->languages() as $language) {
                 $content = $this->saveTranslationContent($article, $language, (array) data_get($data, 'translations.' . $language, []));
 
-                evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content'));
+                evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content', 'data'));
             }
 
-            $this->seo()->saveArticleTranslations($article, (array) data_get($data, 'seo', []), $this->lang()->languages());
             $controller->setArticlesListing();
 
             return (int) $article->id;
@@ -1064,9 +976,7 @@ class ArticlesTableData
         $content->constructor = json_encode($constructor, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $content->save();
 
-        $this->seo()->saveArticle($article, $content, (array) data_get($data, 'seo', []));
-
-        evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content'));
+        evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content', 'data'));
         $controller->setArticlesListing();
 
         return (int) $article->id;
@@ -1184,20 +1094,6 @@ class ArticlesTableData
     }
 
     /**
-     * Resolve the SEO integration service.
-     *
-     * Using the container keeps this table provider decoupled from the concrete integration
-     * implementation while still allowing modal and save flows to share one service.
-     *
-     * @return SeoIntegration SEO integration service resolved from the container.
-     * @since 2.0.0
-     */
-    protected function seo(): SeoIntegration
-    {
-        return app(SeoIntegration::class);
-    }
-
-    /**
      * Resolve the language integration service.
      *
      * The language service owns package multilingual rules, available languages, labels, and tab
@@ -1209,6 +1105,76 @@ class ArticlesTableData
     protected function lang(): LangIntegration
     {
         return app(LangIntegration::class);
+    }
+
+    /**
+     * Collect flat arrays returned by manager integration listeners.
+     *
+     * sArticles owns only the extension point. Packages such as sSeo own their field schemas,
+     * defaults, options, and save payload interpretation through these events.
+     *
+     * @param string $event Evolution event name without the `evolution.` prefix.
+     * @param array<string, mixed> $params Event payload.
+     * @return array<int, mixed> Flattened event items.
+     * @since 2.0.0
+     */
+    protected function managerEventList(string $event, array $params = []): array
+    {
+        $items = [];
+
+        if (!is_array($events = evo()->invokeEvent($event, $params))) {
+            return $items;
+        }
+
+        foreach ($events as $eventResult) {
+            if (!is_array($eventResult)) {
+                continue;
+            }
+
+            if (array_is_list($eventResult)) {
+                foreach ($eventResult as $item) {
+                    $items[] = $item;
+                }
+            } else {
+                $items[] = $eventResult;
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * Merge associative arrays returned by manager integration listeners.
+     *
+     * @param string $event Evolution event name without the `evolution.` prefix.
+     * @param array<string, mixed> $params Event payload.
+     * @return array<string, mixed> Merged associative payload.
+     * @since 2.0.0
+     */
+    protected function managerEventPayload(string $event, array $params = []): array
+    {
+        $payload = [];
+
+        foreach ($this->managerEventList($event, $params) as $item) {
+            if (is_array($item)) {
+                $payload = array_replace_recursive($payload, $item);
+            }
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Determine whether an integration listener supplied any data for a hook.
+     *
+     * @param string $event Evolution event name without the `evolution.` prefix.
+     * @param array<string, mixed> $params Event payload.
+     * @return bool True when at least one listener returned a non-empty array.
+     * @since 2.0.0
+     */
+    protected function hasManagerEventOutput(string $event, array $params = []): bool
+    {
+        return $this->managerEventList($event, $params) !== [];
     }
 
     /**
@@ -1389,7 +1355,10 @@ class ArticlesTableData
         $content->builder = json_encode($builder, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $content->constructor = json_encode($constructor, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        if (!$this->seo()->enabled()) {
+        if (!$this->hasManagerEventOutput('sArticlesManagerModalFieldsEvent', [
+            'multilingual' => true,
+            'languages' => $this->lang()->languages(),
+        ])) {
             $content->seotitle = trim((string) data_get($data, 'seotitle', ''));
             $content->seodescription = trim((string) data_get($data, 'seodescription', ''));
             $content->seorobots = in_array((string) data_get($data, 'seorobots', 'index,follow'), ['index,follow', 'noindex,nofollow'], true)

@@ -10,9 +10,8 @@ sArticles використовує EvoUI + Livewire як менеджерськ�
 - `config/articles/table.php` - таблиця, фільтри, колонки, список і row actions.
 - `config/articles/modal.php` - форма створення та редагування публікації.
 - `config/settings/form.php` - форма конфігурації.
-- `src/Tables/ArticlesTableData.php` - article provider, choices, save/delete/duplicate, content builder, sSeo/sLang glue.
+- `src/Tables/ArticlesTableData.php` - article provider, choices, save/delete/duplicate, content builder і hook-и інтеграцій.
 - `src/Tables/*TableData.php` - provider-и інших вкладок.
-- `src/Support/SeoIntegration.php` - інтеграція з sSeo.
 - `src/Support/LangIntegration.php` - інтеграція з sLang.
 - `builder/*` - типи блоків контенту.
 
@@ -22,7 +21,7 @@ sArticles використовує EvoUI + Livewire як менеджерськ�
 {
   "require": {
     "evolution-cms/evo-ui": "^1.0.2",
-    "seiger/sarticles": "^1.2"
+    "seiger/sarticles": "^2.0"
   }
 }
 ```
@@ -140,7 +139,27 @@ php artisan sarticles:rerender --articles=123,124,200 --lang=uk
 
 ## sSeo
 
-Якщо встановлено sSeo, sArticles додає SEO-поля до форми публікації. Без sLang SEO живе в базовому потоці, а з sLang - у мовних вкладках і зберігається для конкретної мови.
+Якщо встановлено sSeo, він підключається до sArticles через події. sArticles не тримає список
+SEO-полів і не зберігає SEO напряму: пакет sSeo сам додає вкладку, поля, дефолти, options,
+frontend document data і save logic.
+
+Основні події:
+
+```php
+evo()->invokeEvent('sArticlesManagerModalDefaultsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalDataEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalTabsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalFieldsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalOptionsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesOnBeforeLoadDocumentObject', [
+    'article' => $article,
+    'documentObject' => $documentObject,
+]);
+```
+
+Без sLang SEO зберігається в base-потоці. З sLang SEO зберігається по мовах. У multisite-проєктах
+sSeo має зберігати дані під ключем сайту, якому належить стаття.
 
 ## sLang
 

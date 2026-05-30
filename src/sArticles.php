@@ -1,6 +1,8 @@
 <?php namespace Seiger\sArticles;
 
 use Illuminate\Support\Arr;
+use EvolutionCMS\Models\SiteContent;
+use EvolutionCMS\Models\SiteTemplate;
 use EvolutionCMS\Models\UserAttribute;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
@@ -191,6 +193,65 @@ class sArticles
     }
 
     /**
+     * Return the resource used to render resolved public article URLs.
+     *
+     * Articles must render through the current domain start page so multisite projects do not
+     * depend on one global blank resource that may belong to another domain tree.
+     *
+     * @return int Current site start resource ID.
+     */
+    public function articleForwardResource(): int
+    {
+        return max(1, (int) evo()->getConfig('site_start', 1));
+    }
+
+    /**
+     * Return the template alias used to render resolved public article URLs.
+     *
+     * The public route no longer forwards to the legacy blank resource, but existing projects may
+     * still keep their article template assigned there. Reading the template alias keeps those
+     * projects compatible while the render resource remains domain-local.
+     *
+     * @return string Blade template alias for article pages.
+     */
+    public function articleTemplateAlias(): string
+    {
+        $configured = trim((string) evo()->getConfig('sart_template_alias', ''));
+        if ($configured !== '') {
+            return $configured;
+        }
+
+        $blankId = (int) evo()->getConfig('sart_blank', 0);
+        if ($blankId > 0) {
+            $templateId = (int) (SiteContent::query()->whereKey($blankId)->value('template') ?? 0);
+            if ($templateId > 0) {
+                $templateAlias = trim((string) (SiteTemplate::query()->whereKey($templateId)->value('templatealias') ?? ''));
+                if ($templateAlias !== '') {
+                    return $templateAlias;
+                }
+            }
+        }
+
+        return 's_articles_article';
+    }
+
+    /**
+     * Return the template ID for an article template alias.
+     *
+     * @param string|null $templateAlias Optional already-resolved template alias.
+     * @return int Evolution template ID or 0 when the Blade alias is used without a DB template.
+     */
+    public function articleTemplateId(?string $templateAlias = null): int
+    {
+        $templateAlias = trim((string) ($templateAlias ?: sArticles::articleTemplateAlias()));
+        if ($templateAlias === '') {
+            return 0;
+        }
+
+        return (int) (SiteTemplate::query()->whereTemplatealias($templateAlias)->value('id') ?? 0);
+    }
+
+    /**
      * Resolve an article from request URI segments.
      *
      * The method checks cached article aliases and validates the resolved article link before
@@ -211,7 +272,7 @@ class sArticles
 
         if ($articleId > 0) {
             $article = sArticles::getArticle((int) $articleId);
-            if ($article->id ?? 0) {
+            if (($article->id ?? 0) && sArticles::articleBelongsToCurrentSite($article)) {
                 return $article;
             }
         }
@@ -221,19 +282,71 @@ class sArticles
             return null;
         }
 
-        $article = sArticles::getArticleByAlias($articleAlias);
-        if (!($article->id ?? 0)) {
-            return null;
-        }
+        $articles = sArticle::where('s_articles.alias', $articleAlias)->get();
 
-        if (
-            trim($article->link, '/') === trim($alias, '/') ||
-            trim($article->link, '/') === trim('/' . evo()->getConfig('lang', 'uk') . '/' . $alias, '/')
-        ) {
-            return $article;
+        $aliasPath = $this->normalizeArticlePath($alias);
+        $localizedAliasPath = $this->normalizeArticlePath('/' . evo()->getConfig('lang', 'uk') . '/' . $alias);
+
+        foreach ($articles as $article) {
+            if (!sArticles::articleBelongsToCurrentSite($article)) {
+                continue;
+            }
+
+            $articlePath = $this->normalizeArticlePath((string) $article->link);
+            if ($articlePath === $aliasPath || $articlePath === $localizedAliasPath) {
+                return $article;
+            }
         }
 
         return null;
+    }
+
+    /**
+     * Check whether an article parent belongs to the current multisite resource tree.
+     *
+     * @param sArticle $article Article being resolved from the public URL.
+     * @return bool True when the article can be rendered on the current site.
+     */
+    public function articleBelongsToCurrentSite(sArticle $article): bool
+    {
+        if (!evo()->getConfig('check_sMultisite', false)) {
+            return true;
+        }
+
+        $parent = (int) ($article->parent ?? 0);
+        if ($parent <= 0) {
+            return true;
+        }
+
+        $siteKey = evo()->getConfig('site_key', 'default');
+        $siteResources = Cache::get('sMultisite-' . $siteKey . '-resources');
+        if (is_array($siteResources) && $siteResources !== []) {
+            return in_array($parent, array_map('intval', $siteResources), true);
+        }
+
+        $siteRoot = (int) evo()->getConfig('site_root', 0);
+        if ($siteRoot <= 0) {
+            return true;
+        }
+
+        $parents = array_map('intval', array_values(evo()->getParentIds($parent, 20)));
+        return $parent === $siteRoot || in_array($siteRoot, $parents, true);
+    }
+
+    /**
+     * Normalize a relative or absolute article URL into a comparable path.
+     *
+     * @param string $path Article path or absolute URL.
+     * @return string Normalized path without leading or trailing slashes.
+     */
+    protected function normalizeArticlePath(string $path): string
+    {
+        $urlPath = parse_url($path, PHP_URL_PATH);
+        if (is_string($urlPath) && $urlPath !== '') {
+            $path = $urlPath;
+        }
+
+        return trim($path, '/');
     }
 
     /**

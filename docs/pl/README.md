@@ -9,6 +9,20 @@ Nowy interfejs managera jest zbudowany na **EvoUI** i **Livewire**. Zakladki, fi
 - [Przewodnik uzytkownika](user-guide.md)
 - [Przewodnik dewelopera](developer-guide.md)
 
+## Zrzuty ekranu
+
+### Manager publikacji
+
+![Manager publikacji sArticles](../assets/articles-manager.png)
+
+### Edytor publikacji
+
+![Edytor publikacji sArticles](../assets/article-editor.png)
+
+### Ustawienia modulu
+
+![Ustawienia sArticles](../assets/settings.png)
+
 ## Funkcje
 
 - Publikacje z konfigurowalnymi typami.
@@ -26,6 +40,6 @@ Nowy interfejs managera jest zbudowany na **EvoUI** i **Livewire**. Zakladki, fi
 - `config/articles/table.php`
 - `config/articles/modal.php`
 - `src/Tables/ArticlesTableData.php`
-- `src/Support/SeoIntegration.php`
+- eventy managera i frontendu sArticles dla integracji takich jak sSeo
 - `src/Support/LangIntegration.php`
 - `builder/*`

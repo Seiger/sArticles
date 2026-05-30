@@ -9,6 +9,20 @@ La nouvelle interface manager est construite avec **EvoUI** et **Livewire**. Les
 - [Guide utilisateur](user-guide.md)
 - [Guide developpeur](developer-guide.md)
 
+## Captures d'ecran
+
+### Manager des publications
+
+![Manager des publications sArticles](../assets/articles-manager.png)
+
+### Editeur de publication
+
+![Editeur de publication sArticles](../assets/article-editor.png)
+
+### Parametres du module
+
+![Parametres sArticles](../assets/settings.png)
+
 ## Fonctionnalites
 
 - Publications avec types configurables.
@@ -26,6 +40,6 @@ La nouvelle interface manager est construite avec **EvoUI** et **Livewire**. Les
 - `config/articles/table.php`
 - `config/articles/modal.php`
 - `src/Tables/ArticlesTableData.php`
-- `src/Support/SeoIntegration.php`
+- evenements manager et frontend sArticles pour les integrations comme sSeo
 - `src/Support/LangIntegration.php`
 - `builder/*`

@@ -9,6 +9,20 @@ sArticles - модуль Evolution CMS для публикаций, новост
 - [Руководство пользователя](user-guide.md)
 - [Руководство разработчика](developer-guide.md)
 
+## Скриншоты
+
+### Менеджер публикаций
+
+![Менеджер публикаций sArticles](../assets/articles-manager.png)
+
+### Редактор публикации
+
+![Редактор публикации sArticles](../assets/article-editor.png)
+
+### Настройки модуля
+
+![Настройки sArticles](../assets/settings.png)
+
 ## Возможности
 
 - Публикации с несколькими настраиваемыми типами.
@@ -26,6 +40,6 @@ sArticles - модуль Evolution CMS для публикаций, новост
 - `config/articles/table.php`
 - `config/articles/modal.php`
 - `src/Tables/ArticlesTableData.php`
-- `src/Support/SeoIntegration.php`
+- события менеджера и фронтенда sArticles для интеграций вроде sSeo
 - `src/Support/LangIntegration.php`
 - `builder/*`

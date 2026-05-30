@@ -9,6 +9,20 @@ sArticles - модуль Evolution CMS для керування публіка�
 - [Гайд користувача](user-guide.md)
 - [Гайд розробника](developer-guide.md)
 
+## Скріншоти
+
+### Менеджер публікацій
+
+![Менеджер публікацій sArticles](../assets/articles-manager.png)
+
+### Редактор публікації
+
+![Редактор публікації sArticles](../assets/article-editor.png)
+
+### Налаштування модуля
+
+![Налаштування sArticles](../assets/settings.png)
+
 ## Основні можливості
 
 - Список публікацій у режимах таблиці та списку.
@@ -27,6 +41,6 @@ sArticles - модуль Evolution CMS для керування публіка�
 - `config/articles/table.php` - пресет таблиці публікацій.
 - `config/articles/modal.php` - пресет модалки публікації.
 - `src/Tables/ArticlesTableData.php` - дані, збереження та логіка публікацій.
-- `src/Support/SeoIntegration.php` - інтеграція з sSeo.
+- події менеджера та фронтенду sArticles - точки інтеграції для пакетів на кшталт sSeo.
 - `src/Support/LangIntegration.php` - інтеграція з sLang.
 - `builder/*` - блоки конструктора контенту.

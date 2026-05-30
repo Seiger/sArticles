@@ -8,6 +8,7 @@ sArticles работает как EvoUI + Livewire модуль. `ModulePanel` �
 
 ```console
 php artisan package:installrequire seiger/sarticles "*"
+php artisan vendor:publish --tag=evo-ui --force
 php artisan vendor:publish --provider="Seiger\\sArticles\\sArticlesServiceProvider" --tag=sarticles
 php artisan migrate
 ```
@@ -50,7 +51,26 @@ UI-пресеты:
 
 ## Интеграции
 
-`SeoIntegration` работает с sSeo, resource type `article`, domain key `default`. Без sLang SEO хранится в base-потоке, с sLang - по языкам.
+sArticles не хранит список SEO-полей и логику сохранения sSeo внутри пакета. Он предоставляет
+события, через которые sSeo добавляет вкладку, поля, значения по умолчанию, options, frontend
+document data и сохранение. Resource type: `article`. В multisite-проектах domain key должен
+соответствовать сайту, которому принадлежит статья. Без sLang SEO хранится в base-потоке, с sLang -
+по языкам.
+
+Основные события:
+
+```php
+evo()->invokeEvent('sArticlesManagerModalDefaultsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalDataEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalTabsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalFieldsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalOptionsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesOnBeforeLoadDocumentObject', [
+    'article' => $article,
+    'documentObject' => $documentObject,
+]);
+```
 
 `LangIntegration` читает языки из sLang, ставит язык по умолчанию первым и создает вкладки `lang_<code>`.
 

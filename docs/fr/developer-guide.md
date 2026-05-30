@@ -8,6 +8,7 @@ sArticles est un module EvoUI + Livewire. `ModulePanel` gere les onglets, EvoUI 
 
 ```console
 php artisan package:installrequire seiger/sarticles "*"
+php artisan vendor:publish --tag=evo-ui --force
 php artisan vendor:publish --provider="Seiger\\sArticles\\sArticlesServiceProvider" --tag=sarticles
 php artisan migrate
 ```
@@ -51,7 +52,26 @@ Presets UI:
 
 ## Integrations
 
-`SeoIntegration` utilise sSeo avec resource type `article` et domain key `default`. Sans sLang, le SEO est sauvegarde en mode base. Avec sLang, il est sauvegarde par langue.
+sArticles ne garde pas la liste des champs sSeo ni la logique de sauvegarde sSeo dans le paquet.
+Il expose des evenements qui permettent a sSeo d'ajouter son onglet, ses champs, ses valeurs par
+defaut, ses options, ses donnees frontend et sa logique de sauvegarde. Resource type: `article`.
+Dans les projets multisite, le domain key doit correspondre au site auquel appartient l'article.
+Sans sLang, le SEO est sauvegarde en mode base. Avec sLang, il est sauvegarde par langue.
+
+Evenements principaux:
+
+```php
+evo()->invokeEvent('sArticlesManagerModalDefaultsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalDataEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalTabsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalFieldsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalOptionsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesOnBeforeLoadDocumentObject', [
+    'article' => $article,
+    'documentObject' => $documentObject,
+]);
+```
 
 `LangIntegration` lit les langues depuis sLang, place la langue par defaut en premier et cree des onglets `lang_<code>`.
 

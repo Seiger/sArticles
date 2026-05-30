@@ -9,6 +9,20 @@ The current admin interface is built with **EvoUI** and **Livewire**. The module
 - [User Guide](user-guide.md)
 - [Developer Guide](developer-guide.md)
 
+## Screenshots
+
+### Publications manager
+
+![sArticles publications manager](../assets/articles-manager.png)
+
+### Article editor
+
+![sArticles article editor](../assets/article-editor.png)
+
+### Module settings
+
+![sArticles module settings](../assets/settings.png)
+
 ## Main Capabilities
 
 - Publication list with table and list modes.
@@ -37,6 +51,6 @@ sArticles uses:
 - `config/articles/table.php` - publication table preset.
 - `config/articles/modal.php` - publication modal preset.
 - `src/Tables/ArticlesTableData.php` - publication data provider and save logic.
-- `src/Support/SeoIntegration.php` - sSeo bridge.
+- sArticles manager/frontend events - integration points for packages such as sSeo.
 - `src/Support/LangIntegration.php` - sLang bridge.
 - `builder/*` - content builder blocks.

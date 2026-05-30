@@ -10,6 +10,8 @@ Core pieces:
 - `Seiger\sArticles\Livewire\ModulePanel` renders the manager shell and switches internal tabs without iframe reloads.
 - `EvoUI` renders tables, filters, choices, forms, modals, builder fields, delete dialogs, and session state.
 - `src/Tables/*TableData.php` classes provide rows, options, modal defaults, saves, deletes, filters, and custom action logic.
+- sArticles exposes manager and frontend events for optional integrations. The integrating package
+  owns its own fields, defaults, rendering, and save logic.
 
 ## Installation
 
@@ -17,6 +19,7 @@ Inside `core`:
 
 ```console
 php artisan package:installrequire seiger/sarticles "*"
+php artisan vendor:publish --tag=evo-ui --force
 php artisan vendor:publish --provider="Seiger\\sArticles\\sArticlesServiceProvider" --tag=sarticles
 php artisan migrate
 ```
@@ -159,13 +162,14 @@ EvoUI supports `options_source.type = rich_text_editors`, which reads registered
 
 ## sSeo Integration
 
-`src/Support/SeoIntegration.php` is the sSeo bridge.
+sArticles does not hard-code the sSeo field list or save implementation. It exposes hooks that
+allow sSeo to attach its own tab, fields, defaults, options, frontend document data, and save logic.
 
 Rules:
 
-- Enabled when `check_sSeo` is true and sSeo classes exist.
+- Enabled by the sSeo package when its plugin is installed and listens to the sArticles events.
 - Resource type is `article`.
-- Domain key is `default`.
+- Domain key is resolved from the article's site ownership in multisite projects.
 - Without sLang, SEO is saved in the base flow.
 - With sLang, SEO is saved per language.
 
@@ -218,19 +222,28 @@ Important methods:
 
 ## Events
 
-Legacy extension events are still available for compatibility:
+Manager integration events:
 
 ```php
-Event::listen('evolution.sArticlesManagerValueEvent', function ($params) {
-    return '';
-});
-
-Event::listen('evolution.sArticlesManagerAddAfterEvent', function ($params) {
-    return '';
-});
+evo()->invokeEvent('sArticlesManagerModalDefaultsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalDataEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalTabsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalFieldsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesManagerModalOptionsEvent', compact('article', 'content', 'data'));
+evo()->invokeEvent('sArticlesAfterContentSave', compact('article', 'content', 'data'));
 ```
 
-Prefer new EvoUI configuration and provider methods for new manager functionality.
+Frontend integration event:
+
+```php
+evo()->invokeEvent('sArticlesOnBeforeLoadDocumentObject', [
+    'article' => $article,
+    'documentObject' => $documentObject,
+]);
+```
+
+Use these events for cross-package integrations. Prefer EvoUI configuration and provider methods for
+module-owned manager functionality.
 
 ## Development Rules
 

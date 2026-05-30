@@ -253,6 +253,38 @@ s_articles_group('settings-form', function (): void {
 });
 
 s_articles_group('provider-hooks', function (): void {
+    s_articles_test('frontend article routing uses current site start instead of a global blank resource', function (): void {
+        $plugin = s_articles_read('plugins/sArticlesPlugin.php');
+        $component = s_articles_read('src/sArticles.php');
+        $controller = s_articles_read('src/Controllers/sArticlesController.php');
+
+        foreach ([
+            'evo()->setPlaceholder(\'article\', (int) $article->id);',
+            'evo()->sendForward(sArticles::articleForwardResource());',
+            '$templateAlias = sArticles::articleTemplateAlias();',
+            '$article->template = sArticles::articleTemplateId($templateAlias);',
+            '$article->templatealias = $templateAlias;',
+            '$article->menutitle = $article->menutitle ?? $article->pagetitle ?? \'\';',
+            "'article' => \$article",
+            'function articleForwardResource(): int',
+            'function articleTemplateAlias(): string',
+            'function articleBelongsToCurrentSite(sArticle $article): bool',
+            "Cache::get('sMultisite-' . \$siteKey . '-resources')",
+            'sArticles::articleBelongsToCurrentSite($article)',
+            "sArticle::where('s_articles.alias', \$articleAlias)->get()",
+            "evo()->getConfig('sart_template_alias', '')",
+            "evo()->getConfig('sart_blank', 0)",
+            "evo()->getConfig('site_start', 1)",
+            'parse_url((string) $article->link, PHP_URL_PATH)',
+        ] as $marker) {
+            s_articles_assert_contains($marker, $plugin . "\n" . $component . "\n" . $controller, 'Missing site-start article routing marker: ' . $marker);
+        }
+
+        s_articles_assert(!str_contains($plugin, "sendForward(sArticles::isLegacyMode() ?"), 'Article routing must not forward public URLs to the legacy blank resource.');
+        s_articles_assert(!str_contains($plugin, 'if (sArticles::isLegacyMode()) {' . "\n" . '        return;' . "\n" . '    }'), 'Placeholder-based article hydration must work even when a legacy blank resource is configured.');
+        s_articles_assert(!str_contains($controller, "str_replace(EVO_SITE_URL, '', \$article->link)"), 'Article URL cache must not depend on the current host constant.');
+    });
+
     s_articles_test('ArticlesTableData owns module behavior behind evo-ui hooks', function (): void {
         $provider = s_articles_read('src/Tables/ArticlesTableData.php');
 

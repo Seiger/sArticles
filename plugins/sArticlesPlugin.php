@@ -3,7 +3,6 @@
  * Plugin for Seiger Offers Management Module for Evolution CMS admin panel.
  */
 
-use EvolutionCMS\Models\SiteTemplate;
 use Illuminate\Support\Arr;
 use Seiger\sArticles\Models\sArticle;
 
@@ -14,13 +13,11 @@ Event::listen('evolution.OnPageNotFound', function($params) {
     $goTo = false;
     $article = sArticles::resolveArticleByUri(request()->segments());
     if ($article && (($article->published ?? 0) == 1 || evo()->getLoginUserID('mgr'))) {
-        if (!sArticles::isLegacyMode()) {
-            evo()->setPlaceholder('article', (int) $article->id);
-        }
+        evo()->setPlaceholder('article', (int) $article->id);
         $goTo = true;
     }
     if ($goTo) {
-        evo()->sendForward(sArticles::isLegacyMode() ? evo()->getConfig('sart_blank', 1) : evo()->getConfig('site_start', 1));
+        evo()->sendForward(sArticles::articleForwardResource());
         exit();
     }
 
@@ -45,10 +42,6 @@ Event::listen('evolution.OnPageNotFound', function($params) {
  * Get document fields and add to array of resource fields
  */
 Event::listen('evolution.OnBeforeLoadDocumentObject', function($params) {
-    if (sArticles::isLegacyMode()) {
-        return;
-    }
-
     $requestId = (int) evo()->getPlaceholder('article');
     if ($requestId) {
         $article = sArticles::getArticle($requestId);
@@ -66,9 +59,11 @@ Event::listen('evolution.OnBeforeLoadDocumentObject', function($params) {
             }
         }
 
-        $template = SiteTemplate::whereTemplatealias('s_articles_article')->first();
+        $templateAlias = sArticles::articleTemplateAlias();
         $article->type = 'article';
-        $article->template = $template->id ?? 0;
+        $article->template = sArticles::articleTemplateId($templateAlias);
+        $article->templatealias = $templateAlias;
+        $article->menutitle = $article->menutitle ?? $article->pagetitle ?? '';
         $article->hide_from_tree = false;
         $article->content_dispo = false;
         $article->deleted = 0;
@@ -77,8 +72,24 @@ Event::listen('evolution.OnBeforeLoadDocumentObject', function($params) {
         sArticles::trackView($article);
 
         unset($article->tmplvars);
-        $params['documentObject'] = Arr::dot($article->toArray());
+        $documentObject = Arr::dot($article->toArray());
+        if (is_array($events = evo()->invokeEvent('sArticlesOnBeforeLoadDocumentObject', [
+            'article' => $article,
+            'documentObject' => $documentObject,
+        ]))) {
+            foreach ($events as $event) {
+                if (is_array($event)) {
+                    $documentObject = array_merge($documentObject, $event);
+                }
+            }
+        }
+
+        $params['documentObject'] = $documentObject;
         $params['documentObject']['article'] = $article;
+        evo()->addDataToView([
+            'article' => $article,
+            'constructor' => $article->constructor,
+        ]);
 
         return $params['documentObject'];
     }
@@ -104,8 +115,26 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
             }
         }
         sArticles::trackView($article);
+        $article->templatealias = sArticles::articleTemplateAlias();
+        $article->menutitle = $article->menutitle ?? $article->pagetitle ?? '';
+        evo()->addDataToView([
+            'article' => $article,
+            'constructor' => $article->constructor,
+        ]);
         unset($article->tmplvars);
-        return array_merge($params['documentObject'], Arr::dot($article->toArray()));
+        $documentObject = array_merge($params['documentObject'], Arr::dot($article->toArray()));
+        if (is_array($events = evo()->invokeEvent('sArticlesOnBeforeLoadDocumentObject', [
+            'article' => $article,
+            'documentObject' => $documentObject,
+        ]))) {
+            foreach ($events as $event) {
+                if (is_array($event)) {
+                    $documentObject = array_merge($documentObject, $event);
+                }
+            }
+        }
+
+        return $documentObject;
     }
 });
 

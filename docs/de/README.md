@@ -9,6 +9,20 @@ Die neue Manager-Oberflache basiert auf **EvoUI** und **Livewire**. Tabs, Filter
 - [Benutzerhandbuch](user-guide.md)
 - [Entwicklerhandbuch](developer-guide.md)
 
+## Screenshots
+
+### Publikationsmanager
+
+![sArticles Publikationsmanager](../assets/articles-manager.png)
+
+### Publikationseditor
+
+![sArticles Publikationseditor](../assets/article-editor.png)
+
+### Moduleinstellungen
+
+![sArticles Einstellungen](../assets/settings.png)
+
 ## Funktionen
 
 - Publikationen mit konfigurierbaren Typen.
@@ -26,6 +40,6 @@ Die neue Manager-Oberflache basiert auf **EvoUI** und **Livewire**. Tabs, Filter
 - `config/articles/table.php`
 - `config/articles/modal.php`
 - `src/Tables/ArticlesTableData.php`
-- `src/Support/SeoIntegration.php`
+- sArticles Manager- und Frontend-Events fur Integrationen wie sSeo
 - `src/Support/LangIntegration.php`
 - `builder/*`

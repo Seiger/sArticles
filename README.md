@@ -170,10 +170,13 @@ sArticles registers an EvoUI module panel and table/form presets. The manager UI
 
 ### sSeo
 
-When `sSeo` is installed, sArticles stores SEO data for resource type `article`.
+sArticles exposes manager and frontend hooks for SEO packages. When `sSeo` is installed, it uses
+those hooks to render and save SEO data for resource type `article`.
 
 - Without `sLang`, SEO fields are shown as a standalone SEO area in the article modal.
 - With `sLang`, SEO fields are attached to each language flow.
+- In multisite projects, SEO data is saved under the article owner's site key instead of a shared
+  `default` key.
 
 ### sLang
 
@@ -194,6 +197,8 @@ Per-field editor selectors are intentionally hidden in sArticles forms to keep t
 - Legacy manager blades, scripts, and styles are removed from the new flow.
 - Use `EVO_*` constants for Evolution paths; old compatibility aliases should not be used in new code.
 - Keep module-specific hooks in sArticles, not in EvoUI.
+- Keep package-specific integrations in the integrating package. sArticles provides hooks; packages
+  like sSeo provide their own fields, defaults, render logic, and save logic.
 - Use table presets for manager lists and modal presets for edit/create flows.
 
 ## License
