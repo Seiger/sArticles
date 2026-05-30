@@ -567,12 +567,14 @@ class ArticlesTableData
     {
         $name = (string) ($field['name'] ?? '');
 
-        foreach ($this->managerEventList('sArticlesManagerModalOptionsEvent', [
+        $eventParams = [
             'field' => $field,
             'data' => $data,
             'articleId' => $articleId,
             'mode' => $mode,
-        ]) as $options) {
+        ];
+
+        foreach ((array) evo()->invokeEvent('sArticlesManagerModalOptionsEvent', $eventParams) as $options) {
             if (is_array($options) && $options !== []) {
                 return $options;
             }
