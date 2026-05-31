@@ -239,6 +239,9 @@ s_articles_group('settings-form', function (): void {
         $surface = var_export($form, true);
         foreach ([
             "'type' => 'rich_text_editors'",
+            "'name' => 'section_template_ids'",
+            "'type' => 'multi-select'",
+            "EvolutionCMS\\\\Models\\\\SiteTemplate",
             "'type' => 'config-map'",
             "'name' => 'general.tvparams_on'",
             "'delete_guard'",
@@ -300,6 +303,9 @@ s_articles_group('provider-hooks', function (): void {
             'public function articleBuilderBlocks',
             'public function saveModal',
             'public function filters',
+            'protected function sectionTemplateIds',
+            "whereIn('template', \$templateIds)",
+            "count(\$templateIds) ? []",
             'categories()->sync',
             'tags()->sync',
             'features()->sync',

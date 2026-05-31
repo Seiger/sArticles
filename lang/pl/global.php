@@ -186,6 +186,8 @@
     'settings_long_title' => 'Rozszerzony tytuł',
     'settings_manager_section' => 'Panel menedżera',
     'settings_resource_name' => 'Typ publikacji',
+    'settings_section_templates_help' => 'Ogranicza listę sekcji w formularzu publikacji do zasobów używających wybranych szablonów Evolution. Pozostaw puste, aby zezwolić na wszystkie zasoby.',
+    'settings_section_templates' => 'Szablony sekcji',
     'settings_show_cover_title_help' => 'Pokazuje pole podpisu głównego obrazu w formularzu publikacji.',
     'settings_show_description_help' => 'Pokazuje pole opisu w formularzu publikacji.',
     'settings_show_introtext_help' => 'Pokazuje pole krótkiego opisu w formularzu publikacji.',

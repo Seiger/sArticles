@@ -25,6 +25,7 @@
             "long_title_on" => 1,
             "name" => "Article",
             "publish_date_on" => 1,
+            "section_template_ids" => [],
             "to_button_text" => "articles",
             "visual_editor_description" => 1,
             "visual_editor_introtext" => 1,

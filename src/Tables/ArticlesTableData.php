@@ -592,7 +592,7 @@ class ArticlesTableData
                 ->map(fn ($type) => ['value' => $type, 'label' => $this->typeLabel($type)])
                 ->values()
                 ->all(),
-            'parent' => $this->parentOptions(),
+            'parent' => $this->parentOptions((int) data_get($data, 'parent', 0)),
             'author_id' => $this->authorOptions(),
             'categories' => $this->taxonomyOptions(sArticlesCategory::query()->orderBy($this->baseColumn())->get(), 'catid'),
             'main_tag' => collect([['value' => '', 'label' => '-']])
@@ -1479,29 +1479,59 @@ class ArticlesTableData
     /**
      * Build parent resource options for the article modal.
      *
-     * The site root is included as a synthetic option, followed by Evolution resources, so articles
-     * can be attached to either a root bucket or a concrete page.
+     * The site root is included as a synthetic option only in legacy mode, before section templates
+     * are configured. Once section templates are narrowed, articles must point to real section pages.
      *
      * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
      * @since 2.0.0
      */
-    protected function parentOptions(): array
+    protected function parentOptions(int $currentParentId = 0): array
     {
-        $items = collect([
+        $templateIds = $this->sectionTemplateIds();
+        $items = collect(count($templateIds) ? [] : [
             ['value' => '0', 'label' => evo()->getConfig('site_name')],
         ]);
+        $query = SiteContent::withTrashed()
+            ->select('id', 'pagetitle', 'template')
+            ->orderBy('pagetitle');
+
+        if (count($templateIds)) {
+            $query->where(function ($query) use ($templateIds, $currentParentId) {
+                $query->whereIn('template', $templateIds);
+
+                if ($currentParentId > 0) {
+                    $query->orWhere('id', $currentParentId);
+                }
+            });
+        }
 
         return $items
-            ->merge(
-                SiteContent::withTrashed()
-                    ->select('id', 'pagetitle')
-                    ->orderBy('pagetitle')
-                    ->get()
-                    ->map(fn ($resource) => [
-                        'value' => (string) $resource->id,
-                        'label' => trim((string) $resource->pagetitle) !== '' ? (string) $resource->pagetitle : ('#' . $resource->id),
-                    ])
-            )
+            ->merge($query->get()->map(fn ($resource) => [
+                'value' => (string) $resource->id,
+                'label' => trim((string) $resource->pagetitle) !== '' ? (string) $resource->pagetitle : ('#' . $resource->id),
+            ]))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Return Evolution template IDs allowed as article section resources.
+     *
+     * An empty setting intentionally keeps the legacy behavior and allows every resource, so package
+     * upgrades do not suddenly hide existing section choices until the manager narrows the list.
+     *
+     * @return array<int, int> Positive template identifiers.
+     * @since 2.0.0
+     */
+    protected function sectionTemplateIds(): array
+    {
+        $typeTemplateIds = (array) config('seiger.settings.sArticles.types.' . $this->activeType() . '.section_template_ids', []);
+        $legacyTemplateIds = (array) config('seiger.settings.sArticles.general.section_template_ids', []);
+
+        return collect(count($typeTemplateIds) ? $typeTemplateIds : $legacyTemplateIds)
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
             ->values()
             ->all();
     }

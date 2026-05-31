@@ -9,6 +9,14 @@
         ->filter(fn ($itemField) => is_array($itemField) && !empty($itemField['name']))
         ->values()
         ->all();
+    $inputFields = collect($itemFields)
+        ->reject(fn ($itemField) => (($itemField['type'] ?? 'text') === 'checkbox'))
+        ->values()
+        ->all();
+    $toggleFields = collect($itemFields)
+        ->filter(fn ($itemField) => (($itemField['type'] ?? 'text') === 'checkbox'))
+        ->values()
+        ->all();
     $items = array_values((array) data_get($controller->data, $name, []));
     $addLabel = __($field['add_label'] ?? 'evo::global.action_add');
 @endphp
@@ -80,44 +88,30 @@
                         </button>
                     </div>
 
-                    <div class="evo-ui-config-map__fields">
-                        <label class="evo-ui-field evo-ui-field--compact">
-                            <span class="evo-ui-field__label">
-                                <span>{{ __($field['key_label'] ?? 'evo::global.key') }}</span>
-                            </span>
-                            <input
-                                class="evo-ui-input"
-                                type="text"
-                                wire:model.blur="data.{{ $name }}.{{ $index }}.{{ $keyField }}"
-                                @if($index === 0 && ($field['lock_first_key'] ?? false)) readonly @endif
-                            >
-                        </label>
-
-                        @foreach($itemFields as $itemField)
-                            @php
-                                $itemName = (string) $itemField['name'];
-                                $itemType = (string) ($itemField['type'] ?? 'text');
-                                $itemLabel = __($itemField['label'] ?? $itemName);
-                                $itemModel = 'data.' . $name . '.' . $index . '.' . $itemName;
-                            @endphp
-                            <label class="evo-ui-field {{ ($itemField['span'] ?? null) === 'full' ? 'evo-ui-field--full' : '' }}">
+                    <div class="evo-ui-config-map__fields" style="align-items: start;">
+                        <div style="display: grid; gap: 8px;">
+                            <label class="evo-ui-field evo-ui-field--compact">
                                 <span class="evo-ui-field__label">
-                                    <span>{{ $itemLabel }}</span>
+                                    <span>{{ __($field['key_label'] ?? 'evo::global.key') }}</span>
                                 </span>
-
-                                @if($itemType === 'checkbox')
-                                    <span class="evo-ui-checkbox">
-                                        <input type="checkbox" wire:model.live="{{ $itemModel }}">
-                                    </span>
-                                @elseif($itemType === 'number')
-                                    <input class="evo-ui-input" type="number" wire:model.blur="{{ $itemModel }}" @if(isset($itemField['min'])) min="{{ $itemField['min'] }}" @endif>
-                                @elseif($itemType === 'textarea')
-                                    <textarea class="evo-ui-input evo-ui-textarea" rows="{{ $itemField['rows'] ?? 3 }}" wire:model.blur="{{ $itemModel }}"></textarea>
-                                @else
-                                    <input class="evo-ui-input" type="text" wire:model.blur="{{ $itemModel }}">
-                                @endif
+                                <input
+                                    class="evo-ui-input"
+                                    type="text"
+                                    wire:model.blur="data.{{ $name }}.{{ $index }}.{{ $keyField }}"
+                                    @if($index === 0 && ($field['lock_first_key'] ?? false)) readonly @endif
+                                >
                             </label>
-                        @endforeach
+
+                            @foreach($inputFields as $itemField)
+                                @include('sarticles::evo-ui.form.types-config-map-field', ['itemField' => $itemField, 'item' => $item, 'name' => $name, 'index' => $index])
+                            @endforeach
+                        </div>
+
+                        <div style="display: grid; gap: 8px;">
+                            @foreach($toggleFields as $itemField)
+                                @include('sarticles::evo-ui.form.types-config-map-field', ['itemField' => $itemField, 'item' => $item, 'name' => $name, 'index' => $index])
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             @endforeach
