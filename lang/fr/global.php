@@ -227,4 +227,5 @@
     'with_id' => 'avec ID',
     'you_sure' => 'Voulez-vous vraiment supprimer l’enregistrement',
     'not_writable' => 'Le fichier ../core/custom/config/seiger/settings/sArticles.php n’est pas accessible en écriture.',
+    'invalid_section_for_type' => 'La section sélectionnée n’est pas autorisée pour ce type de publication.',
 ]);
