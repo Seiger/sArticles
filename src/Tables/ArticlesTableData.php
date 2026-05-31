@@ -228,7 +228,7 @@ class ArticlesTableData
             'type' => $type,
             'published' => true,
             'published_at' => now()->format('Y-m-d\TH:i'),
-            'parent' => (int) evo()->getConfig('site_start', 1),
+            'parent' => $this->defaultParentId($type),
             'author_id' => (int) sArticlesAuthor::query()->orderBy('base_name')->value('autid'),
             'position' => 0,
             'cover' => '',
@@ -592,7 +592,10 @@ class ArticlesTableData
                 ->map(fn ($type) => ['value' => $type, 'label' => $this->typeLabel($type)])
                 ->values()
                 ->all(),
-            'parent' => $this->parentOptions((int) data_get($data, 'parent', 0)),
+            'parent' => $this->parentOptions(
+                (int) data_get($data, 'parent', 0),
+                trim((string) data_get($data, 'type', $this->activeType())) ?: $this->activeType()
+            ),
             'author_id' => $this->authorOptions(),
             'categories' => $this->taxonomyOptions(sArticlesCategory::query()->orderBy($this->baseColumn())->get(), 'catid'),
             'main_tag' => collect([['value' => '', 'label' => '-']])
@@ -929,13 +932,14 @@ class ArticlesTableData
         $publishedAt = $this->modalDateTime((string) data_get($data, 'published_at', ''));
         $alias = trim((string) data_get($data, 'alias', ''));
         $votes = data_is_json($article->votes ?? '', true);
+        $parentId = $this->validatedParentId($type, max(0, (int) data_get($data, 'parent', 0)));
 
         if (!$votes) {
             $votes = ['total' => 1, '1' => 0, '2' => 0, '3' => 0, '4' => 0, '5' => 1];
         }
 
         $article->published = data_get($data, 'published') ? 1 : 0;
-        $article->parent = max(0, (int) data_get($data, 'parent', 0));
+        $article->parent = $parentId;
         $article->author_id = max(0, (int) data_get($data, 'author_id', 0));
         $article->position = max(0, (int) data_get($data, 'position', 0));
         $article->cover = trim((string) data_get($data, 'cover', ''));
@@ -1485,9 +1489,9 @@ class ArticlesTableData
      * @return array<int, array<string, mixed>> Option payload consumed by evo-ui controls.
      * @since 2.0.0
      */
-    protected function parentOptions(int $currentParentId = 0): array
+    protected function parentOptions(int $currentParentId = 0, ?string $type = null): array
     {
-        $templateIds = $this->sectionTemplateIds();
+        $templateIds = $this->sectionTemplateIds($type);
         $items = collect(count($templateIds) ? [] : [
             ['value' => '0', 'label' => evo()->getConfig('site_name')],
         ]);
@@ -1496,13 +1500,7 @@ class ArticlesTableData
             ->orderBy('pagetitle');
 
         if (count($templateIds)) {
-            $query->where(function ($query) use ($templateIds, $currentParentId) {
-                $query->whereIn('template', $templateIds);
-
-                if ($currentParentId > 0) {
-                    $query->orWhere('id', $currentParentId);
-                }
-            });
+            $query->whereIn('template', $templateIds);
         }
 
         return $items
@@ -1520,12 +1518,14 @@ class ArticlesTableData
      * An empty setting intentionally keeps the legacy behavior and allows every resource, so package
      * upgrades do not suddenly hide existing section choices until the manager narrows the list.
      *
+     * @param ?string $type Article type key. Falls back to the active table type.
      * @return array<int, int> Positive template identifiers.
      * @since 2.0.0
      */
-    protected function sectionTemplateIds(): array
+    protected function sectionTemplateIds(?string $type = null): array
     {
-        $typeTemplateIds = (array) config('seiger.settings.sArticles.types.' . $this->activeType() . '.section_template_ids', []);
+        $type = trim((string) ($type ?? $this->activeType())) ?: $this->activeType();
+        $typeTemplateIds = (array) config('seiger.settings.sArticles.types.' . $type . '.section_template_ids', []);
         $legacyTemplateIds = (array) config('seiger.settings.sArticles.general.section_template_ids', []);
 
         return collect(count($typeTemplateIds) ? $typeTemplateIds : $legacyTemplateIds)
@@ -1534,6 +1534,59 @@ class ArticlesTableData
             ->unique()
             ->values()
             ->all();
+    }
+
+    /**
+     * Resolve the default parent for a new article of the given type.
+     *
+     * When section templates are restricted, the first matching resource becomes the default so the
+     * create modal starts from an allowed section instead of the global site start resource.
+     *
+     * @param string $type Article type key.
+     * @return int Resource identifier to use as modal default.
+     * @since 2.0.0
+     */
+    protected function defaultParentId(string $type): int
+    {
+        $templateIds = $this->sectionTemplateIds($type);
+
+        if (!count($templateIds)) {
+            return (int) evo()->getConfig('site_start', 1);
+        }
+
+        return (int) SiteContent::withTrashed()
+            ->whereIn('template', $templateIds)
+            ->orderBy('pagetitle')
+            ->value('id');
+    }
+
+    /**
+     * Validate that the submitted article section is allowed for the current article type.
+     *
+     * Empty template settings keep legacy behavior. Once templates are configured, the selected
+     * parent must point to a resource using one of those templates.
+     *
+     * @param string $type Article type key.
+     * @param int $parentId Submitted resource identifier.
+     * @return int Validated resource identifier.
+     * @since 2.0.0
+     */
+    protected function validatedParentId(string $type, int $parentId): int
+    {
+        $templateIds = $this->sectionTemplateIds($type);
+
+        if (!count($templateIds)) {
+            return $parentId;
+        }
+
+        if ($parentId > 0 && SiteContent::withTrashed()
+            ->whereKey($parentId)
+            ->whereIn('template', $templateIds)
+            ->exists()) {
+            return $parentId;
+        }
+
+        throw new \InvalidArgumentException(__('sArticles::global.invalid_section_for_type'));
     }
 
     /**

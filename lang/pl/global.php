@@ -229,4 +229,5 @@
     'with_id' => 'z ID',
     'you_sure' => 'Czy na pewno chcesz usunąć rekord',
     'not_writable' => 'Plik ../core/custom/config/seiger/settings/sArticles.php nie jest dostępny do zapisu.',
+    'invalid_section_for_type' => 'Wybrana sekcja nie jest dozwolona dla tego typu publikacji.',
 ]);

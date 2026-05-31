@@ -240,4 +240,5 @@
     'with_id' => 'з ID',
     'you_sure' => 'Ви впевнені, що хочете видалити запис',
     'not_writable' => 'Файл ../core/custom/config/seiger/settings/sArticles.php не доступний для запису.',
+    'invalid_section_for_type' => 'Обрана секція не дозволена для цього типу публікації.',
 ];

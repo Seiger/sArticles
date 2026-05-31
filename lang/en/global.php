@@ -240,4 +240,5 @@
     'with_id' => 'with ID',
     'you_sure' => 'Are you sure you want to delete the entry',
     'not_writable' => 'The file ../core/custom/config/seiger/settings/sArticles.php is not writable.',
+    'invalid_section_for_type' => 'Selected section is not allowed for this publication type.',
 ];

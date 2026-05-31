@@ -304,6 +304,10 @@ s_articles_group('provider-hooks', function (): void {
             'public function saveModal',
             'public function filters',
             'protected function sectionTemplateIds',
+            'protected function defaultParentId',
+            'protected function validatedParentId',
+            '$this->sectionTemplateIds($type)',
+            '$this->validatedParentId($type',
             "whereIn('template', \$templateIds)",
             "count(\$templateIds) ? []",
             'categories()->sync',
@@ -333,6 +337,7 @@ s_articles_group('provider-hooks', function (): void {
         foreach ($expected as $locale => $suffix) {
             $translations = require s_articles_path("lang/{$locale}/global.php");
             s_articles_assert(($translations['duplicate_suffix'] ?? null) === $suffix, "Duplicate suffix must be localized for {$locale}.");
+            s_articles_assert(isset($translations['invalid_section_for_type']), "Invalid section message must be localized for {$locale}.");
         }
     });
 });

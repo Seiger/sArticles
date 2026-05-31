@@ -229,4 +229,5 @@
     'with_id' => 'mit ID',
     'you_sure' => 'Sind Sie sicher, dass Sie den Datensatz löschen möchten',
     'not_writable' => 'Die Datei ../core/custom/config/seiger/settings/sArticles.php ist nicht beschreibbar.',
+    'invalid_section_for_type' => 'Der ausgewählte Bereich ist für diesen Veröffentlichungstyp nicht erlaubt.',
 ]);
