@@ -186,6 +186,8 @@
     'settings_long_title' => 'Erweiterter Titel',
     'settings_manager_section' => 'Manager-Panel',
     'settings_resource_name' => 'Publikationstyp',
+    'settings_section_templates_help' => 'Beschränkt die Bereichsauswahl in Publikationsformularen auf Ressourcen mit den ausgewählten Evolution-Templates. Leer lassen, um alle Ressourcen zu erlauben.',
+    'settings_section_templates' => 'Bereichs-Templates',
     'settings_show_cover_title_help' => 'Zeigt das Feld für die Hauptbild-Beschriftung im Publikationsformular.',
     'settings_show_description_help' => 'Zeigt das Beschreibungsfeld im Publikationsformular.',
     'settings_show_introtext_help' => 'Zeigt das Kurzbeschreibungsfeld im Publikationsformular.',

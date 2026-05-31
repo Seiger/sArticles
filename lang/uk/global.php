@@ -195,6 +195,8 @@
     'settings_long_title' => 'Розширений заголовок',
     'settings_manager_section' => 'Панель менеджера',
     'settings_resource_name' => 'Тип публікації',
+    'settings_section_templates_help' => 'Обмежує список розділів у формі публікації ресурсами, які використовують вибрані шаблони Evolution. Залиште порожнім, щоб дозволити всі ресурси.',
+    'settings_section_templates' => 'Шаблони розділів',
     'settings_show_cover_title_help' => 'Відображає поле підпису до головного зображення у формі публікації.',
     'settings_show_description_help' => 'Відображає поле опису у формі публікації.',
     'settings_show_introtext_help' => 'Відображає поле короткого опису у формі публікації.',

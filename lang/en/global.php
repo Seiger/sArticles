@@ -195,6 +195,8 @@
     'settings_long_title' => 'Long title',
     'settings_manager_section' => 'Manager panel',
     'settings_resource_name' => 'Publication type',
+    'settings_section_templates_help' => 'Limits the Section selector in publication forms to resources that use the selected Evolution templates. Leave empty to allow all resources.',
+    'settings_section_templates' => 'Section templates',
     'settings_show_cover_title_help' => 'Shows the cover image caption field in the publication form.',
     'settings_show_description_help' => 'Shows the description field in the publication form.',
     'settings_show_introtext_help' => 'Shows the summary field in the publication form.',
