@@ -340,6 +340,27 @@ s_articles_group('provider-hooks', function (): void {
             s_articles_assert(isset($translations['invalid_section_for_type']), "Invalid section message must be localized for {$locale}.");
         }
     });
+
+    s_articles_test('article views use session and cookie markers instead of raw reload counts', function (): void {
+        $component = s_articles_read('src/sArticles.php');
+
+        foreach ([
+            'function trackView(sArticle $article): void',
+            'function hasTrackedArticleView(int $articleId): bool',
+            'function rememberArticleView(int $articleId): void',
+            'function articleViewSessionKey(): string',
+            'session()->get($sessionKey',
+            'session()->put($sessionKey',
+            '$_SESSION[$sessionKey]',
+            'setcookie(',
+            'hash_equals(',
+            's_articles_view_',
+        ] as $marker) {
+            s_articles_assert_contains($marker, $component, 'Missing article view tracking marker: ' . $marker);
+        }
+
+        s_articles_assert(!str_contains($component, "in_array(\$article->id, \$_SESSION['s_articles_article_views']"), 'Article views must not rely only on the legacy PHP session marker.');
+    });
 });
 
 s_articles_group('builder', function (): void {

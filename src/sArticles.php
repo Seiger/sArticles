@@ -360,12 +360,129 @@ class sArticles
      */
     public function trackView(sArticle $article): void
     {
-        if (sArticles::config('general.views_on', 1) == 1) {
-            if (!in_array($article->id, $_SESSION['s_articles_article_views'] ?? [])) {
-                $article->increment('views');
-                $_SESSION['s_articles_article_views'][] = $article->id;
-            }
+        $articleId = (int) ($article->id ?? 0);
+        if ($articleId < 1 || sArticles::config('general.views_on', 1) != 1) {
+            return;
         }
+
+        if ($this->hasTrackedArticleView($articleId)) {
+            return;
+        }
+
+        $article->increment('views');
+        $this->rememberArticleView($articleId);
+    }
+
+    /**
+     * Check whether this visitor has already viewed an article.
+     *
+     * Laravel session is preferred, while a per-article cookie keeps the counter stable for
+     * public visitors when the frontend request does not keep a PHP session alive.
+     *
+     * @param int $articleId Article ID being checked.
+     * @return bool True when the view was already tracked for this visitor.
+     */
+    protected function hasTrackedArticleView(int $articleId): bool
+    {
+        $sessionKey = $this->articleViewSessionKey();
+        try {
+            if (function_exists('session')) {
+                $views = session()->get($sessionKey, []);
+                if (in_array($articleId, array_map('intval', (array) $views), true)) {
+                    return true;
+                }
+            }
+        } catch (\Throwable) {
+            // Public requests may run without a Laravel session store.
+        }
+
+        $legacyViews = array_map('intval', (array) ($_SESSION[$sessionKey] ?? []));
+        if (in_array($articleId, $legacyViews, true)) {
+            return true;
+        }
+
+        return hash_equals(
+            $this->articleViewCookieValue($articleId),
+            (string) ($_COOKIE[$this->articleViewCookieName($articleId)] ?? '')
+        );
+    }
+
+    /**
+     * Remember that this visitor has already viewed an article.
+     *
+     * @param int $articleId Article ID being remembered.
+     * @return void No value is returned.
+     */
+    protected function rememberArticleView(int $articleId): void
+    {
+        $sessionKey = $this->articleViewSessionKey();
+        try {
+            if (function_exists('session')) {
+                $views = array_map('intval', (array) session()->get($sessionKey, []));
+                if (!in_array($articleId, $views, true)) {
+                    $views[] = $articleId;
+                    session()->put($sessionKey, array_values(array_unique($views)));
+                }
+            }
+        } catch (\Throwable) {
+            // Cookie fallback below still prevents repeated frontend counts.
+        }
+
+        $_SESSION[$sessionKey] = array_values(array_unique(array_merge(
+            array_map('intval', (array) ($_SESSION[$sessionKey] ?? [])),
+            [$articleId]
+        )));
+
+        $cookieName = $this->articleViewCookieName($articleId);
+        $cookieValue = $this->articleViewCookieValue($articleId);
+        $_COOKIE[$cookieName] = $cookieValue;
+
+        if (!headers_sent()) {
+            setcookie(
+                $cookieName,
+                $cookieValue,
+                [
+                    'expires' => time() + 60 * 60 * 24 * 365,
+                    'path' => '/',
+                    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]
+            );
+        }
+    }
+
+    /**
+     * Return the session key used for article view markers.
+     *
+     * @return string Session key.
+     */
+    protected function articleViewSessionKey(): string
+    {
+        return 's_articles_article_views';
+    }
+
+    /**
+     * Return the per-article view cookie name.
+     *
+     * @param int $articleId Article ID.
+     * @return string Cookie name.
+     */
+    protected function articleViewCookieName(int $articleId): string
+    {
+        return 's_articles_view_' . $articleId;
+    }
+
+    /**
+     * Return a stable cookie marker for an article view.
+     *
+     * @param int $articleId Article ID.
+     * @return string Cookie value.
+     */
+    protected function articleViewCookieValue(int $articleId): string
+    {
+        $siteKey = (string) (evo()->getConfig('site_key', 'default') ?: 'default');
+        return hash('sha256', $siteKey . '|s_articles_view|' . $articleId);
     }
 
     /**
