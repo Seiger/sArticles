@@ -205,6 +205,10 @@ $article = sArticles::getArticleByAlias('my-alias');
 sArticles::trackView($article);
 ```
 
+Frontend list and URL flows use `sArticle::active()`. A record is active only when `published = 1`
+and `published_at` is empty or not later than the current site time. Manager flows can still load
+future-dated published records for editing.
+
 Important methods:
 
 - `all($paginate = 30)`

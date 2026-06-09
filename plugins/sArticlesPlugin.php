@@ -12,7 +12,7 @@ use Seiger\sArticles\Models\sArticle;
 Event::listen('evolution.OnPageNotFound', function($params) {
     $goTo = false;
     $article = sArticles::resolveArticleByUri(request()->segments());
-    if ($article && (($article->published ?? 0) == 1 || evo()->getLoginUserID('mgr'))) {
+    if ($article && (evo()->getLoginUserID('mgr') || sArticle::where('s_articles.id', (int) $article->id)->active()->exists())) {
         evo()->setPlaceholder('article', (int) $article->id);
         $goTo = true;
     }
@@ -104,7 +104,7 @@ Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
     }
 
     $article = sArticles::resolveArticleByUri(request()->segments());
-    if ($article && ($article->id ?? 0)) {
+    if ($article && ($article->id ?? 0) && (evo()->getLoginUserID('mgr') || sArticle::where('s_articles.id', (int) $article->id)->active()->exists())) {
         $article->constructor = data_is_json($article->constructor ?? '', true);
         $article->tmplvars = data_is_json($article->tmplvars ?? '', true);
         if ($article->tmplvars && count($article->tmplvars)) {

@@ -50,6 +50,17 @@ The main tab contains:
 
 The content tab contains the content builder. If sLang is enabled, the modal shows language-specific main/content tabs.
 
+## Publication Date
+
+Published publications with a future publication date stay hidden on the frontend until that date is reached.
+
+The manager may still show and edit these records, but frontend lists, article URL resolution, and the article alias cache use the same active-publication rule:
+
+- publication status is enabled;
+- publication date is empty or is not later than the current site time.
+
+If a publication is saved as published without a date, sArticles stores the current time as the publication date. Drafts may keep the publication date empty.
+
 ## Content Builder
 
 The builder stores structured content blocks and renders them through published builder templates.

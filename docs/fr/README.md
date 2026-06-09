@@ -28,6 +28,7 @@ La nouvelle interface manager est construite avec **EvoUI** et **Livewire**. Les
 - Publications avec types configurables.
 - Vue table et vue liste.
 - Recherche, filtres, tri, pagination et etat en session.
+- Les dates de publication futures gardent les enregistrements publies caches sur le frontend.
 - Grande modale d'edition d'article.
 - Content Builder: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion, File.
 - Gestion des auteurs, tags, textes de tag, thematiques, caracteristiques, commentaires, sondages et TV.

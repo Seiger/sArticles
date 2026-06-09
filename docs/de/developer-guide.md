@@ -89,6 +89,8 @@ $articles = sArticles::all(10);
 $article = sArticles::getArticleByAlias('alias');
 ```
 
+Frontend-Listen und URL-Auflosung verwenden `sArticle::active()`. Ein Datensatz ist nur aktiv, wenn `published = 1` ist und `published_at` leer ist oder nicht nach der aktuellen Site-Zeit liegt. Manager-Flows konnen zukunftig datierte veroffentlichte Datensatze weiterhin zum Bearbeiten laden.
+
 Methoden: `all`, `comments`, `getArticle`, `getArticleByAlias`, `resolveArticleByUri`, `trackView`, `showPoll`, `ratingVotes`, `setComment`, `publishArticle`, `config`.
 
 ## Regeln

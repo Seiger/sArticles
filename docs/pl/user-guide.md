@@ -16,6 +16,17 @@ Publikacja otwiera sie w duzym modalu. Glowna zakladka zawiera tytul, dlugi tytu
 
 Zakladka tresci zawiera builder. Gdy sLang jest aktywny, zakladki sa tworzone per jezyk.
 
+## Data publikacji
+
+Opublikowane publikacje z przyszla data publikacji pozostaja ukryte na frontendzie do czasu osiagniecia tej daty.
+
+Manager nadal moze wyswietlac i edytowac takie rekordy, ale listy frontendowe, rozpoznawanie URL i cache aliasow uzywaja tej samej reguly aktywnej publikacji:
+
+- status publikacji jest wlaczony;
+- data publikacji jest pusta albo nie pozniejsza niz aktualny czas strony.
+
+Jesli publikacja zostanie zapisana jako opublikowana bez daty, sArticles zapisuje aktualny czas jako date publikacji. Szkice moga pozostawic date pusta.
+
 ## Builder
 
 Dostepne bloki: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion i File.

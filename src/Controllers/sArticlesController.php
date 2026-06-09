@@ -221,7 +221,7 @@ class sArticlesController
     public function setArticlesListing(): void
     {
         $articlesListing = [];
-        $articles = sArticle::select('id', 'alias', 'parent')->wherePublished(1)->get();
+        $articles = sArticle::select('id', 'alias', 'parent')->active()->get();
         if ($articles) {
             foreach ($articles as $article) {
                 $link = parse_url((string) $article->link, PHP_URL_PATH) ?: (string) $article->link;

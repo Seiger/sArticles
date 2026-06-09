@@ -17,6 +17,7 @@ The current manager interface is rebuilt on top of **EvoUI** and **Livewire**. I
 
 - Publications with multiple configurable resource types.
 - EvoUI tables with table/list views, filters, search, sorting, pagination, selection, bulk-style actions, and session state.
+- Future publication dates keep published records hidden on the frontend until their time.
 - Large modal article editor with main fields, relations, SEO fields, multilingual tabs, and a content builder.
 - Content builder blocks: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion, and File.
 - Authors, tags, tag texts, topics, features, comments, polls, and TV parameter management.
@@ -124,8 +125,7 @@ php artisan sarticles:rerender --articles=123-10000 --chunk=200
 Localized documentation lives in `docs/`:
 
 - [English](docs/en/README.md)
-- [Ukrainian](docs/ua/README.md)
-- [Ukrainian `uk` locale](docs/uk/README.md)
+- [Ukrainian](docs/uk/README.md)
 - [Russian](docs/ru/README.md)
 - [German](docs/de/README.md)
 - [French](docs/fr/README.md)
@@ -142,6 +142,9 @@ Each language contains a user guide and a developer guide.
     <a href="{{ $article->link }}">{{ $article->pagetitle }}</a>
 @endforeach
 ```
+
+Frontend helpers use the active-publication rule: `published = 1` and `published_at` is empty or
+not later than the current site time.
 
 Useful facade methods:
 

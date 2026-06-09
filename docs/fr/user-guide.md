@@ -16,6 +16,17 @@ La publication s'edite dans une grande modale. L'onglet principal contient titre
 
 L'onglet contenu contient le builder. Si sLang est actif, les onglets sont crees par langue.
 
+## Date de publication
+
+Les publications publiees avec une date de publication future restent cachees sur le frontend jusqu'a cette date.
+
+Le manager peut toujours afficher et modifier ces enregistrements, mais les listes frontend, la resolution d'URL et le cache des alias utilisent la meme regle de publication active:
+
+- le statut de publication est active;
+- la date de publication est vide ou n'est pas posterieure a l'heure actuelle du site.
+
+Si une publication est enregistree comme publiee sans date, sArticles enregistre l'heure actuelle comme date de publication. Les brouillons peuvent garder une date vide.
+
 ## Builder
 
 Blocs disponibles: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion et File.

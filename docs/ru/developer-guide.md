@@ -89,6 +89,8 @@ $articles = sArticles::all(10);
 $article = sArticles::getArticleByAlias('alias');
 ```
 
+Фронтенд-списки и разрешение URL используют `sArticle::active()`. Запись считается активной только если `published = 1`, а `published_at` пустой или не позже текущего времени сайта. Менеджер по-прежнему может загружать опубликованные записи с будущей датой для редактирования.
+
 Методы: `all`, `comments`, `getArticle`, `getArticleByAlias`, `resolveArticleByUri`, `trackView`, `showPoll`, `ratingVotes`, `setComment`, `publishArticle`, `config`.
 
 ## Правила

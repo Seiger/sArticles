@@ -169,9 +169,10 @@ switch ($data['get']) {
         break;
     case "articleSave":
         $requestId = (int) request()->article;
+        $published = (int) request()->published;
         $publishedAt = request()->published_at;
         if (empty($publishedAt) || $publishedAt == '0000-00-00 00:00:00') {
-            $publishedAt = evo()->now()->toDateTimeString();
+            $publishedAt = $published ? evo()->now()->toDateTimeString() : null;
         }
         $article = sArticle::where('s_articles.id', $requestId)->firstOrNew();
         $alias = request()->alias;
@@ -200,7 +201,7 @@ switch ($data['get']) {
             $votes['4'] = 0;
             $votes['5'] = 1;
         }
-        $article->published = (int) request()->published;
+        $article->published = $published;
         $article->parent = (int) request()->parent;
         $article->author_id = (int) request()->author_id;
         $article->alias = $sArticlesController->validateAlias($alias, request()->article);

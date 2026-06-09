@@ -28,6 +28,7 @@ The current admin interface is built with **EvoUI** and **Livewire**. The module
 - Publication list with table and list modes.
 - Search, sorting, filters, date range filters, availability filters, and per-page pagination.
 - Configurable publication types.
+- Future publication dates keep published records hidden on the frontend until their time.
 - Article editor modal with main fields, relations, multilingual content, SEO fields, and content builder.
 - Builder blocks: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion, File.
 - Author, tag, tag text, topic, feature, comment, poll, and TV parameter management.

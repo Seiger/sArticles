@@ -88,6 +88,8 @@ $articles = sArticles::all(10);
 $article = sArticles::getArticleByAlias('alias');
 ```
 
+Listy frontendowe i rozpoznawanie URL uzywaja `sArticle::active()`. Rekord jest aktywny tylko wtedy, gdy `published = 1`, a `published_at` jest puste albo nie pozniejsze niz aktualny czas strony. Flow managera nadal moze ladowac opublikowane rekordy z przyszla data do edycji.
+
 Metody: `all`, `comments`, `getArticle`, `getArticleByAlias`, `resolveArticleByUri`, `trackView`, `showPoll`, `ratingVotes`, `setComment`, `publishArticle`, `config`.
 
 ## Zasady

@@ -938,13 +938,14 @@ class ArticlesTableData
             $votes = ['total' => 1, '1' => 0, '2' => 0, '3' => 0, '4' => 0, '5' => 1];
         }
 
-        $article->published = data_get($data, 'published') ? 1 : 0;
+        $published = data_get($data, 'published') ? 1 : 0;
+        $article->published = $published;
         $article->parent = $parentId;
         $article->author_id = max(0, (int) data_get($data, 'author_id', 0));
         $article->position = max(0, (int) data_get($data, 'position', 0));
         $article->cover = trim((string) data_get($data, 'cover', ''));
         $article->type = $type;
-        $article->published_at = $publishedAt ?: now()->toDateTimeString();
+        $article->published_at = $publishedAt ?: ($published ? now()->toDateTimeString() : null);
         $article->relevants = json_encode($this->integerIds((array) data_get($data, 'relevants', [])), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $article->votes = json_encode($votes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $article->alias = $controller->validateAlias($alias !== '' ? $alias : ($title !== '' ? $title : 'article'), (int) ($article->id ?? 0));

@@ -193,7 +193,13 @@ class sArticle extends Model
      */
     public function scopeActive($builder)
     {
-        return $builder->where('s_articles.published', '1');
+        return $builder
+            ->where('s_articles.published', '1')
+            ->where(function (Builder $builder) {
+                $builder
+                    ->whereNull('s_articles.published_at')
+                    ->orWhere('s_articles.published_at', '<=', evo()->now()->toDateTimeString());
+            });
     }
 
     /**

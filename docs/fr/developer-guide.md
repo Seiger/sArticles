@@ -90,6 +90,8 @@ $articles = sArticles::all(10);
 $article = sArticles::getArticleByAlias('alias');
 ```
 
+Les listes frontend et la resolution d'URL utilisent `sArticle::active()`. Un enregistrement est actif uniquement si `published = 1` et si `published_at` est vide ou n'est pas posterieur a l'heure actuelle du site. Les flux manager peuvent toujours charger les enregistrements publies dates dans le futur pour les modifier.
+
 Methodes: `all`, `comments`, `getArticle`, `getArticleByAlias`, `resolveArticleByUri`, `trackView`, `showPoll`, `ratingVotes`, `setComment`, `publishArticle`, `config`.
 
 ## Regles

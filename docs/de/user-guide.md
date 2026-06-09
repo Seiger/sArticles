@@ -16,6 +16,17 @@ Die Bearbeitung erfolgt in einem groBen Modal. Der Haupttab enthalt Titel, Langt
 
 Der Content-Tab enthalt den Builder. Wenn sLang aktiv ist, werden Tabs pro Sprache angezeigt.
 
+## Veroffentlichungsdatum
+
+Veroffentlichte Publikationen mit einem zukunftigen Veroffentlichungsdatum bleiben im Frontend verborgen, bis dieses Datum erreicht ist.
+
+Im Manager konnen diese Datensatze weiterhin angezeigt und bearbeitet werden. Frontend-Listen, URL-Auflosung und der Alias-Cache verwenden jedoch dieselbe Aktiv-Regel:
+
+- der Publikationsstatus ist aktiviert;
+- das Veroffentlichungsdatum ist leer oder liegt nicht nach der aktuellen Site-Zeit.
+
+Wenn eine Publikation als veroffentlicht ohne Datum gespeichert wird, setzt sArticles die aktuelle Zeit als Veroffentlichungsdatum. Entwurfe konnen ein leeres Datum behalten.
+
 ## Builder
 
 Verfugbare Blocke: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion und File.

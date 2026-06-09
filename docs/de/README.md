@@ -28,6 +28,7 @@ Die neue Manager-Oberflache basiert auf **EvoUI** und **Livewire**. Tabs, Filter
 - Publikationen mit konfigurierbaren Typen.
 - Tabellen- und Listenansicht.
 - Suche, Filter, Sortierung, Pagination und Session-State.
+- Zukunftige Veroffentlichungsdaten halten veroffentlichte Datensatze im Frontend verborgen.
 - GroBes Bearbeitungsmodal fur Artikel.
 - Content Builder: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion, File.
 - Verwaltung von Autoren, Tags, Tag-Texten, Themen, Merkmalen, Kommentaren, Umfragen und TV-Parametern.

@@ -28,6 +28,7 @@ Nowy interfejs managera jest zbudowany na **EvoUI** i **Livewire**. Zakladki, fi
 - Publikacje z konfigurowalnymi typami.
 - Widok tabeli i listy.
 - Wyszukiwanie, filtry, sortowanie, paginacja i stan sesji.
+- Przyszle daty publikacji ukrywaja opublikowane rekordy na frontendzie.
 - Duzy modal edycji publikacji.
 - Content Builder: RichText, SingleImg, Image and Text, YouTube, Quote, Note, ArticlePreview, Poll, Slider, Accordion, File.
 - Zarzadzanie autorami, tagami, tekstami tagow, tematami, cechami, komentarzami, ankietami i TV.
