@@ -415,6 +415,43 @@ s_articles_group('builder', function (): void {
             s_articles_assert(false, 'Legacy asset render file should not remain: ' . $legacyRender);
         }
     });
+
+    s_articles_test('FAQ builder keeps visible answers and FAQPage schema on one data source', function (): void {
+        $config = s_articles_config('builder/faq/config.php');
+        $table = s_articles_read('src/Tables/ArticlesTableData.php');
+        $template = s_articles_read('builder/faq/template.blade.php');
+        $render = s_articles_read('views/render/faq.blade.php');
+
+        s_articles_assert(($config['id'] ?? null) === 'faq', 'FAQ builder config must use the faq storage key.');
+        s_articles_assert(($config['active'] ?? 0) === 1, 'FAQ builder must be available in the article editor.');
+
+        foreach ([
+            "'faq' => [",
+            "'name' => 'items'",
+            "'name' => 'question'",
+            "'name' => 'answer'",
+        ] as $marker) {
+            s_articles_assert_contains($marker, $table, 'Missing FAQ builder definition marker: ' . $marker);
+        }
+
+        foreach ([
+            '[faq][items]',
+            '[question]',
+            '[answer]',
+        ] as $marker) {
+            s_articles_assert_contains($marker, $template, 'Missing FAQ legacy editor marker: ' . $marker);
+        }
+
+        foreach ([
+            "'@type' => 'FAQPage'",
+            "'@type' => 'Question'",
+            "'acceptedAnswer'",
+            "JSON_HEX_TAG",
+            "filter(fn (array \$item) => \$item['question'] !== '' && \$item['plainAnswer'] !== '')",
+        ] as $marker) {
+            s_articles_assert_contains($marker, $render, 'Missing FAQ render/schema marker: ' . $marker);
+        }
+    });
 });
 
 if ($failed > 0) {
