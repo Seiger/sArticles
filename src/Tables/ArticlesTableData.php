@@ -2079,6 +2079,27 @@ class ArticlesTableData
                     ],
                 ],
             ],
+            'faq' => [
+                'label' => 'FAQ',
+                'icon' => 'help-circle',
+                'defaults' => ['items' => [['question' => '', 'answer' => '']]],
+                'fields' => [
+                    [
+                        'name' => 'items',
+                        'type' => 'items',
+                        'label' => 'FAQ',
+                        'item_label' => 'Question',
+                        'add_label' => 'Add question',
+                        'span' => 'full',
+                        'rules' => ['array'],
+                        'defaults' => ['question' => '', 'answer' => ''],
+                        'fields' => [
+                            ['name' => 'question', 'type' => 'text', 'label' => 'Question', 'span' => 'full', 'rules' => ['nullable', 'string', 'max:255']],
+                            ['name' => 'answer', 'type' => 'editor', 'label' => 'Answer', 'span' => 'full', 'rows' => 5, 'height' => '220px', 'rules' => ['nullable', 'string']],
+                        ],
+                    ],
+                ],
+            ],
             default => [],
         };
 
