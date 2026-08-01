@@ -5,6 +5,7 @@ use EvolutionCMS\Models\SiteContent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -146,9 +147,12 @@ class sArticlesController
         }
 
         match ($table) {
-            'features' => $this->ensureLanguageColumns('s_articles_features', $languages, fn (string $language) => [
-                $language => 'string',
-            ]),
+            'features' => $this->ensureLanguageColumns(
+                's_articles_features',
+                $languages,
+                fn (string $language) => [$language => 'string'],
+                fn (string $language, string $column) => 'base'
+            ),
             'tags' => $this->ensureLanguageColumns('s_articles_tags', $languages, fn (string $language) => [
                 $language => 'string',
                 $language . '_content' => 'mediumText',
@@ -174,10 +178,16 @@ class sArticlesController
      * @param string $tableName Table Name value.
      * @param array<string, mixed> $languages Language codes included in the current multilingual flow.
      * @param callable $columnsForLanguage Columns For Language value.
+     * @param callable|null $sourceColumnForLanguage Source column resolver for new language columns.
      * @return void No value is returned.
      * @since 2.0.0
      */
-    protected function ensureLanguageColumns(string $tableName, array $languages, callable $columnsForLanguage): void
+    protected function ensureLanguageColumns(
+        string $tableName,
+        array $languages,
+        callable $columnsForLanguage,
+        ?callable $sourceColumnForLanguage = null
+    ): void
     {
         if (!Schema::hasTable($tableName)) {
             return;
@@ -188,7 +198,10 @@ class sArticlesController
         foreach ($languages as $language) {
             foreach ((array) $columnsForLanguage($language) as $column => $type) {
                 if (!Schema::hasColumn($tableName, $column)) {
-                    $columns[$column] = $type;
+                    $columns[$column] = [
+                        'type' => $type,
+                        'source' => $sourceColumnForLanguage ? $sourceColumnForLanguage($language, $column) : null,
+                    ];
                 }
             }
         }
@@ -198,7 +211,8 @@ class sArticlesController
         }
 
         Schema::table($tableName, function (Blueprint $table) use ($columns) {
-            foreach ($columns as $column => $type) {
+            foreach ($columns as $column => $definition) {
+                $type = $definition['type'];
                 if ($type === 'mediumText') {
                     $table->mediumText($column)->nullable();
                     continue;
@@ -207,6 +221,19 @@ class sArticlesController
                 $table->string($column, 255)->nullable();
             }
         });
+
+        foreach ($columns as $column => $definition) {
+            $source = $definition['source'];
+
+            if (!is_string($source) || !Schema::hasColumn($tableName, $source)) {
+                continue;
+            }
+
+            $grammar = DB::connection()->getQueryGrammar();
+            DB::table($tableName)->update([
+                $column => DB::raw($grammar->wrap($source)),
+            ]);
+        }
     }
 
     /**
