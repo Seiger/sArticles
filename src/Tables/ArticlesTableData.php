@@ -30,6 +30,7 @@ class ArticlesTableData
 {
     protected string $moduleUrl;
     protected string $type;
+    protected sArticlesController $controller;
 
     /**
      * Initialize the article table data provider.
@@ -49,6 +50,11 @@ class ArticlesTableData
     ) {
         $this->moduleUrl = (string) ($context['moduleUrl'] ?? '');
         $this->type = (string) ($context['type'] ?? 'article') ?: 'article';
+        $this->controller = new sArticlesController();
+
+        foreach (['authors', 'categories', 'features', 'tags'] as $table) {
+            $this->controller->setModifyTables($table);
+        }
     }
 
     /**
