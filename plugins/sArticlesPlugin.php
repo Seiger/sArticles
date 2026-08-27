@@ -99,7 +99,7 @@ Event::listen('evolution.OnBeforeLoadDocumentObject', function($params) {
  * Legacy article resource mode.
  */
 Event::listen('evolution.OnAfterLoadDocumentObject', function($params) {
-    if (!sArticles::isLegacyMode()) {
+    if (!evo()->has('request') || !sArticles::isLegacyMode()) {
         return;
     }
 

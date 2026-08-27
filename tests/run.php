@@ -288,6 +288,16 @@ s_articles_group('provider-hooks', function (): void {
         s_articles_assert(!str_contains($controller, "str_replace(EVO_SITE_URL, '', \$article->link)"), 'Article URL cache must not depend on the current host constant.');
     });
 
+    s_articles_test('legacy document listener skips request-less API bootstraps', function (): void {
+        $plugin = s_articles_read('plugins/sArticlesPlugin.php');
+
+        s_articles_assert_contains(
+            "if (!evo()->has('request') || !sArticles::isLegacyMode())",
+            $plugin,
+            'Legacy article hydration must not resolve the request service before routes bind it.'
+        );
+    });
+
     s_articles_test('ArticlesTableData owns module behavior behind evo-ui hooks', function (): void {
         $provider = s_articles_read('src/Tables/ArticlesTableData.php');
 
