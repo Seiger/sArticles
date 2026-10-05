@@ -98,8 +98,11 @@ class sArticles
     /**
      * Resolve article by request URI segments.
      *
-     * @param array $segments
-     * @return sArticle|null
+     * Fall back to an alias lookup when the listing cache misses. Compare URL paths,
+     * not absolute links, while retaining the parent path and current language check.
+     *
+     * @param array<string> $segments Request URI segments.
+     * @return sArticle|null Article matching the full path, or null when not found.
      */
     public function resolveArticleByUri(array $segments): ?sArticle
     {
@@ -128,9 +131,10 @@ class sArticles
             return null;
         }
 
+        $articlePath = trim((string)parse_url((string)$article->link, PHP_URL_PATH), '/');
         if (
-            trim($article->link, '/') === trim($alias, '/') ||
-            trim($article->link, '/') === trim('/' . evo()->getConfig('lang', 'uk') . '/' . $alias, '/')
+            $articlePath === trim($alias, '/') ||
+            $articlePath === trim('/' . evo()->getConfig('lang', 'uk') . '/' . $alias, '/')
         ) {
             return $article;
         }
