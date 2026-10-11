@@ -324,13 +324,15 @@ class sArticlesController
     }
 
     /**
-     * Module url
+     * Builds the base URL for manager tabs, forms and redirects with the current
+     * session token required by Evolution's module execution CSRF checks.
      *
      * @return string
      */
     protected function moduleUrl(): string
     {
-        return 'index.php?a=112&id=' . md5(__('sArticles::global.articles'));
+        return 'index.php?a=112&id=' . md5(__('sArticles::global.articles'))
+            . '&_token=' . rawurlencode(csrf_token());
     }
 
     /**
