@@ -19,12 +19,29 @@
 | 1.x | `1.x` | Stable / maintenance | Current manager UI, bug fixes only |
 | 2.x | `2.x` | In development | New evo-ui based interface |
 
+### Incorrect v1.2.2 tag
+
+The `v1.2.2` tag points to code from the `2.x` branch, including the EvoUI
+interface. It is not a maintenance release of the legacy 1.x interface.
+Composer constraints such as `1.*` or `^1.0` can therefore install the new
+interface unless this version is explicitly excluded.
+
+For projects that need the legacy interface, use `^1.0 !=1.2.2`. The last
+correctly tagged legacy release is `v1.2.1`; the planned `v1.2.3` release
+must be tagged from `1.x` and includes the article URI cache-miss fix.
+After changing the requirement in `core/custom/composer.json`, run Composer
+update from `core` to replace an already locked `v1.2.2` installation.
+
+Release tags must follow their source branch: `v1.*` from `1.x`, and `v2.*`
+from `2.x`. The EvoUI release belongs under `v2.0.0`, not `v1.2.2`.
+Do not move the existing `v1.2.2` tag: existing lock files retain its commit.
+
 ## Install by artisan package installer
 
 Run in you /core/ folder:
 
 ```console
-php artisan package:installrequire seiger/sarticles "^1.0"
+php artisan package:installrequire seiger/sarticles "^1.0 !=1.2.2"
 ```
 
 Generate the config file in **core/custom/config/cms/settings** with
