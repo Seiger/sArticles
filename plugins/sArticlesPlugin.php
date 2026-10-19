@@ -20,6 +20,7 @@ Event::listen('evolution.OnPageNotFound', function($params) {
         $goTo = true;
     }
     if ($goTo) {
+        evo()->setConfig('enable_cache', 0);
         evo()->sendForward(sArticles::isLegacyMode() ? evo()->getConfig('sart_blank', 1) : evo()->getConfig('site_start', 1));
         exit();
     }
