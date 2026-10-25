@@ -14,6 +14,7 @@ use Seiger\sArticles\Models\sArticle;
 use Seiger\sArticles\Models\sArticleComment;
 use Seiger\sArticles\Models\sArticlesPoll;
 use Seiger\sArticles\Support\LikeSearch;
+use Seiger\sArticles\Support\LegacyArticleUriCache;
 
 /**
  * sArticles package component.
@@ -254,13 +255,29 @@ class sArticles
     /**
      * Resolve an article from request URI segments.
      *
-     * The method checks cached article aliases and validates the resolved article link before
-     * returning a model.
+     * Resolution results, including misses, are cached by locale, site context and current
+     * listing. Article, translation and resource writes invalidate cached results. Cache misses
+     * retain listing-first precedence and the original localized link validation.
      *
      * @param array<string, mixed> $segments Request URI segments after Evolution routing parsing.
      * @return ?sArticle Resolved article model or null when no article matches the URI.
      */
     public function resolveArticleByUri(array $segments): ?sArticle
+    {
+        $listing = sArticles::documentListing();
+        return LegacyArticleUriCache::remember($segments, $listing,
+            fn () => $this->resolveArticleByUriUncached($segments, $listing));
+    }
+
+    /**
+     * Keep listing-first precedence and exact localized fallback matching on a cache miss.
+     *
+     * @param array<string, mixed> $segments Original request segments, including locale prefix.
+     * @param array<string, mixed> $listing Current listing snapshot used for the cache identity.
+     * @return sArticle|null Original translated model, including existing link/parent accessors.
+     * @since 2.1.0
+     */
+    private function resolveArticleByUriUncached(array $segments, array $listing): ?sArticle
     {
         if (isset($segments[0]) && $segments[0] === evo()->getConfig('lang', 'uk')) {
             unset($segments[0]);
@@ -268,7 +285,7 @@ class sArticles
 
         $segments = array_values($segments);
         $alias = implode('/', $segments);
-        $articleId = sArticles::documentListing()[$alias] ?? 0;
+        $articleId = $listing[$alias] ?? 0;
 
         if ($articleId > 0) {
             $article = sArticles::getArticle((int) $articleId);
