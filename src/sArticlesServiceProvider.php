@@ -8,6 +8,7 @@ use Livewire\Livewire;
 use Seiger\sArticles\Console\RerenderArticlesCommand;
 use Seiger\sArticles\Facades\sArticles as sArticlesFacade;
 use Seiger\sArticles\Support\BuilderRenderer;
+use Seiger\sArticles\Support\LegacyArticleUriCache;
 
 /**
  * sArticlesServiceProvider package component.
@@ -127,10 +128,12 @@ class sArticlesServiceProvider extends ServiceProvider
      * Register package services with Evolution CMS.
      *
      * The provider adds plugins, manager module metadata, singleton bindings, and aliases used
-     * by facade access.
+     * by facade access. URI cache invalidation observes writes in manager, frontend and CLI.
      */
     public function register()
     {
+        LegacyArticleUriCache::listen($this->app['events']);
+
         // Add plugins to Evo
         $this->loadPluginsFrom(dirname(__DIR__) . '/plugins/');
         $this->app->singleton(BuilderRenderer::class);
