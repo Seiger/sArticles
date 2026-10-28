@@ -7,9 +7,14 @@ use Illuminate\Support\Arr;
 use Seiger\sArticles\Models\sArticle;
 
 /**
- * Catch the Article by alias
+ * Catch the Article by alias when an HTTP request is available.
+ * API entrypoints may dispatch this event without binding a request.
  */
 Event::listen('evolution.OnPageNotFound', function($params) {
+    if (!app()->bound('request')) {
+        return;
+    }
+
     $goTo = false;
     $article = sArticles::resolveArticleByUri(request()->segments());
     if ($article && (evo()->getLoginUserID('mgr') || sArticle::where('s_articles.id', (int) $article->id)->active()->exists())) {

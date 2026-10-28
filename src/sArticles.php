@@ -393,14 +393,15 @@ class sArticles
     /**
      * Check whether this visitor has already viewed an article.
      *
-     * Laravel session is preferred, while a per-article cookie keeps the counter stable for
-     * public visitors when the frontend request does not keep a PHP session alive.
+     * Laravel session is preferred; one bounded cookie remembers the latest 256 article IDs
+     * when a frontend session is unavailable. Legacy per-article markers are migrated.
      *
      * @param int $articleId Article ID being checked.
      * @return bool True when the view was already tracked for this visitor.
      */
     protected function hasTrackedArticleView(int $articleId): bool
     {
+        $cookieViews = $this->articleViewCookieIds();
         $sessionKey = $this->articleViewSessionKey();
         try {
             if (function_exists('session')) {
@@ -418,10 +419,7 @@ class sArticles
             return true;
         }
 
-        return hash_equals(
-            $this->articleViewCookieValue($articleId),
-            (string) ($_COOKIE[$this->articleViewCookieName($articleId)] ?? '')
-        );
+        return in_array($articleId, $cookieViews, true);
     }
 
     /**
@@ -450,22 +448,78 @@ class sArticles
             [$articleId]
         )));
 
-        $cookieName = $this->articleViewCookieName($articleId);
-        $cookieValue = $this->articleViewCookieValue($articleId);
-        $_COOKIE[$cookieName] = $cookieValue;
+        $this->writeArticleViewCookie(array_merge($this->articleViewCookieIds(), [$articleId]));
+    }
 
+    /**
+     * Read bounded view markers and retire legacy per-article cookies.
+     *
+     * Old hashed markers retain their site validation during migration. Session markers
+     * remain unbounded; cookie-only visitors retain at most the latest 256 article IDs.
+     *
+     * @return list<int> Article IDs remembered by the cookie fallback.
+     * @since 2.2.0
+     */
+    protected function articleViewCookieIds(): array
+    {
+        $siteKey = (string) (evo()->getConfig('site_key', 'default') ?: 'default');
+        $name = 's_articles_views_' . substr(hash('sha256', $siteKey), 0, 12);
+        $raw = $_COOKIE[$name] ?? '';
+        $ids = is_string($raw) && strlen($raw) <= 3500
+            ? array_values(array_filter(explode(',', $raw), static fn ($id) => ctype_digit($id) && (int) $id > 0 && (string) (int) $id === $id))
+            : [];
+        $migrated = false;
+        foreach ($_COOKIE as $cookie => $value) {
+            if (!preg_match('/^s_articles_view_([1-9][0-9]*)$/D', (string) $cookie, $match)) {
+                continue;
+            }
+            $id = (int) $match[1];
+            if (is_string($value) && hash_equals($this->articleViewCookieValue($id), $value)) {
+                $ids[] = $id;
+            }
+            unset($_COOKIE[$cookie]);
+            if (!headers_sent()) {
+                setcookie($cookie, '', ['expires' => 1, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
+            }
+            $migrated = true;
+        }
+        $ids = array_slice(array_values(array_unique(array_map('intval', $ids))), -256);
+        if ($migrated) {
+            $this->writeArticleViewCookie($ids);
+        }
+        return $ids;
+    }
+
+    /**
+     * Persist one bounded, site-specific fallback cookie instead of one cookie per article.
+     *
+     * Up to 256 IDs are retained, with a 3500-byte encoded-value budget for large IDs. Refreshing
+     * an existing ID moves it to the retained tail without changing session counters.
+     *
+     * @param list<int> $ids Article IDs to remember in visitation order.
+     * @return void
+     * @since 2.2.0
+     */
+    protected function writeArticleViewCookie(array $ids): void
+    {
+        $siteKey = (string) (evo()->getConfig('site_key', 'default') ?: 'default');
+        $name = 's_articles_views_' . substr(hash('sha256', $siteKey), 0, 12);
+        $ids = array_reverse(array_unique(array_reverse(array_filter($ids, static fn ($id) => $id > 0))));
+        $ids = array_slice(array_values($ids), -256);
+        $value = implode(',', $ids);
+        while (strlen(urlencode($value)) > 3500) {
+            array_shift($ids);
+            $value = implode(',', array_values($ids));
+        }
+        $_COOKIE[$name] = $value;
         if (!headers_sent()) {
-            setcookie(
-                $cookieName,
-                $cookieValue,
-                [
-                    'expires' => time() + 60 * 60 * 24 * 365,
-                    'path' => '/',
-                    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-                    'httponly' => true,
-                    'samesite' => 'Lax',
-                ]
-            );
+            setcookie($name, $value, [
+                'expires' => time() + 60 * 60 * 24 * 365,
+                'path' => '/',
+                'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
         }
     }
 

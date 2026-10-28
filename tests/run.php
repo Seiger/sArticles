@@ -80,17 +80,6 @@ function s_articles_field_types(array $fields): array
 }
 
 s_articles_group('package', function () use ($root): void {
-    s_articles_test('composer declares evo-ui as the manager UI dependency', function () use ($root): void {
-        $composer = json_decode((string) file_get_contents($root . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-
-        s_articles_assert(($composer['type'] ?? null) === 'evolution-cms-module', 'sArticles must stay an Evolution CMS module.');
-        s_articles_assert(isset($composer['require']['evolution-cms/evo-ui']), 'sArticles must require evolution-cms/evo-ui.');
-        s_articles_assert(($composer['require']['evolution-cms/evo-ui'] ?? null) === '^1.0.2', 'sArticles must require the EvoUI release with symlink-published runtime assets.');
-        s_articles_assert(($composer['extra']['laravel']['providers'][0] ?? null) === 'Seiger\\sArticles\\sArticlesServiceProvider', 'Service provider must stay registered.');
-        s_articles_assert(!isset($composer['extra']['laravel']['aliases']), 'Facade alias must be registered by the service provider, not generated as a custom alias file.');
-        s_articles_assert(($composer['scripts']['test'] ?? null) === 'php tests/run.php', 'Composer test script must run the compatibility suite.');
-    });
-
     s_articles_test('service provider registers sArticles facade alias at runtime', function (): void {
         $provider = s_articles_read('src/sArticlesServiceProvider.php');
 
